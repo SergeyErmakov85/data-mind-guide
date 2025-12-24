@@ -12,7 +12,16 @@ import {
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 
-const modules = [
+interface Module {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  path: string;
+  color: string;
+  external?: boolean;
+}
+
+const modules: Module[] = [
   {
     icon: GraduationCap,
     title: 'Теория',
@@ -40,6 +49,14 @@ const modules = [
     description: 'Пирсон, Спирмен, линейная регрессия',
     path: '/correlation',
     color: 'bg-warning/10 text-warning',
+  },
+  {
+    icon: BarChart3,
+    title: 'Однофакторный дисперсионный анализ',
+    description: 'ANOVA — сравнение средних значений трёх и более групп',
+    path: 'https://stats-anova-guide.lovable.app',
+    color: 'bg-purple-500/10 text-purple-500',
+    external: true,
   },
   {
     icon: Calculator,
@@ -110,28 +127,47 @@ const Index = () => {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module, index) => (
-            <Link 
-              key={module.path} 
-              to={module.path}
-              className="module-card group"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className={`w-12 h-12 rounded-lg ${module.color} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-                <module.icon className="w-6 h-6" />
-              </div>
-              <h3 className="font-heading text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                {module.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {module.description}
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>Перейти</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </Link>
-          ))}
+          {modules.map((module, index) => {
+            const CardContent = (
+              <>
+                <div className={`w-12 h-12 rounded-lg ${module.color} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
+                  <module.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-heading text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                  {module.title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {module.description}
+                </p>
+                <div className="mt-4 flex items-center gap-2 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span>Перейти</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </>
+            );
+
+            return module.external ? (
+              <a 
+                key={module.path} 
+                href={module.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="module-card group"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {CardContent}
+              </a>
+            ) : (
+              <Link 
+                key={module.path} 
+                to={module.path}
+                className="module-card group"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {CardContent}
+              </Link>
+            );
+          })}
         </div>
       </section>
 
