@@ -78,7 +78,9 @@ const modules: Module[] = [
 
 const Index = () => {
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const [visibleFeatures, setVisibleFeatures] = useState<Set<number>>(new Set());
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
+  const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -95,6 +97,30 @@ const Index = () => {
             });
           },
           { threshold: 0.1, rootMargin: '50px' }
+        );
+        observer.observe(ref);
+        observers.push(observer);
+      }
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    featureRefs.current.forEach((ref, index) => {
+      if (ref) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setVisibleFeatures((prev) => new Set(prev).add(index));
+                observer.disconnect();
+              }
+            });
+          },
+          { threshold: 0.2, rootMargin: '20px' }
         );
         observer.observe(ref);
         observers.push(observer);
@@ -219,7 +245,15 @@ const Index = () => {
       <section className="bg-muted/30 py-16">
         <div className="container">
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
+            <div 
+              ref={(el) => (featureRefs.current[0] = el)}
+              className={`text-center transition-all duration-500 ${
+                visibleFeatures.has(0) 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: '0ms' }}
+            >
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-8 h-8 text-primary" />
               </div>
@@ -228,7 +262,15 @@ const Index = () => {
                 Все концепции объясняются понятным языком с примерами из психологии
               </p>
             </div>
-            <div className="text-center">
+            <div 
+              ref={(el) => (featureRefs.current[1] = el)}
+              className={`text-center transition-all duration-500 ${
+                visibleFeatures.has(1) 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: '100ms' }}
+            >
               <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
                 <BarChart3 className="w-8 h-8 text-success" />
               </div>
@@ -237,7 +279,15 @@ const Index = () => {
                 Визуализации, калькуляторы и моментальная обратная связь
               </p>
             </div>
-            <div className="text-center">
+            <div 
+              ref={(el) => (featureRefs.current[2] = el)}
+              className={`text-center transition-all duration-500 ${
+                visibleFeatures.has(2) 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <div className="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-4">
                 <FlaskConical className="w-8 h-8 text-warning" />
               </div>
