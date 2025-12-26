@@ -7,7 +7,8 @@ import {
   Calculator, 
   GraduationCap,
   FileText,
-  ArrowRight
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -130,8 +131,13 @@ const Index = () => {
           {modules.map((module, index) => {
             const CardContent = (
               <>
-                <div className={`w-12 h-12 rounded-lg ${module.color} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-                  <module.icon className="w-6 h-6" />
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-lg ${module.color} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                    <module.icon className="w-6 h-6" />
+                  </div>
+                  {module.external && (
+                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                  )}
                 </div>
                 <h3 className="font-heading text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
                   {module.title}
@@ -140,8 +146,8 @@ const Index = () => {
                   {module.description}
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>Перейти</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>{module.external ? 'Открыть' : 'Перейти'}</span>
+                  {module.external ? <ExternalLink className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
                 </div>
               </>
             );
