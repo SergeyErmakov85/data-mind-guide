@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { 
   BookOpen, 
   BarChart3, 
@@ -76,6 +77,33 @@ const modules: Module[] = [
 ];
 
 const Index = () => {
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    cardRefs.current.forEach((ref, index) => {
+      if (ref) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setVisibleCards((prev) => new Set(prev).add(index));
+                observer.disconnect();
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '50px' }
+        );
+        observer.observe(ref);
+        observers.push(observer);
+      }
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -154,21 +182,31 @@ const Index = () => {
 
             return module.external ? (
               <a 
-                key={module.path} 
+                key={module.path}
+                ref={(el) => (cardRefs.current[index] = el)}
                 href={module.path}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="module-card group"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`module-card group transition-all duration-500 ${
+                  visibleCards.has(index) 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {CardContent}
               </a>
             ) : (
               <Link 
-                key={module.path} 
+                key={module.path}
+                ref={(el) => (cardRefs.current[index] = el)}
                 to={module.path}
-                className="module-card group"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`module-card group transition-all duration-500 ${
+                  visibleCards.has(index) 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 {CardContent}
               </Link>
