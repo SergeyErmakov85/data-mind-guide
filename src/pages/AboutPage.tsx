@@ -20,7 +20,7 @@ const AboutPage = () => {
           {/* Hero */}
           <div className="text-center mb-12">
             <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
-              О проекте <span className="gradient-text">DataMind</span>
+              О проекте <span className="gradient-text">МатСтат для психологов</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Интерактивная образовательная платформа для изучения статистики 
