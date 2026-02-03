@@ -290,7 +290,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-8">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2024 DataMind — Интерактивная платформа для изучения статистики</p>
+          <p>© 2024 Математическая статистика для психологов — Интерактивная образовательная платформа</p>
         </div>
       </footer>
     </div>

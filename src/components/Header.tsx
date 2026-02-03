@@ -64,7 +64,7 @@ export const Header = () => {
           <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
             <BarChart3 className="w-6 h-6 text-primary-foreground" />
           </div>
-          <span className="font-heading font-bold text-xl hidden sm:inline">DataMind</span>
+          <span className="font-heading font-bold text-xl hidden sm:inline">МатСтат для психологов</span>
         </Link>
 
         {/* Desktop Navigation */}
