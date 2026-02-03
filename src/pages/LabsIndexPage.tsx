@@ -73,7 +73,7 @@ const labs: Lab[] = [
     path: '/labs/regression',
     difficulty: 'advanced',
     concepts: ['Метод наименьших квадратов', 'R²', 'Остатки'],
-    status: 'coming-soon',
+    status: 'available',
   },
 ];
 

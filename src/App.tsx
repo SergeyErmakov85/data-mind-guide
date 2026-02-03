@@ -11,6 +11,7 @@ import CLTLabPage from "./pages/labs/CLTLabPage";
 import SamplingLabPage from "./pages/labs/SamplingLabPage";
 import ConfidenceLabPage from "./pages/labs/ConfidenceLabPage";
 import HypothesisLabPage from "./pages/labs/HypothesisLabPage";
+import RegressionLabPage from "./pages/labs/RegressionLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/labs/sampling" element={<SamplingLabPage />} />
           <Route path="/labs/confidence" element={<ConfidenceLabPage />} />
           <Route path="/labs/hypothesis" element={<HypothesisLabPage />} />
+          <Route path="/labs/regression" element={<RegressionLabPage />} />
           
           {/* Courses (redirect to descriptive for now) */}
           <Route path="/courses/descriptive" element={<DescriptiveStatsPage />} />
