@@ -118,8 +118,8 @@ const Index = () => {
             </div>
             
             <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
-              Статистика через
-              <span className="block gradient-text">эксперименты</span>
+              Математическая статистика
+              <span className="block gradient-text">для психологов</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
