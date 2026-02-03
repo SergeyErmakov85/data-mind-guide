@@ -2,7 +2,7 @@ import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Lightbulb, AlertCircle, Database, Ruler, BarChart3, Target } from 'lucide-react';
-
+import { NormalDistributionVisualizer } from '@/components/NormalDistributionVisualizer';
 const TheoryPage = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -228,6 +228,9 @@ const TheoryPage = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Интерактивная визуализация */}
+              <NormalDistributionVisualizer />
 
               <Card>
                 <CardHeader>
