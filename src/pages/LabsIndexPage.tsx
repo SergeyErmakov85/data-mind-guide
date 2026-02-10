@@ -10,7 +10,9 @@ import {
   FlaskConical, 
   TrendingUp,
   ArrowRight,
-  Play
+  Play,
+  Sigma,
+  ScatterChart
 } from 'lucide-react';
 
 interface Lab {
@@ -73,6 +75,26 @@ const labs: Lab[] = [
     path: '/labs/regression',
     difficulty: 'advanced',
     concepts: ['Метод наименьших квадратов', 'R²', 'Остатки'],
+    status: 'available',
+  },
+  {
+    id: 'correlation',
+    title: 'Корреляция и ковариация',
+    description: 'Связаны ли тревожность и успеваемость? Генерируйте данные с заданной корреляцией, добавляйте выбросы и наблюдайте их влияние на коэффициент Пирсона.',
+    icon: ScatterChart,
+    path: '/labs/correlation',
+    difficulty: 'beginner',
+    concepts: ['Корреляция Пирсона', 'Ковариация', 'Выбросы'],
+    status: 'available',
+  },
+  {
+    id: 'ttest',
+    title: 't-тесты',
+    description: 'Работает ли терапия? Сравните уровень депрессии до и после лечения с помощью одновыборочного, независимого и парного t-тестов.',
+    icon: Sigma,
+    path: '/labs/ttest',
+    difficulty: 'intermediate',
+    concepts: ['t-статистика', 'd Коэна', 'Степени свободы'],
     status: 'available',
   },
 ];

@@ -7,11 +7,14 @@ import Index from "./pages/Index";
 import TheoryPage from "./pages/TheoryPage";
 import AboutPage from "./pages/AboutPage";
 import LabsIndexPage from "./pages/LabsIndexPage";
+import CoursesIndexPage from "./pages/CoursesIndexPage";
 import CLTLabPage from "./pages/labs/CLTLabPage";
 import SamplingLabPage from "./pages/labs/SamplingLabPage";
 import ConfidenceLabPage from "./pages/labs/ConfidenceLabPage";
 import HypothesisLabPage from "./pages/labs/HypothesisLabPage";
 import RegressionLabPage from "./pages/labs/RegressionLabPage";
+import CorrelationLabPage from "./pages/labs/CorrelationLabPage";
+import TTestLabPage from "./pages/labs/TTestLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import NotFound from "./pages/NotFound";
 
@@ -36,8 +39,11 @@ const App = () => (
           <Route path="/labs/confidence" element={<ConfidenceLabPage />} />
           <Route path="/labs/hypothesis" element={<HypothesisLabPage />} />
           <Route path="/labs/regression" element={<RegressionLabPage />} />
+          <Route path="/labs/correlation" element={<CorrelationLabPage />} />
+          <Route path="/labs/ttest" element={<TTestLabPage />} />
           
-          {/* Courses (redirect to descriptive for now) */}
+          {/* Courses */}
+          <Route path="/courses" element={<CoursesIndexPage />} />
           <Route path="/courses/descriptive" element={<DescriptiveStatsPage />} />
           <Route path="/courses/probability" element={<TheoryPage />} />
           <Route path="/courses/inference" element={<TheoryPage />} />
