@@ -3,6 +3,9 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ProgressBadge } from '@/components/ProgressIndicators';
+import { getLabProgress, getTotalProgress } from '@/lib/progress';
+import { Progress } from '@/components/ui/progress';
 import { 
   LineChart, 
   BarChart3, 
@@ -14,7 +17,8 @@ import {
   Sigma,
   ScatterChart,
   Layers,
-  Shuffle
+  Shuffle,
+  Trophy
 } from 'lucide-react';
 
 interface Lab {
@@ -154,6 +158,10 @@ const difficultyLabels = {
 };
 
 const LabsIndexPage = () => {
+  const totalProgress = getTotalProgress();
+  const completedCount = labs.filter(l => getLabProgress(l.id)).length;
+  const progressPercent = labs.length > 0 ? Math.round((completedCount / labs.length) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -176,6 +184,18 @@ const LabsIndexPage = () => {
           </p>
         </div>
 
+        {/* Progress Summary */}
+        {completedCount > 0 && (
+          <div className="mb-8 p-6 rounded-xl border bg-card">
+            <div className="flex items-center gap-3 mb-3">
+              <Trophy className="w-5 h-5 text-primary" />
+              <span className="font-semibold">Ваш прогресс</span>
+              <span className="text-sm text-muted-foreground ml-auto">{completedCount} из {labs.length} лабораторий</span>
+            </div>
+            <Progress value={progressPercent} className="h-2" />
+          </div>
+        )}
+
         {/* Labs Grid */}
         <div className="grid md:grid-cols-2 gap-6">
           {labs.map((lab) => (
@@ -190,9 +210,12 @@ const LabsIndexPage = () => {
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <lab.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <Badge variant="outline" className={difficultyColors[lab.difficulty]}>
-                    {difficultyLabels[lab.difficulty]}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    {getLabProgress(lab.id) && <ProgressBadge completed={true} />}
+                    <Badge variant="outline" className={difficultyColors[lab.difficulty]}>
+                      {difficultyLabels[lab.difficulty]}
+                    </Badge>
+                  </div>
                 </div>
                 <CardTitle className="text-xl">{lab.title}</CardTitle>
                 <CardDescription className="text-base">{lab.description}</CardDescription>
