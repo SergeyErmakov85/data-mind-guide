@@ -17,7 +17,10 @@ import CorrelationLabPage from "./pages/labs/CorrelationLabPage";
 import TTestLabPage from "./pages/labs/TTestLabPage";
 import ANOVALabPage from "./pages/labs/ANOVALabPage";
 import NonParametricLabPage from "./pages/labs/NonParametricLabPage";
+import BinomialLabPage from "./pages/labs/BinomialLabPage";
+import ChiSquareLabPage from "./pages/labs/ChiSquareLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
+import CalculatorsPage from "./pages/CalculatorsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,8 +48,11 @@ const App = () => (
           <Route path="/labs/ttest" element={<TTestLabPage />} />
           <Route path="/labs/anova" element={<ANOVALabPage />} />
           <Route path="/labs/nonparametric" element={<NonParametricLabPage />} />
+          <Route path="/labs/binomial" element={<BinomialLabPage />} />
+          <Route path="/labs/chisquare" element={<ChiSquareLabPage />} />
           
           {/* Courses */}
+          <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/courses" element={<CoursesIndexPage />} />
           <Route path="/courses/descriptive" element={<DescriptiveStatsPage />} />
           <Route path="/courses/probability" element={<TheoryPage />} />
