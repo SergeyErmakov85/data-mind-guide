@@ -40,6 +40,8 @@ const labItems: NavItem[] = [
   { path: '/labs/regression', label: 'Линейная регрессия', icon: LineChart, description: 'Интерактивный анализ связей' },
   { path: '/labs/correlation', label: 'Корреляция и ковариация', icon: ScatterChart, description: 'Scatter plot, выбросы и коэффициент Пирсона' },
   { path: '/labs/ttest', label: 't-тесты', icon: Sigma, description: 'Одновыборочный, независимый и парный' },
+  { path: '/labs/binomial', label: 'Биномиальное распределение', icon: BarChart3, description: 'Вероятности и нормальное приближение' },
+  { path: '/labs/chisquare', label: 'Хи-квадрат (χ²)', icon: Library, description: 'Таблицы сопряжённости и тест независимости' },
 ];
 
 const courseItems: NavItem[] = [
@@ -51,6 +53,7 @@ const courseItems: NavItem[] = [
 const mainNavItems: NavItem[] = [
   { path: '/', label: 'Главная', icon: BookOpen },
   { path: '/theory', label: 'Справочник', icon: GraduationCap },
+  { path: '/calculators', label: 'Калькуляторы', icon: BarChart3 },
   { path: '/about', label: 'О проекте', icon: Info },
 ];
 

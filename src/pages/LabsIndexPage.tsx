@@ -119,6 +119,26 @@ const labs: Lab[] = [
     concepts: ['Манна-Уитни', 'Вилкоксон', 'Спирмен'],
     status: 'available',
   },
+  {
+    id: 'binomial',
+    title: 'Биномиальное распределение',
+    description: 'Какова вероятность, что 15 из 20 пациентов покажут улучшение? Визуализируйте биномиальное распределение и его нормальное приближение.',
+    icon: BarChart3,
+    path: '/labs/binomial',
+    difficulty: 'beginner',
+    concepts: ['Биномиальное распределение', 'Нормальное приближение', 'z-тест для доли'],
+    status: 'available',
+  },
+  {
+    id: 'chisquare',
+    title: 'Хи-квадрат (χ²)',
+    description: 'Зависит ли выбор терапии от пола? Создавайте таблицы сопряжённости и проверяйте связь между категориальными переменными.',
+    icon: Layers,
+    path: '/labs/chisquare',
+    difficulty: 'intermediate',
+    concepts: ['Тест независимости', 'Ожидаемые частоты', 'V Крамера'],
+    status: 'available',
+  },
 ];
 
 const difficultyColors = {
