@@ -15,6 +15,8 @@ import HypothesisLabPage from "./pages/labs/HypothesisLabPage";
 import RegressionLabPage from "./pages/labs/RegressionLabPage";
 import CorrelationLabPage from "./pages/labs/CorrelationLabPage";
 import TTestLabPage from "./pages/labs/TTestLabPage";
+import ANOVALabPage from "./pages/labs/ANOVALabPage";
+import NonParametricLabPage from "./pages/labs/NonParametricLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/labs/regression" element={<RegressionLabPage />} />
           <Route path="/labs/correlation" element={<CorrelationLabPage />} />
           <Route path="/labs/ttest" element={<TTestLabPage />} />
+          <Route path="/labs/anova" element={<ANOVALabPage />} />
+          <Route path="/labs/nonparametric" element={<NonParametricLabPage />} />
           
           {/* Courses */}
           <Route path="/courses" element={<CoursesIndexPage />} />

@@ -12,7 +12,9 @@ import {
   ArrowRight,
   Play,
   Sigma,
-  ScatterChart
+  ScatterChart,
+  Layers,
+  Shuffle
 } from 'lucide-react';
 
 interface Lab {
@@ -95,6 +97,26 @@ const labs: Lab[] = [
     path: '/labs/ttest',
     difficulty: 'intermediate',
     concepts: ['t-статистика', 'd Коэна', 'Степени свободы'],
+    status: 'available',
+  },
+  {
+    id: 'anova',
+    title: 'ANOVA (Дисперсионный анализ)',
+    description: 'Какой метод терапии эффективнее? Сравните средние трёх и более групп, изучите F-статистику, таблицу ANOVA и размер эффекта η².',
+    icon: Layers,
+    path: '/labs/anova',
+    difficulty: 'advanced',
+    concepts: ['F-статистика', 'η² (eta-квадрат)', 'Post-hoc тесты'],
+    status: 'available',
+  },
+  {
+    id: 'nonparametric',
+    title: 'Непараметрические тесты',
+    description: 'Что делать, если данные не нормальны? Сравните результаты параметрических и непараметрических тестов на данных шкал Лайкерта.',
+    icon: Shuffle,
+    path: '/labs/nonparametric',
+    difficulty: 'intermediate',
+    concepts: ['Манна-Уитни', 'Вилкоксон', 'Спирмен'],
     status: 'available',
   },
 ];
