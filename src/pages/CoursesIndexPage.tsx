@@ -3,6 +3,8 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { getCourseProgress } from '@/lib/progress';
 import { 
   BarChart3, 
   FlaskConical, 
@@ -131,6 +133,15 @@ const CoursesIndexPage = () => {
                     </Badge>
                   </div>
                 </div>
+                {course.status === 'available' && (() => {
+                  const progress = getCourseProgress(course.id, course.lessonsCount);
+                  return progress > 0 ? (
+                    <div className="flex items-center gap-2 mb-1">
+                      <Progress value={progress} className="h-1.5 flex-1" />
+                      <span className="text-xs text-muted-foreground">{progress}%</span>
+                    </div>
+                  ) : null;
+                })()}
                 <CardTitle className="text-xl">{course.title}</CardTitle>
                 <CardDescription className="text-base">{course.description}</CardDescription>
               </CardHeader>

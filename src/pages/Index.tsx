@@ -11,12 +11,15 @@ import {
   TrendingUp,
   Lightbulb,
   PlayCircle,
-  Library
+  Library,
+  Trophy,
+  CheckCircle2
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { getTotalProgress } from '@/lib/progress';
 
 interface LabPreview {
   icon: React.ComponentType<{ className?: string }>;
@@ -230,8 +233,35 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Quick Links */}
+      {/* Progress + Quick Links */}
       <section className="container py-16">
+        {(() => {
+          const progress = getTotalProgress();
+          const hasProgress = progress.labs > 0 || progress.quizzes > 0 || progress.topics > 0;
+          return hasProgress ? (
+            <div className="mb-8 p-6 rounded-xl border bg-card">
+              <div className="flex items-center gap-3 mb-4">
+                <Trophy className="w-5 h-5 text-primary" />
+                <span className="font-heading font-semibold text-lg">Ваш прогресс</span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="text-2xl font-bold text-primary">{progress.labs}</div>
+                  <div className="text-xs text-muted-foreground">Лабораторий</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="text-2xl font-bold text-primary">{progress.quizzes}</div>
+                  <div className="text-xs text-muted-foreground">Квизов</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="text-2xl font-bold text-primary">{progress.topics}</div>
+                  <div className="text-xs text-muted-foreground">Тем курсов</div>
+                </div>
+              </div>
+            </div>
+          ) : null;
+        })()}
+
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="group hover:shadow-lg transition-shadow">
             <CardHeader>
