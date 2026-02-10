@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
 import { 
   BookOpen, 
   BarChart3, 
@@ -13,8 +12,8 @@ import {
   PlayCircle,
   Library,
   Trophy,
-  CheckCircle2
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,33 +77,19 @@ const features = [
   },
 ];
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
 const Index = () => {
-  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
-  const cardRefs = useRef<(HTMLElement | null)[]>([]);
-
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-
-    cardRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setVisibleCards((prev) => new Set(prev).add(index));
-                observer.disconnect();
-              }
-            });
-          },
-          { threshold: 0.1, rootMargin: '50px' }
-        );
-        observer.observe(ref);
-        observers.push(observer);
-      }
-    });
-
-    return () => observers.forEach((obs) => obs.disconnect());
-  }, []);
+  const progress = getTotalProgress();
+  const hasProgress = progress.labs > 0 || progress.quizzes > 0 || progress.topics > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,23 +99,28 @@ const Index = () => {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
         <div className="container py-16 md:py-24 relative">
-          <div className="max-w-3xl mx-auto text-center animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <Beaker className="w-4 h-4" />
               <span>Интерактивная образовательная платформа</span>
-            </div>
+            </motion.div>
             
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
+            <motion.h1 variants={fadeUp} transition={{ duration: 0.5 }} className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
               Математическая статистика
               <span className="block gradient-text">для психологов</span>
-            </h1>
+            </motion.h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} transition={{ duration: 0.5 }} className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Понимайте статистические концепции не через формулы, а через интерактивные 
               симуляции. Меняйте параметры — наблюдайте закономерности.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/labs">
                 <Button size="lg" className="btn-primary gap-2">
                   <Beaker className="w-4 h-4" />
@@ -144,33 +134,36 @@ const Index = () => {
                   Справочник теории
                 </Button>
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Featured Labs */}
       <section className="container py-16">
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+        >
           <Badge variant="outline" className="mb-4">Лаборатории</Badge>
           <h2 className="font-heading text-3xl font-bold mb-4">Интерактивные эксперименты</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Каждая лаборатория — это симуляция статистического явления с полным контролем параметров
           </p>
-        </div>
+        </motion.div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredLabs.map((lab, index) => (
-            <div
-              key={lab.path}
-              ref={(el) => (cardRefs.current[index] = el)}
-              className={`transition-all duration-500 ${
-                visibleCards.has(index) 
-                  ? 'opacity-100 translate-y-0' 
-                  : 'opacity-0 translate-y-8'
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
+        <motion.div
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={staggerContainer}
+        >
+          {featuredLabs.map((lab) => (
+            <motion.div key={lab.path} variants={fadeUp} transition={{ duration: 0.4 }}>
               <Link 
                 to={lab.path}
                 className="module-card group block h-full"
@@ -189,132 +182,173 @@ const Index = () => {
                   <ArrowRight className="w-4 h-4" />
                 </div>
               </Link>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="text-center mt-8">
+        <motion.div
+          className="text-center mt-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+        >
           <Link to="/labs">
             <Button variant="outline" size="lg" className="gap-2">
               Все лаборатории
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features */}
       <section className="bg-muted/30 py-16">
         <div className="container">
-          <div className="text-center mb-12">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="font-heading text-3xl font-bold mb-4">Почему это работает</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Наш подход основан на принципах активного обучения и визуализации
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+          >
             {features.map((feature, index) => (
-              <Card key={index} className="text-center border-0 bg-transparent shadow-none">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-8 h-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <motion.div key={index} variants={fadeUp} transition={{ duration: 0.4 }}>
+                <Card className="text-center border-0 bg-transparent shadow-none">
+                  <CardHeader>
+                    <motion.div
+                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <feature.icon className="w-8 h-8 text-primary" />
+                    </motion.div>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-base">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Progress + Quick Links */}
       <section className="container py-16">
-        {(() => {
-          const progress = getTotalProgress();
-          const hasProgress = progress.labs > 0 || progress.quizzes > 0 || progress.topics > 0;
-          return hasProgress ? (
-            <div className="mb-8 p-6 rounded-xl border bg-card">
-              <div className="flex items-center gap-3 mb-4">
-                <Trophy className="w-5 h-5 text-primary" />
-                <span className="font-heading font-semibold text-lg">Ваш прогресс</span>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <div className="text-2xl font-bold text-primary">{progress.labs}</div>
-                  <div className="text-xs text-muted-foreground">Лабораторий</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <div className="text-2xl font-bold text-primary">{progress.quizzes}</div>
-                  <div className="text-xs text-muted-foreground">Квизов</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <div className="text-2xl font-bold text-primary">{progress.topics}</div>
-                  <div className="text-xs text-muted-foreground">Тем курсов</div>
-                </div>
-              </div>
+        {hasProgress && (
+          <motion.div
+            className="mb-8 p-6 rounded-xl border bg-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Trophy className="w-5 h-5 text-primary" />
+              <span className="font-heading font-semibold text-lg">Ваш прогресс</span>
             </div>
-          ) : null;
-        })()}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { value: progress.labs, label: 'Лабораторий' },
+                { value: progress.quizzes, label: 'Квизов' },
+                { value: progress.topics, label: 'Тем курсов' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  className="text-center p-3 rounded-lg bg-muted/50"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.3 }}
+                >
+                  <div className="text-2xl font-bold text-primary">{item.value}</div>
+                  <div className="text-xs text-muted-foreground">{item.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="group hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-primary" />
+        <motion.div
+          className="grid md:grid-cols-2 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={staggerContainer}
+        >
+          <motion.div variants={fadeUp} transition={{ duration: 0.4 }}>
+            <Card className="group hover:shadow-lg transition-shadow h-full">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Курсы</CardTitle>
+                    <CardDescription>Структурированное обучение</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>Курсы</CardTitle>
-                  <CardDescription>Структурированное обучение</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Последовательное изучение статистики: от описательных методов 
-                до продвинутого анализа данных.
-              </p>
-              <Link to="/courses/descriptive">
-                <Button variant="outline" className="gap-2">
-                  Начать курс
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Последовательное изучение статистики: от описательных методов 
+                  до продвинутого анализа данных.
+                </p>
+                <Link to="/courses/descriptive">
+                  <Button variant="outline" className="gap-2">
+                    Начать курс
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card className="group hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-success" />
+          <motion.div variants={fadeUp} transition={{ duration: 0.4 }}>
+            <Card className="group hover:shadow-lg transition-shadow h-full">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-success" />
+                  </div>
+                  <div>
+                    <CardTitle>Справочник</CardTitle>
+                    <CardDescription>Теория и формулы</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>Справочник</CardTitle>
-                  <CardDescription>Теория и формулы</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Краткий справочник по основным концепциям, формулам 
-                и интерпретации результатов.
-              </p>
-              <Link to="/theory">
-                <Button variant="outline" className="gap-2">
-                  Открыть справочник
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Краткий справочник по основным концепциям, формулам 
+                  и интерпретации результатов.
+                </p>
+                <Link to="/theory">
+                  <Button variant="outline" className="gap-2">
+                    Открыть справочник
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Footer */}
