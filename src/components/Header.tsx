@@ -56,9 +56,9 @@ const courseItems: NavItem[] = [
 const mainNavItems: NavItem[] = [
   { path: '/', label: 'Главная', icon: BookOpen },
   { path: '/theory', label: 'Справочник', icon: GraduationCap },
+  { path: '/visualizations', label: 'Распределения', icon: LineChart },
   { path: '/calculators', label: 'Калькуляторы', icon: BarChart3 },
   { path: '/glossary', label: 'Глоссарий', icon: Library },
-  { path: '/resources', label: 'Ресурсы', icon: BookOpen },
   { path: '/faq', label: 'FAQ', icon: Info },
   { path: '/about', label: 'О проекте', icon: Info },
 ];
