@@ -38,10 +38,13 @@ const labItems: NavItem[] = [
   { path: '/labs/confidence', label: 'Доверительные интервалы', icon: Beaker, description: 'Интерактивная симуляция покрытия' },
   { path: '/labs/hypothesis', label: 'Проверка гипотез', icon: FlaskConical, description: 'Визуализация p-value и мощности теста' },
   { path: '/labs/regression', label: 'Линейная регрессия', icon: LineChart, description: 'Интерактивный анализ связей' },
+  { path: '/labs/multiple-regression', label: 'Множественная регрессия', icon: LineChart, description: '2–4 предиктора, R² adj, VIF' },
   { path: '/labs/correlation', label: 'Корреляция и ковариация', icon: ScatterChart, description: 'Scatter plot, выбросы и коэффициент Пирсона' },
   { path: '/labs/ttest', label: 't-тесты', icon: Sigma, description: 'Одновыборочный, независимый и парный' },
+  { path: '/labs/anova', label: 'ANOVA', icon: BarChart3, description: 'Дисперсионный анализ для 2–5 групп' },
   { path: '/labs/binomial', label: 'Биномиальное распределение', icon: BarChart3, description: 'Вероятности и нормальное приближение' },
   { path: '/labs/chisquare', label: 'Хи-квадрат (χ²)', icon: Library, description: 'Таблицы сопряжённости и тест независимости' },
+  { path: '/labs/nonparametric', label: 'Непараметрические тесты', icon: Sigma, description: 'Манна-Уитни, Спирмен и сравнение с параметрическими' },
 ];
 
 const courseItems: NavItem[] = [
@@ -54,6 +57,9 @@ const mainNavItems: NavItem[] = [
   { path: '/', label: 'Главная', icon: BookOpen },
   { path: '/theory', label: 'Справочник', icon: GraduationCap },
   { path: '/calculators', label: 'Калькуляторы', icon: BarChart3 },
+  { path: '/glossary', label: 'Глоссарий', icon: Library },
+  { path: '/resources', label: 'Ресурсы', icon: BookOpen },
+  { path: '/faq', label: 'FAQ', icon: Info },
   { path: '/about', label: 'О проекте', icon: Info },
 ];
 
