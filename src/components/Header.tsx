@@ -9,7 +9,9 @@ import {
   Beaker,
   LineChart,
   Library,
-  Info
+  Info,
+  ScatterChart,
+  Sigma
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
@@ -36,6 +38,8 @@ const labItems: NavItem[] = [
   { path: '/labs/confidence', label: 'Доверительные интервалы', icon: Beaker, description: 'Интерактивная симуляция покрытия' },
   { path: '/labs/hypothesis', label: 'Проверка гипотез', icon: FlaskConical, description: 'Визуализация p-value и мощности теста' },
   { path: '/labs/regression', label: 'Линейная регрессия', icon: LineChart, description: 'Интерактивный анализ связей' },
+  { path: '/labs/correlation', label: 'Корреляция и ковариация', icon: ScatterChart, description: 'Scatter plot, выбросы и коэффициент Пирсона' },
+  { path: '/labs/ttest', label: 't-тесты', icon: Sigma, description: 'Одновыборочный, независимый и парный' },
 ];
 
 const courseItems: NavItem[] = [
