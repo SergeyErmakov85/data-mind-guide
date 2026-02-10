@@ -19,8 +19,12 @@ import ANOVALabPage from "./pages/labs/ANOVALabPage";
 import NonParametricLabPage from "./pages/labs/NonParametricLabPage";
 import BinomialLabPage from "./pages/labs/BinomialLabPage";
 import ChiSquareLabPage from "./pages/labs/ChiSquareLabPage";
+import MultipleRegressionLabPage from "./pages/labs/MultipleRegressionLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import CalculatorsPage from "./pages/CalculatorsPage";
+import GlossaryPage from "./pages/GlossaryPage";
+import ResourcesPage from "./pages/ResourcesPage";
+import FAQPage from "./pages/FAQPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +54,7 @@ const App = () => (
           <Route path="/labs/nonparametric" element={<NonParametricLabPage />} />
           <Route path="/labs/binomial" element={<BinomialLabPage />} />
           <Route path="/labs/chisquare" element={<ChiSquareLabPage />} />
+          <Route path="/labs/multiple-regression" element={<MultipleRegressionLabPage />} />
           
           {/* Courses */}
           <Route path="/calculators" element={<CalculatorsPage />} />
@@ -57,6 +62,11 @@ const App = () => (
           <Route path="/courses/descriptive" element={<DescriptiveStatsPage />} />
           <Route path="/courses/probability" element={<TheoryPage />} />
           <Route path="/courses/inference" element={<TheoryPage />} />
+          
+          {/* Info pages */}
+          <Route path="/glossary" element={<GlossaryPage />} />
+          <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/faq" element={<FAQPage />} />
           
           {/* Legacy routes - redirect */}
           <Route path="/descriptive" element={<DescriptiveStatsPage />} />
