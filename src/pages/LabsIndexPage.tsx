@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -157,8 +158,17 @@ const difficultyLabels = {
   advanced: 'Продвинутый',
 };
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerGrid = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+};
+
 const LabsIndexPage = () => {
-  const totalProgress = getTotalProgress();
   const completedCount = labs.filter(l => getLabProgress(l.id)).length;
   const progressPercent = labs.length > 0 ? Math.round((completedCount / labs.length) * 100) : 0;
 
@@ -168,84 +178,101 @@ const LabsIndexPage = () => {
       
       <main className="container py-12">
         {/* Hero */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+        <motion.div
+          className="text-center mb-12"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+        >
+          <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Beaker className="w-4 h-4" />
             <span>Интерактивные эксперименты</span>
-          </div>
+          </motion.div>
           
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
+          <motion.h1 variants={fadeUp} transition={{ duration: 0.5 }} className="font-heading text-4xl md:text-5xl font-bold mb-4">
             Статистические <span className="gradient-text">лаборатории</span>
-          </h1>
+          </motion.h1>
           
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <motion.p variants={fadeUp} transition={{ duration: 0.5 }} className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Исследуйте статистические концепции через интерактивные симуляции. 
             Меняйте параметры и наблюдайте закономерности в реальном времени.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Progress Summary */}
         {completedCount > 0 && (
-          <div className="mb-8 p-6 rounded-xl border bg-card">
+          <motion.div
+            className="mb-8 p-6 rounded-xl border bg-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
             <div className="flex items-center gap-3 mb-3">
               <Trophy className="w-5 h-5 text-primary" />
               <span className="font-semibold">Ваш прогресс</span>
               <span className="text-sm text-muted-foreground ml-auto">{completedCount} из {labs.length} лабораторий</span>
             </div>
             <Progress value={progressPercent} className="h-2" />
-          </div>
+          </motion.div>
         )}
 
         {/* Labs Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <motion.div
+          className="grid md:grid-cols-2 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-30px" }}
+          variants={staggerGrid}
+        >
           {labs.map((lab) => (
-            <Card 
-              key={lab.id} 
-              className={`group transition-all duration-300 hover:shadow-lg ${
-                lab.status === 'coming-soon' ? 'opacity-60' : ''
-              }`}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <lab.icon className="w-6 h-6 text-primary" />
+            <motion.div key={lab.id} variants={fadeUp} transition={{ duration: 0.4 }}>
+              <Card 
+                className={`group transition-all duration-300 hover:shadow-lg h-full ${
+                  lab.status === 'coming-soon' ? 'opacity-60' : ''
+                }`}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <lab.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getLabProgress(lab.id) && <ProgressBadge completed={true} />}
+                      <Badge variant="outline" className={difficultyColors[lab.difficulty]}>
+                        {difficultyLabels[lab.difficulty]}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {getLabProgress(lab.id) && <ProgressBadge completed={true} />}
-                    <Badge variant="outline" className={difficultyColors[lab.difficulty]}>
-                      {difficultyLabels[lab.difficulty]}
-                    </Badge>
+                  <CardTitle className="text-xl">{lab.title}</CardTitle>
+                  <CardDescription className="text-base">{lab.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {lab.concepts.map((concept) => (
+                      <Badge key={concept} variant="secondary" className="text-xs">
+                        {concept}
+                      </Badge>
+                    ))}
                   </div>
-                </div>
-                <CardTitle className="text-xl">{lab.title}</CardTitle>
-                <CardDescription className="text-base">{lab.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {lab.concepts.map((concept) => (
-                    <Badge key={concept} variant="secondary" className="text-xs">
-                      {concept}
-                    </Badge>
-                  ))}
-                </div>
-                
-                {lab.status === 'available' ? (
-                  <Link to={lab.path}>
-                    <Button className="w-full gap-2">
-                      <Play className="w-4 h-4" />
-                      Запустить лабораторию
-                      <ArrowRight className="w-4 h-4" />
+                  
+                  {lab.status === 'available' ? (
+                    <Link to={lab.path}>
+                      <Button className="w-full gap-2">
+                        <Play className="w-4 h-4" />
+                        Запустить лабораторию
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button disabled className="w-full gap-2">
+                      Скоро
                     </Button>
-                  </Link>
-                ) : (
-                  <Button disabled className="w-full gap-2">
-                    Скоро
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </main>
     </div>
   );
