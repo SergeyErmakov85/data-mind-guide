@@ -20,6 +20,7 @@ import NonParametricLabPage from "./pages/labs/NonParametricLabPage";
 import BinomialLabPage from "./pages/labs/BinomialLabPage";
 import ChiSquareLabPage from "./pages/labs/ChiSquareLabPage";
 import MultipleRegressionLabPage from "./pages/labs/MultipleRegressionLabPage";
+import EffectSizeLabPage from "./pages/labs/EffectSizeLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import CalculatorsPage from "./pages/CalculatorsPage";
 import GlossaryPage from "./pages/GlossaryPage";
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/labs/binomial" element={<BinomialLabPage />} />
           <Route path="/labs/chisquare" element={<ChiSquareLabPage />} />
           <Route path="/labs/multiple-regression" element={<MultipleRegressionLabPage />} />
+          <Route path="/labs/effect-size" element={<EffectSizeLabPage />} />
           
           {/* Courses */}
           <Route path="/calculators" element={<CalculatorsPage />} />
