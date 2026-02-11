@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BookOpen, Lightbulb, AlertCircle, Database, Ruler, BarChart3, Target, ScatterChart, Sigma, FlaskConical, TrendingUp, Calculator } from 'lucide-react';
 import { NormalDistributionVisualizer } from '@/components/NormalDistributionVisualizer';
 import { MathFormula } from '@/components/MathFormula';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 const TheoryPage = () => {
   return (
@@ -12,15 +15,16 @@ const TheoryPage = () => {
       
       <main className="container py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
+          <motion.div className="mb-8" initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
               Справочник статистических методов
             </h1>
             <p className="text-muted-foreground text-lg">
               Базовые и продвинутые концепции для психологических исследований
             </p>
-          </div>
+          </motion.div>
 
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.4 }}>
           <Tabs defaultValue="population" className="space-y-6">
             <TabsList className="flex flex-wrap h-auto gap-1 bg-muted p-1">
               <TabsTrigger value="population">Выборка</TabsTrigger>
@@ -726,6 +730,7 @@ const TheoryPage = () => {
               </Card>
             </TabsContent>
           </Tabs>
+          </motion.div>
         </div>
       </main>
     </div>

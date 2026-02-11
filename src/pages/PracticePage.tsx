@@ -6,6 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Upload, FileSpreadsheet, BarChart3, Calculator, Download, AlertCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter } from 'recharts';
 import Papa from 'papaparse';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 interface DataRow {
   [key: string]: string | number;
@@ -144,18 +148,18 @@ const PracticePage = () => {
       
       <main className="container py-8">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
+          <motion.div className="mb-8" initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
               Практика: Анализ данных
             </h1>
             <p className="text-muted-foreground text-lg">
               Загрузите свои данные в формате CSV или введите вручную для анализа
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <motion.div className="grid lg:grid-cols-2 gap-8" initial="hidden" animate="visible" variants={stagger}>
             {/* Input Section */}
-            <div className="space-y-6">
+            <motion.div className="space-y-6" variants={fadeUp}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -282,10 +286,10 @@ const PracticePage = () => {
                   </CardContent>
                 </Card>
               )}
-            </div>
+            </motion.div>
 
             {/* Results Section */}
-            <div className="space-y-6">
+            <motion.div className="space-y-6" variants={fadeUp}>
               {stats ? (
                 <>
                   <Card>
@@ -380,8 +384,8 @@ const PracticePage = () => {
                   </CardContent>
                 </Card>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </main>
     </div>

@@ -2,6 +2,10 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, BookOpen, Video, Globe, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.07 } } };
 
 interface Resource {
   title: string;
@@ -35,18 +39,19 @@ const ResourcesPage = () => (
   <div className="min-h-screen bg-background">
     <Header />
     <main className="container py-8">
-      <div className="mb-8">
+      <motion.div className="mb-8" initial="hidden" animate="visible" variants={fadeUp}>
         <h1 className="font-heading text-3xl font-bold mb-2">📚 Ресурсы</h1>
         <p className="text-muted-foreground text-lg">
           Учебники, видео и инструменты для углублённого изучения статистики
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" initial="hidden" animate="visible" variants={stagger}>
         {resources.map((res, i) => {
           const Icon = typeIcons[res.type];
           return (
-            <Card key={i} className="hover:shadow-md transition-shadow">
+            <motion.div key={i} variants={fadeUp}>
+            <Card className="hover:shadow-md transition-shadow h-full">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-base leading-tight flex items-center gap-2">
@@ -69,9 +74,10 @@ const ResourcesPage = () => (
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </main>
   </div>
 );
