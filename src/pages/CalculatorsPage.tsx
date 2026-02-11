@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MathFormula } from '@/components/MathFormula';
 import { Calculator } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 /* ─── Effect Size Calculator ─── */
 const EffectSizeCalc = () => {
@@ -206,15 +209,16 @@ const CalculatorsPage = () => {
       <Header />
       <main className="container py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8 text-center">
+          <motion.div className="mb-8 text-center" initial="hidden" animate="visible" variants={fadeUp}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <Calculator className="w-4 h-4" />
               Инструменты
             </div>
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-2">Статистические калькуляторы</h1>
             <p className="text-muted-foreground text-lg">Быстрые расчёты для психологических исследований</p>
-          </div>
+          </motion.div>
 
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4 }}>
           <Tabs defaultValue="effectsize" className="space-y-6">
             <TabsList className="flex flex-wrap h-auto gap-1 bg-muted p-1">
               <TabsTrigger value="effectsize">Размер эффекта</TabsTrigger>
@@ -227,6 +231,7 @@ const CalculatorsPage = () => {
             <TabsContent value="correlation"><CorrelationCalc /></TabsContent>
             <TabsContent value="ttest"><TTestCalc /></TabsContent>
           </Tabs>
+          </motion.div>
         </div>
       </main>
     </div>
