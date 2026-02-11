@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -216,7 +217,7 @@ const DescriptiveStatsCourse = () => {
           </Link>
         </div>
 
-        <div className="mb-8">
+        <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <h1 className="font-heading text-3xl font-bold mb-2">Описательная статистика</h1>
           <p className="text-muted-foreground text-lg">
             Меры центральной тенденции, разброса и формы распределения
@@ -230,8 +231,9 @@ const DescriptiveStatsCourse = () => {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>
         <Tabs defaultValue={topics[0].id} className="space-y-6">
           <TabsList className="flex flex-wrap h-auto gap-1">
             {topics.map((t) => (
@@ -266,17 +268,19 @@ const DescriptiveStatsCourse = () => {
             </TabsContent>
           ))}
         </Tabs>
+        </motion.div>
 
         {/* Quiz */}
-        <div className="mt-10">
+        <motion.div className="mt-10" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
           <h2 className="font-heading text-2xl font-bold mb-4">Проверьте себя</h2>
           <Quiz
             questions={quizQuestions}
             title="Квиз: Описательная статистика"
           />
-        </div>
+        </motion.div>
 
         {/* Link to calculator */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
         <Card className="mt-8">
           <CardContent className="py-6 flex items-center justify-between">
             <div>
@@ -288,6 +292,7 @@ const DescriptiveStatsCourse = () => {
             </Link>
           </CardContent>
         </Card>
+        </motion.div>
       </main>
     </div>
   );

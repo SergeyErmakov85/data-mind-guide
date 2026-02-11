@@ -4,6 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, BookOpen } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
 
 interface GlossaryEntry {
   term: string;
@@ -64,7 +68,7 @@ const GlossaryPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container py-8">
-        <div className="mb-8">
+        <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
             <BookOpen className="w-8 h-8 text-primary" />
             Глоссарий
@@ -72,7 +76,7 @@ const GlossaryPage = () => {
           <p className="text-muted-foreground text-lg">
             Основные термины математической статистики для психологов
           </p>
-        </div>
+        </motion.div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
@@ -105,9 +109,10 @@ const GlossaryPage = () => {
           </div>
         </div>
 
-        <div className="grid gap-3">
+        <motion.div className="grid gap-3" initial="hidden" animate="visible" variants={stagger} key={search + selectedCategory}>
           {filtered.map((entry, i) => (
-            <Card key={i}>
+            <motion.div key={i} variants={fadeUp} transition={{ duration: 0.3 }}>
+            <Card>
               <CardContent className="py-4">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-2">
                   <div className="flex-1">
@@ -125,11 +130,12 @@ const GlossaryPage = () => {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
           {filtered.length === 0 && (
             <p className="text-center text-muted-foreground py-8">Ничего не найдено</p>
           )}
-        </div>
+        </motion.div>
       </main>
     </div>
   );

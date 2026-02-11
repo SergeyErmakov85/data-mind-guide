@@ -1,6 +1,10 @@
 import { Header } from '@/components/Header';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { HelpCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.07 } } };
 
 const faqItems = [
   {
@@ -49,7 +53,7 @@ const FAQPage = () => (
   <div className="min-h-screen bg-background">
     <Header />
     <main className="container py-8 max-w-3xl">
-      <div className="mb-8">
+      <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
           <HelpCircle className="w-8 h-8 text-primary" />
           Частые вопросы (FAQ)
@@ -57,11 +61,13 @@ const FAQPage = () => (
         <p className="text-muted-foreground text-lg">
           Ответы на самые распространённые вопросы студентов-психологов о статистике
         </p>
-      </div>
+      </motion.div>
 
+      <motion.div initial="hidden" animate="visible" variants={stagger}>
       <Accordion type="single" collapsible className="space-y-2">
         {faqItems.map((item, i) => (
-          <AccordionItem key={i} value={`item-${i}`} className="border rounded-lg px-4">
+          <motion.div key={i} variants={fadeUp} transition={{ duration: 0.3 }}>
+          <AccordionItem value={`item-${i}`} className="border rounded-lg px-4">
             <AccordionTrigger className="text-left font-medium">
               {item.q}
             </AccordionTrigger>
@@ -69,8 +75,10 @@ const FAQPage = () => (
               {item.a}
             </AccordionContent>
           </AccordionItem>
+          </motion.div>
         ))}
       </Accordion>
+      </motion.div>
     </main>
   </div>
 );
