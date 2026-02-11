@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { getCourseProgress } from '@/lib/progress';
+import { motion } from 'framer-motion';
 import { 
   BarChart3, 
   FlaskConical, 
@@ -15,6 +16,9 @@ import {
   Sigma,
   Grid3X3
 } from 'lucide-react';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 interface Course {
   id: string;
@@ -97,28 +101,28 @@ const CoursesIndexPage = () => {
       
       <main className="container py-12">
         {/* Hero */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+        <motion.div className="text-center mb-12" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.12 } } }}>
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <GraduationCap className="w-4 h-4" />
             <span>Структурированное обучение</span>
-          </div>
+          </motion.div>
           
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
+          <motion.h1 variants={fadeUp} className="font-heading text-4xl md:text-5xl font-bold mb-4">
             <span className="gradient-text">Курсы</span> статистики
-          </h1>
+          </motion.h1>
           
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <motion.p variants={fadeUp} className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Последовательное изучение статистики от базовых концепций до продвинутых методов анализа. 
             Каждый курс включает теорию, интерактивные примеры и задания для самопроверки.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Courses Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <motion.div className="grid md:grid-cols-2 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}>
           {courses.map((course) => (
+            <motion.div key={course.id} variants={fadeUp} transition={{ duration: 0.4 }}>
             <Card 
-              key={course.id} 
-              className={`group transition-all duration-300 hover:shadow-lg ${
+              className={`group transition-all duration-300 hover:shadow-lg h-full ${
                 course.status === 'coming-soon' ? 'opacity-60' : ''
               }`}
             >
@@ -169,8 +173,9 @@ const CoursesIndexPage = () => {
                 )}
               </CardContent>
             </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </main>
     </div>
   );
