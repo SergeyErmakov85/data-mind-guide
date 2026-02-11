@@ -19,7 +19,8 @@ import {
   ScatterChart,
   Layers,
   Shuffle,
-  Trophy
+  Trophy,
+  Ruler
 } from 'lucide-react';
 
 interface Lab {
@@ -34,6 +35,16 @@ interface Lab {
 }
 
 const labs: Lab[] = [
+  {
+    id: 'effect-size',
+    title: 'Размер эффекта',
+    description: 'p-value значим — но насколько велик эффект? Сравнивайте d Коэна, η² и r Пирсона. Визуализируйте перекрытие распределений и учитесь отличать статистическую значимость от практической.',
+    icon: Ruler,
+    path: '/labs/effect-size',
+    difficulty: 'beginner',
+    concepts: ['d Коэна', 'η² (eta-квадрат)', 'r Пирсона'],
+    status: 'available',
+  },
   {
     id: 'clt',
     title: 'Центральная предельная теорема',
