@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-// Seeded random for stable scatter points
+// Seeded random for stable scatter points (correlation charts)
 const seededRandom = (seed: number) => {
   let s = seed;
   return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
