@@ -8,6 +8,28 @@ import { motion } from 'framer-motion';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
+// Seeded random for stable scatter points
+const seededRandom = (seed: number) => {
+  let s = seed;
+  return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+};
+
+const generateCorrelationPoints = (r: number): { x: number; y: number }[] => {
+  const rng = seededRandom(Math.abs(Math.round(r * 1000)) + 1);
+  const points: { x: number; y: number }[] = [];
+  for (let i = 0; i < 30; i++) {
+    const xRaw = rng() * 140 + 35;
+    const noise = (rng() - 0.5) * 140 * (1 - Math.abs(r));
+    const yRaw = r > 0 ? 170 - (xRaw - 30) * (140 / 160) + noise
+      : r < 0 ? 10 + (xRaw - 30) * (140 / 160) + noise
+      : rng() * 140 + 20;
+    const x = Math.max(35, Math.min(185, xRaw));
+    const y = Math.max(15, Math.min(165, yRaw));
+    points.push({ x, y });
+  }
+  return points;
+};
+
 const TheoryPage = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -360,6 +382,129 @@ const TheoryPage = () => {
                       ))}
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Графики корреляций */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Визуализация типов корреляции</CardTitle>
+                  <CardDescription>Как выглядят данные при разной силе и направлении связи</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {[
+                      { title: 'Положительная (r ≈ 0.85)', color: 'hsl(var(--success))', points: generateCorrelationPoints(0.85) },
+                      { title: 'Отрицательная (r ≈ −0.75)', color: 'hsl(var(--destructive))', points: generateCorrelationPoints(-0.75) },
+                      { title: 'Отсутствует (r ≈ 0)', color: 'hsl(var(--muted-foreground))', points: generateCorrelationPoints(0) },
+                    ].map((chart) => (
+                      <div key={chart.title} className="text-center">
+                        <h5 className="font-medium text-sm mb-2">{chart.title}</h5>
+                        <svg viewBox="0 0 200 200" className="w-full max-w-[200px] mx-auto border border-border rounded-lg bg-muted/20">
+                          {/* Axes */}
+                          <line x1="30" y1="170" x2="190" y2="170" stroke="hsl(var(--border))" strokeWidth="1" />
+                          <line x1="30" y1="10" x2="30" y2="170" stroke="hsl(var(--border))" strokeWidth="1" />
+                          <text x="110" y="195" textAnchor="middle" className="fill-muted-foreground" fontSize="10">X</text>
+                          <text x="12" y="95" textAnchor="middle" className="fill-muted-foreground" fontSize="10" transform="rotate(-90, 12, 95)">Y</text>
+                          {/* Points */}
+                          {chart.points.map((p, i) => (
+                            <circle key={i} cx={p.x} cy={p.y} r="3" fill={chart.color} opacity="0.7" />
+                          ))}
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Примеры интерпретации */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-accent" />
+                    Примеры интерпретации результатов
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-success/5 border border-success/20 rounded-lg space-y-2">
+                    <h5 className="font-semibold text-success">Пример 1: Тревожность и успеваемость</h5>
+                    <p className="text-sm text-muted-foreground">
+                      Получен <strong>r = −0.62, p &lt; 0.01, n = 85</strong>. Обнаружена статистически значимая отрицательная корреляция средней силы между уровнем тревожности и средним баллом.
+                    </p>
+                    <div className="p-3 bg-background rounded border border-border text-sm text-muted-foreground italic">
+                      <strong>Вывод:</strong> Студенты с более высоким уровнем тревожности склонны иметь более низкую успеваемость. Однако нельзя утверждать, что тревожность <em>вызывает</em> снижение оценок — возможно влияние третьих переменных (мотивация, сон, стресс).
+                    </div>
+                  </div>
+                  <div className="p-4 bg-info/5 border border-info/20 rounded-lg space-y-2">
+                    <h5 className="font-semibold text-info">Пример 2: Время подготовки и баллы экзамена</h5>
+                    <p className="text-sm text-muted-foreground">
+                      Получен <strong>r = 0.74, p &lt; 0.001, n = 120</strong>. Выявлена статистически значимая сильная положительная корреляция между временем подготовки (в часах) и результатами экзамена.
+                    </p>
+                    <div className="p-3 bg-background rounded border border-border text-sm text-muted-foreground italic">
+                      <strong>Вывод:</strong> Чем больше времени студент тратил на подготовку, тем выше его баллы (r² = 0.55 — время подготовки объясняет 55% дисперсии баллов). Для причинно-следственных выводов необходим экспериментальный дизайн.
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Тепловая карта 5×5 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Корреляционная матрица (тепловая карта)</CardTitle>
+                  <CardDescription>Пример корреляций между 5 психологическими показателями</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const vars = ['Тревожн.', 'Депрессия', 'Самооц.', 'Стресс', 'Сон (ч)'];
+                    const matrix = [
+                      [ 1.00,  0.72, -0.58,  0.65, -0.41],
+                      [ 0.72,  1.00, -0.63,  0.54, -0.35],
+                      [-0.58, -0.63,  1.00, -0.47,  0.29],
+                      [ 0.65,  0.54, -0.47,  1.00, -0.52],
+                      [-0.41, -0.35,  0.29, -0.52,  1.00],
+                    ];
+                    const getHeatColor = (v: number) => {
+                      if (v === 1) return 'bg-primary/30 text-primary font-bold';
+                      if (v >= 0.6) return 'bg-success/30 text-success-foreground';
+                      if (v >= 0.3) return 'bg-success/15 text-foreground';
+                      if (v > 0) return 'bg-success/5 text-foreground';
+                      if (v > -0.3) return 'bg-destructive/5 text-foreground';
+                      if (v > -0.6) return 'bg-destructive/15 text-foreground';
+                      return 'bg-destructive/30 text-destructive-foreground';
+                    };
+                    return (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                          <thead>
+                            <tr>
+                              <th className="p-2 text-left text-muted-foreground font-medium"></th>
+                              {vars.map(v => (
+                                <th key={v} className="p-2 text-center text-xs font-medium text-muted-foreground whitespace-nowrap">{v}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {matrix.map((row, i) => (
+                              <tr key={i}>
+                                <td className="p-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{vars[i]}</td>
+                                {row.map((val, j) => (
+                                  <td key={j} className={`p-2 text-center text-xs font-mono rounded-sm ${getHeatColor(val)}`}>
+                                    {val.toFixed(2)}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+                          <span className="inline-block w-4 h-3 rounded bg-destructive/30" /> Сильная отриц.
+                          <span className="inline-block w-4 h-3 rounded bg-destructive/10" /> Слабая отриц.
+                          <span className="inline-block w-4 h-3 rounded bg-success/10" /> Слабая полож.
+                          <span className="inline-block w-4 h-3 rounded bg-success/30" /> Сильная полож.
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
 
