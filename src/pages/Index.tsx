@@ -12,6 +12,9 @@ import {
   PlayCircle,
   Library,
   Trophy,
+  Layers,
+  Shuffle,
+  GitBranch,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
@@ -137,6 +140,62 @@ const Index = () => {
             </motion.div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Probability Theory Section */}
+      <section className="container py-16">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <Badge variant="outline" className="mb-4">Новый раздел</Badge>
+          <h2 className="font-heading text-3xl font-bold mb-4">Теория вероятностей</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Фундамент статистики: случайные события, комбинаторика, формула полной вероятности и схема Бернулли
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+        >
+          <Card className="group hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-4 gap-4 mb-6">
+                {[
+                  { icon: Layers, title: 'Случайные события', desc: 'Операции, диаграммы Венна, условная вероятность' },
+                  { icon: Shuffle, title: 'Комбинаторика', desc: 'Перестановки, размещения, сочетания' },
+                  { icon: GitBranch, title: 'Полная вероятность', desc: 'Формула Байеса и гипотезы' },
+                  { icon: FlaskConical, title: 'Схема Бернулли', desc: 'Биномиальное распределение' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <item.icon className="w-4.5 h-4.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center">
+                <Link to="/probability">
+                  <Button size="lg" className="gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Открыть раздел
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </section>
 
       {/* Featured Labs */}
