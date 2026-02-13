@@ -28,6 +28,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import FAQPage from "./pages/FAQPage";
 import VisualizationLibraryPage from "./pages/VisualizationLibraryPage";
 import DescriptiveStatsCourse from "./pages/courses/DescriptiveStatsCourse";
+import ProbabilityTheoryPage from "./pages/ProbabilityTheoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           {/* Main Pages */}
           <Route path="/" element={<Index />} />
           <Route path="/theory" element={<TheoryPage />} />
+          <Route path="/probability" element={<ProbabilityTheoryPage />} />
           <Route path="/about" element={<AboutPage />} />
           
           {/* Labs */}
