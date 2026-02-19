@@ -28,6 +28,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import FAQPage from "./pages/FAQPage";
 import VisualizationLibraryPage from "./pages/VisualizationLibraryPage";
 import DescriptiveStatsCourse from "./pages/courses/DescriptiveStatsCourse";
+import ChiSquareCourse from "./pages/courses/ChiSquareCourse";
 import ProbabilityTheoryPage from "./pages/ProbabilityTheoryPage";
 import NotFound from "./pages/NotFound";
 
@@ -66,6 +67,7 @@ const App = () => (
           <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/courses" element={<CoursesIndexPage />} />
           <Route path="/courses/descriptive" element={<DescriptiveStatsCourse />} />
+          <Route path="/courses/chisquare" element={<ChiSquareCourse />} />
           <Route path="/courses/probability" element={<TheoryPage />} />
           <Route path="/courses/inference" element={<TheoryPage />} />
           
