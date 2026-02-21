@@ -464,6 +464,98 @@ export const DescriptiveCalculator = () => {
             </p>
           </StepCard>
 
+          {/* Box Plot */}
+          <StepCard title="📦 Ящик с усами (Box Plot)">
+            <div className="px-2 pt-2 pb-6 space-y-1">
+              {/* Labels row */}
+              <div className="relative h-5 text-[10px] text-muted-foreground font-mono">
+                {(() => {
+                  const bMin = Math.max(stats.min, stats.q1 - 1.5 * stats.iqr);
+                  const bMax = Math.min(stats.max, stats.q3 + 1.5 * stats.iqr);
+                  const range = bMax - bMin || 1;
+                  const pct = (v: number) => `${((v - bMin) / range) * 100}%`;
+                  return (
+                    <>
+                      <span className="absolute -translate-x-1/2" style={{ left: pct(bMin) }}>{fmt(bMin)}</span>
+                      <span className="absolute -translate-x-1/2" style={{ left: pct(stats.q1) }}>Q1: {fmt(stats.q1)}</span>
+                      <span className="absolute -translate-x-1/2" style={{ left: pct(stats.median) }}>Me: {fmt(stats.median)}</span>
+                      <span className="absolute -translate-x-1/2" style={{ left: pct(stats.q3) }}>Q3: {fmt(stats.q3)}</span>
+                      <span className="absolute -translate-x-1/2" style={{ left: pct(bMax) }}>{fmt(bMax)}</span>
+                    </>
+                  );
+                })()}
+              </div>
+              {/* Box plot visual */}
+              <div className="relative h-10">
+                {(() => {
+                  const whiskerMin = Math.max(stats.min, stats.q1 - 1.5 * stats.iqr);
+                  const whiskerMax = Math.min(stats.max, stats.q3 + 1.5 * stats.iqr);
+                  const range = whiskerMax - whiskerMin || 1;
+                  const pct = (v: number) => ((v - whiskerMin) / range) * 100;
+                  const outliers = data.filter(v => v < whiskerMin || v > whiskerMax);
+                  return (
+                    <>
+                      {/* Whisker line */}
+                      <div
+                        className="absolute top-1/2 h-0.5 bg-foreground/40 -translate-y-1/2"
+                        style={{ left: `${pct(whiskerMin)}%`, width: `${pct(whiskerMax) - pct(whiskerMin)}%` }}
+                      />
+                      {/* Whisker caps */}
+                      <div className="absolute top-1 bottom-1 w-0.5 bg-foreground/60" style={{ left: `${pct(whiskerMin)}%` }} />
+                      <div className="absolute top-1 bottom-1 w-0.5 bg-foreground/60" style={{ left: `${pct(whiskerMax)}%` }} />
+                      {/* IQR box */}
+                      <div
+                        className="absolute top-0 h-full rounded bg-primary/20 border-2 border-primary"
+                        style={{ left: `${pct(stats.q1)}%`, width: `${pct(stats.q3) - pct(stats.q1)}%` }}
+                      />
+                      {/* Median line */}
+                      <div
+                        className="absolute top-0 h-full w-0.5 bg-primary"
+                        style={{ left: `${pct(stats.median)}%` }}
+                      />
+                      {/* Mean marker */}
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-destructive border border-background"
+                        style={{ left: `${pct(stats.mean)}%` }}
+                        title={`Среднее: ${fmt(stats.mean)}`}
+                      />
+                      {/* Outliers */}
+                      {outliers.map((v, i) => {
+                        const pos = ((v - whiskerMin) / range) * 100;
+                        const clampedPos = Math.max(-2, Math.min(102, pos));
+                        return (
+                          <div
+                            key={i}
+                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full border-2 border-destructive bg-background"
+                            style={{ left: `${clampedPos}%` }}
+                            title={`Выброс: ${v}`}
+                          />
+                        );
+                      })}
+                    </>
+                  );
+                })()}
+              </div>
+              {/* Legend */}
+              <div className="flex gap-4 text-[10px] text-muted-foreground pt-1">
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-destructive" /> Среднее
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-2 h-0.5 bg-primary" /> Медиана
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-3 h-2 rounded border border-primary bg-primary/20" /> IQR
+                </span>
+                {data.some(v => v < stats.q1 - 1.5 * stats.iqr || v > stats.q3 + 1.5 * stats.iqr) && (
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full border-2 border-destructive" /> Выбросы
+                  </span>
+                )}
+              </div>
+            </div>
+          </StepCard>
+
           {/* Histogram */}
           <StepCard title="📊 Гистограмма">
             <div className="h-48">
