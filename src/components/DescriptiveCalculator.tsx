@@ -3,8 +3,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { MathFormula } from '@/components/MathFormula';
-import { Calculator, Trash2, Upload } from 'lucide-react';
+import { Calculator, Trash2, Upload, FileSpreadsheet, X } from 'lucide-react';
 import Papa from 'papaparse';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -102,27 +103,88 @@ const StepCard = ({ title, children }: { title: string; children: React.ReactNod
 export const DescriptiveCalculator = () => {
   const [input, setInput] = useState('12, 15, 14, 13, 18, 21, 14, 16, 14, 19');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [csvColumns, setCsvColumns] = useState<{ name: string; values: number[] }[]>([]);
+  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
+  const [csvFileName, setCsvFileName] = useState<string | null>(null);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCsvFileName(file.name);
     Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
       complete: (results) => {
-        const numbers: number[] = [];
-        results.data.forEach((row: any) => {
-          if (Array.isArray(row)) {
-            row.forEach((cell: any) => {
-              const v = parseFloat(String(cell).trim());
-              if (!isNaN(v)) numbers.push(v);
+        if (results.meta.fields && results.meta.fields.length > 0) {
+          // Parse columns with numeric data
+          const cols: { name: string; values: number[] }[] = [];
+          results.meta.fields.forEach((field) => {
+            const nums = (results.data as Record<string, unknown>[])
+              .map((row) => parseFloat(String(row[field] ?? '').trim()))
+              .filter((v) => !isNaN(v));
+            if (nums.length >= 1) {
+              cols.push({ name: field, values: nums });
+            }
+          });
+
+          if (cols.length > 0) {
+            setCsvColumns(cols);
+            setSelectedColumn(null); // let user pick
+          } else {
+            // Fallback: extract all numbers
+            const allNums: number[] = [];
+            (results.data as Record<string, unknown>[]).forEach((row) => {
+              Object.values(row).forEach((cell) => {
+                const v = parseFloat(String(cell ?? '').trim());
+                if (!isNaN(v)) allNums.push(v);
+              });
             });
+            if (allNums.length > 0) {
+              setInput(allNums.join(', '));
+            }
+            setCsvColumns([]);
+            setSelectedColumn(null);
           }
-        });
-        if (numbers.length > 0) {
-          setInput(numbers.join(', '));
+        } else {
+          // No headers — extract all numbers
+          const allNums: number[] = [];
+          (results.data as unknown[][]).forEach((row) => {
+            if (Array.isArray(row)) {
+              row.forEach((cell) => {
+                const v = parseFloat(String(cell).trim());
+                if (!isNaN(v)) allNums.push(v);
+              });
+            }
+          });
+          if (allNums.length > 0) {
+            setInput(allNums.join(', '));
+          }
+          setCsvColumns([]);
+          setSelectedColumn(null);
         }
       },
     });
     e.target.value = '';
+  };
+
+  const handleSelectColumn = (colName: string) => {
+    const col = csvColumns.find((c) => c.name === colName);
+    if (col) {
+      setInput(col.values.join(', '));
+      setSelectedColumn(colName);
+    }
+  };
+
+  const handleUseAllColumns = () => {
+    const all = csvColumns.flatMap((c) => c.values);
+    setInput(all.join(', '));
+    setSelectedColumn('__all__');
+  };
+
+  const handleClearCsv = () => {
+    setCsvColumns([]);
+    setSelectedColumn(null);
+    setCsvFileName(null);
   };
 
   const data = useMemo(() => {
@@ -180,10 +242,51 @@ export const DescriptiveCalculator = () => {
         <Button variant="outline" size="icon" onClick={() => fileRef.current?.click()} title="Загрузить CSV">
           <Upload className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => setInput('')}>
+        <Button variant="ghost" size="icon" onClick={() => { setInput(''); handleClearCsv(); }}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* CSV column selector */}
+      {csvColumns.length > 0 && (
+        <Card className="border-accent/30 bg-accent/5">
+          <CardContent className="pt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="w-4 h-4 text-accent-foreground" />
+                <Label className="font-medium text-sm">
+                  Столбцы из {csvFileName ?? 'CSV'}
+                </Label>
+                <Badge variant="outline" className="text-xs">{csvColumns.length} числовых</Badge>
+              </div>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleClearCsv}>
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedColumn === '__all__' ? 'default' : 'outline'}
+                size="sm"
+                className="text-xs h-7"
+                onClick={handleUseAllColumns}
+              >
+                Все значения ({csvColumns.reduce((s, c) => s + c.values.length, 0)})
+              </Button>
+              {csvColumns.map((col) => (
+                <Button
+                  key={col.name}
+                  variant={selectedColumn === col.name ? 'default' : 'outline'}
+                  size="sm"
+                  className="text-xs h-7"
+                  onClick={() => handleSelectColumn(col.name)}
+                >
+                  {col.name} <span className="text-muted-foreground ml-1">({col.values.length})</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {data.length > 0 && data.length < 3 && (
         <p className="text-destructive text-xs">Введите минимум 3 числа для расчёта.</p>
