@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { MathFormula } from '@/components/MathFormula';
-import { Calculator, Trash2 } from 'lucide-react';
+import { Calculator, Trash2, Upload } from 'lucide-react';
+import Papa from 'papaparse';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -100,6 +101,29 @@ const StepCard = ({ title, children }: { title: string; children: React.ReactNod
 
 export const DescriptiveCalculator = () => {
   const [input, setInput] = useState('12, 15, 14, 13, 18, 21, 14, 16, 14, 19');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    Papa.parse(file, {
+      complete: (results) => {
+        const numbers: number[] = [];
+        results.data.forEach((row: any) => {
+          if (Array.isArray(row)) {
+            row.forEach((cell: any) => {
+              const v = parseFloat(String(cell).trim());
+              if (!isNaN(v)) numbers.push(v);
+            });
+          }
+        });
+        if (numbers.length > 0) {
+          setInput(numbers.join(', '));
+        }
+      },
+    });
+    e.target.value = '';
+  };
 
   const data = useMemo(() => {
     return input
@@ -135,7 +159,7 @@ export const DescriptiveCalculator = () => {
   return (
     <div className="space-y-6 text-sm leading-relaxed">
       <p>
-        Введите числа через запятую, пробел или точку с запятой. Минимум 3 значения.
+        Введите числа через запятую, пробел или точку с запятой, либо загрузите CSV-файл. Минимум 3 значения.
         Приложение покажет все описательные статистики с <strong>пошаговым расчётом</strong>.
       </p>
 
@@ -146,6 +170,16 @@ export const DescriptiveCalculator = () => {
           placeholder="Например: 12, 15, 14, 13, 18"
           className="font-mono text-xs"
         />
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,.txt"
+          onChange={handleCsvUpload}
+          className="hidden"
+        />
+        <Button variant="outline" size="icon" onClick={() => fileRef.current?.click()} title="Загрузить CSV">
+          <Upload className="w-4 h-4" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={() => setInput('')}>
           <Trash2 className="w-4 h-4" />
         </Button>
