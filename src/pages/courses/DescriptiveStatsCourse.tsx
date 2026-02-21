@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { MathFormula } from '@/components/MathFormula';
 import { Quiz } from '@/components/Quiz';
 import { markTopicCompleted, getProgress } from '@/lib/progress';
+import { DescriptiveCalculator } from '@/components/DescriptiveCalculator';
 
 const topics = [
   {
@@ -141,6 +142,11 @@ const topics = [
         </div>
       </div>
     ),
+  },
+  {
+    id: 'calculator',
+    title: 'Калькулятор',
+    content: <DescriptiveCalculator />,
   },
   {
     id: 'jamovi',
