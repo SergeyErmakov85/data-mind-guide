@@ -328,7 +328,7 @@ const Index = () => {
                 <h3 className="font-heading font-semibold text-lg">Задание 1.1. Описательные статистики</h3>
                 <p className="text-sm text-muted-foreground">Практическое задание в формате Excel (.xlsx)</p>
               </div>
-              <a href="/files/ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx" download>
+              <a href="/files/task-1-1-descriptive-statistics.xlsx" download="ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx">
                 <Button className="gap-2">
                   <Download className="w-4 h-4" />
                   Скачать
