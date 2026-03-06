@@ -20,8 +20,20 @@ export const EffectSizeTheory = () => {
           <CardDescription>Полное методическое руководство</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="p-4 bg-accent/40 border border-accent rounded-lg">
+            <h4 className="font-semibold mb-2 text-foreground">Что такое размер эффекта?</h4>
+            <p className="text-muted-foreground">
+              <strong>Размер эффекта</strong> — это число, которое показывает, <em>насколько сильно</em> одно явление влияет на другое
+              или насколько две группы реально отличаются друг от друга. Если p-значение отвечает на вопрос «Есть ли различие?»,
+              то размер эффекта отвечает на вопрос <strong>«Насколько велико это различие?»</strong>.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Например, если новая методика обучения повышает баллы студентов, размер эффекта покажет, 
+              улучшение минимальное (студенты почти не заметят разницу) или существенное (результат ощутим на практике).
+            </p>
+          </div>
           <p className="text-muted-foreground">
-            <strong>Размер эффекта (effect size)</strong> — стандартизированная количественная мера величины изучаемого явления,
+            Формально: <strong>размер эффекта (effect size)</strong> — стандартизированная количественная мера величины изучаемого явления,
             позволяющая оценить <em>практическую</em> значимость результатов независимо от объёма выборки.
           </p>
           <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
