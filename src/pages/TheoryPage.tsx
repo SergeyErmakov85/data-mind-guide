@@ -2,6 +2,7 @@ import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Lightbulb, AlertCircle, Database, Ruler, BarChart3, Target, ScatterChart, Sigma, FlaskConical, TrendingUp, Calculator } from 'lucide-react';
+import { EffectSizeTheory } from '@/components/theory/EffectSizeTheory';
 import { NormalDistributionVisualizer } from '@/components/NormalDistributionVisualizer';
 import { MathFormula } from '@/components/MathFormula';
 import { motion } from 'framer-motion';
@@ -646,63 +647,7 @@ const TheoryPage = () => {
 
             {/* === NEW TAB: Размер эффекта === */}
             <TabsContent value="effectsize" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                    Почему p-value недостаточно
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">P-value говорит только о том, есть ли эффект. <strong>Размер эффекта</strong> показывает, насколько он большой — а это критически важно для практики.</p>
-                  <div className="example-box">
-                    <p className="text-sm text-muted-foreground">Исследование с n = 10000 может обнаружить статистически значимую разницу в 0.5 баллов IQ (p &lt; 0.001), но практически эта разница бессмысленна.</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader><CardTitle>Основные меры размера эффекта</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="p-4 border border-border rounded-lg">
-                      <h5 className="font-semibold mb-2">d Коэна (для t-тестов)</h5>
-                      <MathFormula formula="d = \frac{\bar{x}_1 - \bar{x}_2}{s_p}" display />
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>|d| ≈ 0.2 — малый</span>
-                        <span>|d| ≈ 0.5 — средний</span>
-                        <span>|d| ≈ 0.8 — большой</span>
-                      </div>
-                    </div>
-                    <div className="p-4 border border-border rounded-lg">
-                      <h5 className="font-semibold mb-2">r (для корреляций)</h5>
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>|r| ≈ 0.1 — малый</span>
-                        <span>|r| ≈ 0.3 — средний</span>
-                        <span>|r| ≈ 0.5 — большой</span>
-                      </div>
-                    </div>
-                    <div className="p-4 border border-border rounded-lg">
-                      <h5 className="font-semibold mb-2"><MathFormula formula="\eta^2" /> (для ANOVA)</h5>
-                      <MathFormula formula="\eta^2 = \frac{SS_{between}}{SS_{total}}" display />
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>η² ≈ 0.01 — малый</span>
-                        <span>η² ≈ 0.06 — средний</span>
-                        <span>η² ≈ 0.14 — большой</span>
-                      </div>
-                    </div>
-                    <div className="p-4 border border-border rounded-lg">
-                      <h5 className="font-semibold mb-2"><MathFormula formula="f^2" /> (для регрессии)</h5>
-                      <MathFormula formula="f^2 = \frac{R^2}{1 - R^2}" display />
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>f² ≈ 0.02 — малый</span>
-                        <span>f² ≈ 0.15 — средний</span>
-                        <span>f² ≈ 0.35 — большой</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <EffectSizeTheory />
             </TabsContent>
 
             {/* === Непараметрические методы === */}
