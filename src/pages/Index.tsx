@@ -319,23 +319,30 @@ const Index = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}
         >
-          <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
-            <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <FileSpreadsheet className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="font-heading font-semibold text-lg">Задание 1.1. Описательные статистики</h3>
-                <p className="text-sm text-muted-foreground">Практическое задание в формате Excel (.xlsx)</p>
-              </div>
-              <a href="/files/task-1-1-descriptive-statistics.xlsx" download="ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx">
-                <Button className="gap-2">
-                  <Download className="w-4 h-4" />
-                  Скачать
-                </Button>
-              </a>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            {[
+              { title: 'Задание 1.1. Описательные статистики', file: '/files/task-1-1-descriptive-statistics.xlsx', download: 'ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx' },
+              { title: 'Задание 1.2. Корреляционный анализ', file: '/files/task-1-2-correlation-analysis.xlsx', download: 'ПЗ_3-4_ЗАДАНИЕ-1.2_КОРРЕЛЯЦИОННЫЙ_АНАЛИЗ.xlsx' },
+            ].map((task) => (
+              <Card key={task.file} className="border-dashed border-2 border-primary/30 bg-primary/5">
+                <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <FileSpreadsheet className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="font-heading font-semibold text-lg">{task.title}</h3>
+                    <p className="text-sm text-muted-foreground">Практическое задание в формате Excel (.xlsx)</p>
+                  </div>
+                  <a href={task.file} download={task.download}>
+                    <Button className="gap-2">
+                      <Download className="w-4 h-4" />
+                      Скачать
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </motion.div>
       </section>
 
