@@ -158,7 +158,7 @@ const Index = () => {
         </div>
       </section>
       {/* Probability Theory Section */}
-      <section className="container py-12">
+      <section className="container py-6">
         <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}
