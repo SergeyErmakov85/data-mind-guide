@@ -8,6 +8,7 @@ import {
   Beaker,
   LineChart,
   TrendingUp,
+  Sparkles,
   Lightbulb,
   PlayCircle,
   Library,
@@ -137,6 +138,19 @@ const Index = () => {
                 <Button size="lg" variant="outline" className="gap-2">
                   <BookOpen className="w-4 h-4" />
                   Справочник теории
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="mt-8">
+              <Link to="/theory">
+                <Button
+                  size="lg"
+                  className="gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105 border-0"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Новый раздел: Размер эффекта
+                  <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </motion.div>
