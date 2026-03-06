@@ -142,8 +142,8 @@ const Index = () => {
               </Link>
             </motion.div>
 
-            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="mt-8">
-              <Link to="/theory">
+            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="mt-6">
+              <Link to="/theory?tab=effectsize">
                 <Button
                   size="lg"
                   className="gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105 border-0"
@@ -157,9 +157,8 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-
       {/* Probability Theory Section */}
-      <section className="container py-16">
+      <section className="container py-12">
         <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}

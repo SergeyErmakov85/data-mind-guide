@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +33,8 @@ const generateCorrelationPoints = (r: number): { x: number; y: number }[] => {
 };
 
 const TheoryPage = () => {
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'population';
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -48,7 +51,7 @@ const TheoryPage = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.4 }}>
-          <Tabs defaultValue="population" className="space-y-6">
+          <Tabs defaultValue={initialTab} className="space-y-6">
             <TabsList className="flex flex-wrap h-auto gap-1 bg-muted p-1">
               <TabsTrigger value="population">Выборка</TabsTrigger>
               <TabsTrigger value="scales">Шкалы</TabsTrigger>
