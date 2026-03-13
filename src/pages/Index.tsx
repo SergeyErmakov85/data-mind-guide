@@ -337,6 +337,7 @@ const Index = () => {
               { title: 'Задание 1.1. Описательные статистики', file: '/files/task-1-1-descriptive-statistics.xlsx', download: 'ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx' },
               { title: 'Задание 1.2. Корреляционный анализ', file: '/files/task-1-2-correlation-analysis.xlsx', download: 'ПЗ_3-4_ЗАДАНИЕ-1.2_КОРРЕЛЯЦИОННЫЙ_АНАЛИЗ.xlsx' },
               { title: 'Задание 1.3. Анализ различий', file: '/files/task-1-3-difference-analysis.xlsx', download: 'Задание_1.3._Анализ_различий_PersonalityTraits.xlsx' },
+              { title: 'Задание 1.4. Анализ различий и корреляции', file: '/files/task-1-4-correlations-and-differences.xlsx', download: 'Data_1.4_Korrelations_and_differences.xlsx' },
             ].map((task) => (
               <Card key={task.file} className="border-dashed border-2 border-primary/30 bg-primary/5">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
