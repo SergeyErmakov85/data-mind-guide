@@ -337,7 +337,7 @@ const Index = () => {
               { title: 'Задание 1.1. Описательные статистики', file: '/files/task-1-1-descriptive-statistics.xlsx', download: 'ЗАДАНИЕ-1.1._ОПИСАТЕЛЬНЫЕ_СТАТИСТИКИ.xlsx' },
               { title: 'Задание 1.2. Корреляционный анализ', file: '/files/task-1-2-correlation-analysis.xlsx', download: 'ПЗ_3-4_ЗАДАНИЕ-1.2_КОРРЕЛЯЦИОННЫЙ_АНАЛИЗ.xlsx' },
               { title: 'Задание 1.3. Анализ различий', file: '/files/task-1-3-difference-analysis.xlsx', download: 'Задание_1.3._Анализ_различий_PersonalityTraits.xlsx' },
-              { title: 'Задание 1.4. Анализ различий и корреляции', file: '/files/task-1-4-correlations-and-differences.xlsx', download: 'Data_1.4_Korrelations_and_differences.xlsx' },
+              { title: 'Задание 1.4. Анализ различий и корреляции', file: '/files/task-1-4-correlations-and-differences.xlsx', download: 'Data_1.4_Korrelations_and_differences.xlsx', extra: { file: '/files/task-1-4-analysis.ipynb', download: 'Analysis_1.4_Korrelations_and_differences.ipynb', label: 'Расчёты' } },
             ].map((task) => (
               <Card key={task.file} className="border-dashed border-2 border-primary/30 bg-primary/5">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
@@ -348,12 +348,22 @@ const Index = () => {
                     <h3 className="font-heading font-semibold text-lg">{task.title}</h3>
                     <p className="text-sm text-muted-foreground">Практическое задание в формате Excel (.xlsx)</p>
                   </div>
-                  <a href={task.file} download={task.download}>
-                    <Button className="gap-2">
-                      <Download className="w-4 h-4" />
-                      Скачать
-                    </Button>
-                  </a>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <a href={task.file} download={task.download}>
+                      <Button className="gap-2">
+                        <Download className="w-4 h-4" />
+                        Скачать
+                      </Button>
+                    </a>
+                    {'extra' in task && task.extra && (
+                      <a href={task.extra.file} download={task.extra.download}>
+                        <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                          <Download className="w-4 h-4" />
+                          {task.extra.label}
+                        </Button>
+                      </a>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
