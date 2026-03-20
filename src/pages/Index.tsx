@@ -338,6 +338,10 @@ const Index = () => {
               { title: 'Задание 1.2. Корреляционный анализ', file: '/files/task-1-2-correlation-analysis.xlsx', download: 'ПЗ_3-4_ЗАДАНИЕ-1.2_КОРРЕЛЯЦИОННЫЙ_АНАЛИЗ.xlsx' },
               { title: 'Задание 1.3. Анализ различий', file: '/files/task-1-3-difference-analysis.xlsx', download: 'Задание_1.3._Анализ_различий_PersonalityTraits.xlsx' },
               { title: 'Задание 1.4. Анализ различий и корреляции', file: '/files/task-1-4-correlations-and-differences.xlsx', download: 'Data_1.4_Korrelations_and_differences.xlsx', extra: { file: '/files/task-1-4-analysis.ipynb', download: 'Analysis_1.4_Korrelations_and_differences.ipynb', label: 'Расчёты' } },
+              { title: 'Задание 1.5. Депрессия у студентов', file: '/files/task-1-5-depression-dataset.xlsx', download: 'Student_Depression_Dataset_Excel.xlsx', extras: [
+                { file: '/files/task-1-5-depression-dataset.csv', download: 'Student_Depression_Dataset.csv', label: 'CSV' },
+                { file: '/files/task-1-5-models.ipynb', download: 'simple-data-cleaning-and-comparing-9-models.ipynb', label: 'Модели' },
+              ] },
             ].map((task) => (
               <Card key={task.file} className="border-dashed border-2 border-primary/30 bg-primary/5">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
@@ -363,14 +367,18 @@ const Index = () => {
                         </Button>
                       </a>
                     )}
+                    {'extras' in task && task.extras && task.extras.map((ex) => (
+                      <a key={ex.file} href={ex.file} download={ex.download}>
+                        <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                          <Download className="w-4 h-4" />
+                          {ex.label}
+                        </Button>
+                      </a>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </motion.div>
-      </section>
-
       {/* Progress + Quick Links */}
       <section className="container py-16">
         {hasProgress && (
