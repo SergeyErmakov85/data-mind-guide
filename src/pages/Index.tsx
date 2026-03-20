@@ -379,6 +379,10 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </motion.div>
+      </section>
+
       {/* Progress + Quick Links */}
       <section className="container py-16">
         {hasProgress && (
