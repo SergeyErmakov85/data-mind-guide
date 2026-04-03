@@ -391,12 +391,20 @@ const Index = () => {
                   <h3 className="font-heading font-semibold text-lg">Контрольная работа</h3>
                   <p className="text-sm text-muted-foreground">10 кейсов в формате CSV (архив .zip)</p>
                 </div>
-                <a href="/files/kontrolnaya_rabota.zip" download="Контрольная_работа.zip">
-                  <Button className="gap-2">
-                    <Download className="w-4 h-4" />
-                    Скачать все (ZIP)
-                  </Button>
-                </a>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <a href="/files/kontrolnaya_rabota.zip" download="Контрольная_работа.zip">
+                    <Button className="gap-2">
+                      <Download className="w-4 h-4" />
+                      Скачать все (ZIP)
+                    </Button>
+                  </a>
+                  <a href="/files/kontrolnaya-instructions.pdf" download="Инструкции.pdf">
+                    <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                      <Download className="w-4 h-4" />
+                      Инструкции
+                    </Button>
+                  </a>
+                </div>
               </CardContent>
             </Card>
           </div>
