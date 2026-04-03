@@ -18,6 +18,7 @@ import {
   GitBranch,
   Download,
   FileSpreadsheet,
+  Archive,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
@@ -379,6 +380,25 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+
+            {/* Контрольная работа */}
+            <Card className="border-dashed border-2 border-accent/30 bg-accent/5">
+              <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                  <Archive className="w-6 h-6 text-accent-foreground" />
+                </div>
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="font-heading font-semibold text-lg">Контрольная работа</h3>
+                  <p className="text-sm text-muted-foreground">10 кейсов в формате CSV (архив .zip)</p>
+                </div>
+                <a href="/files/kontrolnaya_rabota.zip" download="Контрольная_работа.zip">
+                  <Button className="gap-2">
+                    <Download className="w-4 h-4" />
+                    Скачать все (ZIP)
+                  </Button>
+                </a>
+              </CardContent>
+            </Card>
           </div>
         </motion.div>
       </section>
