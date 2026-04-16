@@ -343,6 +343,7 @@ const Index = () => {
                 { file: '/files/task-1-5-depression-dataset.csv', download: 'Student_Depression_Dataset.csv', label: 'CSV' },
                 { file: '/files/task-1-5-models.ipynb', download: 'simple-data-cleaning-and-comparing-9-models.ipynb', label: 'Модели' },
               ] },
+              { title: 'Задание 1.6. Анализ предпочтения музыкальных жанров', file: '/files/task-1-6-music-genres.xlsx', download: 'Задание_1.6._Анализ_предпочтения_музыкальных_жанров.xlsx' },
             ].map((task) => (
               <Card key={task.file} className="border-dashed border-2 border-primary/30 bg-primary/5">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
