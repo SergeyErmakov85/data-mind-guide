@@ -3,6 +3,7 @@ import { CorrelationLab } from '@/components/labs/CorrelationLab';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DatasetHandoffBanner } from '@/components/DatasetHandoffBanner';
 
 const CorrelationLabPage = () => {
   return (
@@ -29,6 +30,8 @@ const CorrelationLabPage = () => {
             Пример: связь тревожности и академической успеваемости.
           </p>
         </div>
+
+        <DatasetHandoffBanner />
 
         <CorrelationLab />
       </main>
