@@ -31,6 +31,7 @@ import {
 } from './ui/sheet';
 import { cn } from '@/lib/utils';
 import { navLinkVariants } from './nav/navLinkVariants';
+import { UserMenu } from './auth/UserMenu';
 
 interface NavItem {
   path: string;
