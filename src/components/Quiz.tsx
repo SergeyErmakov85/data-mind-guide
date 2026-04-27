@@ -5,6 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, XCircle, ArrowRight, RotateCcw, Trophy } from 'lucide-react';
 import { MathFormula } from '@/components/MathFormula';
+import {
+  GlassDialog,
+  GlassDialogContent,
+  GlassDialogTitle,
+  GlassDialogDescription,
+  GlassDialogFooter,
+} from '@/components/ui/glass-dialog';
 
 export interface QuizQuestion {
   id: string;
