@@ -52,7 +52,7 @@ const faqItems = [
 const FAQPage = () => (
   <div className="min-h-screen bg-background">
     <Header />
-    <main className="container py-8 max-w-3xl">
+    <main id="main-content" className="container py-8 max-w-3xl">
       <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
           <HelpCircle className="w-8 h-8 text-primary" />

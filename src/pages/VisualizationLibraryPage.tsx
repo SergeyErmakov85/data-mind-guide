@@ -182,7 +182,7 @@ const VisualizationLibraryPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8">
+      <main id="main-content" className="container py-8">
         <div className="mb-10">
           <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
             # Library · Распределения

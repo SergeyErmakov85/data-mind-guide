@@ -78,7 +78,7 @@ const GlossaryPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8">
+      <main id="main-content" className="container py-8">
         <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
             <BookOpen className="w-8 h-8 text-primary" />

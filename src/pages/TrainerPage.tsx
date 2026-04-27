@@ -201,7 +201,7 @@ const TrainerPage = () => {
       <div className="min-h-screen bg-background">
         <Header />
         
-        <main className="container py-8">
+        <main id="main-content" className="container py-8">
           <div className="max-w-2xl mx-auto">
             <Card className="text-center">
               <CardHeader>

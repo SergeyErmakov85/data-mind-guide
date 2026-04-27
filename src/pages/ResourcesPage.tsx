@@ -38,7 +38,7 @@ const levelColors: Record<string, string> = { 'начальный': 'bg-green-50
 const ResourcesPage = () => (
   <div className="min-h-screen bg-background">
     <Header />
-    <main className="container py-8">
+    <main id="main-content" className="container py-8">
       <motion.div className="mb-8" initial="hidden" animate="visible" variants={fadeUp}>
         <h1 className="font-heading text-3xl font-bold mb-2">📚 Ресурсы</h1>
         <p className="text-muted-foreground text-lg">

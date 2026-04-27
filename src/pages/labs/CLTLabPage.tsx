@@ -9,7 +9,7 @@ const CLTLabPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8">
+      <main id="main-content" className="container py-8">
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link to="/labs">
