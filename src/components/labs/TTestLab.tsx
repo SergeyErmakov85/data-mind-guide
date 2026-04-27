@@ -20,6 +20,7 @@ import {
   AreaChart,
 } from 'recharts';
 import { mean, standardDeviation, normalPDF } from '@/lib/statistics';
+import { ChartA11y } from '@/components/ChartA11y';
 
 type TestType = 'one-sample' | 'independent' | 'paired';
 
@@ -336,18 +337,23 @@ export const TTestLab = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={hist1}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="x" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Bar dataKey="freq" fill="hsl(var(--primary))" opacity={0.6} radius={[2, 2, 0, 0]} name="Группа 1" />
-                    <ReferenceLine x={mean(group1)} stroke="hsl(var(--primary))" strokeWidth={2} strokeDasharray="5 5" />
-                    {testType === 'one-sample' && (
-                      <ReferenceLine x={mu0} stroke="hsl(var(--destructive))" strokeWidth={2} label={{ value: `μ₀=${mu0}`, position: 'top' }} />
-                    )}
-                  </BarChart>
-                </ResponsiveContainer>
+                <ChartA11y
+                  label={`Гистограмма группы 1, n=${group1.length}, M=${mean(group1).toFixed(2)}`}
+                  summary={`Группа 1: n=${group1.length}, M=${mean(group1).toFixed(2)}, SD=${standardDeviation(group1).toFixed(2)}.`}
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={hist1}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="x" className="text-xs" />
+                      <YAxis className="text-xs" />
+                      <Bar dataKey="freq" fill="hsl(var(--primary))" opacity={0.6} radius={[2, 2, 0, 0]} name="Группа 1" />
+                      <ReferenceLine x={mean(group1)} stroke="hsl(var(--primary))" strokeWidth={2} strokeDasharray="5 5" />
+                      {testType === 'one-sample' && (
+                        <ReferenceLine x={mu0} stroke="hsl(var(--destructive))" strokeWidth={2} label={{ value: `μ₀=${mu0}`, position: 'top' }} />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartA11y>
                 {testType !== 'one-sample' && hist2.length > 0 && (
                   <ResponsiveContainer width="100%" height={200} className="mt-4">
                     <BarChart data={hist2}>
@@ -371,17 +377,22 @@ export const TTestLab = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={tCurve}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="x" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Area type="monotone" dataKey="y" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth={2} />
-                    <ReferenceLine x={result.t} stroke="hsl(var(--primary))" strokeWidth={2} label={{ value: `t=${result.t.toFixed(2)}`, position: 'top' }} />
-                    <ReferenceLine x={tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
-                    <ReferenceLine x={-tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <ChartA11y
+                  label={`t-распределение, df=${result.df.toFixed(1)}, t-наблюдаемое=${result.t.toFixed(2)}, α=${alpha}`}
+                  summary={`Кривая t-распределения с df=${result.df.toFixed(1)}. Наблюдаемое значение t=${result.t.toFixed(2)}. Критические значения: ±${tCrit.toFixed(2)}.`}
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={tCurve}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="x" className="text-xs" />
+                      <YAxis className="text-xs" />
+                      <Area type="monotone" dataKey="y" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth={2} />
+                      <ReferenceLine x={result.t} stroke="hsl(var(--primary))" strokeWidth={2} label={{ value: `t=${result.t.toFixed(2)}`, position: 'top' }} />
+                      <ReferenceLine x={tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
+                      <ReferenceLine x={-tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartA11y>
               </CardContent>
             </Card>
           </div>
