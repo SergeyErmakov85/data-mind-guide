@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Calculator, RefreshCw, Info, TrendingUp, TrendingDown } from 'lucide-react';
+import { DatasetHandoffBanner } from '@/components/DatasetHandoffBanner';
 
 const calculateStats = (data: number[]) => {
   if (data.length === 0) return null;
@@ -124,13 +125,36 @@ const DescriptiveStatsPage = () => {
   const [input, setInput] = useState(sampleData);
   const [data, setData] = useState<number[]>([]);
 
-  const parseData = () => {
-    const parsed = input
+  const parseData = useCallback((text?: string) => {
+    const src = text ?? input;
+    const parsed = src
       .split(/[,\s\n]+/)
       .map(s => parseFloat(s.trim()))
       .filter(n => !isNaN(n));
     setData(parsed);
-  };
+  }, [input]);
+
+  const handleDatasetApply = useCallback(
+    (h: { csv: string }) => {
+      // Parse the FULL csv (not just the 10-row preview) and pre-fill all numeric values.
+      const lines = h.csv.split(/\r?\n/).filter((l) => l.trim().length > 0);
+      const nums: number[] = [];
+      // skip header line
+      for (let i = 1; i < lines.length; i++) {
+        const cells = lines[i].split(',');
+        for (const c of cells) {
+          const v = parseFloat(c.trim());
+          if (!Number.isNaN(v)) nums.push(v);
+        }
+      }
+      if (nums.length > 0) {
+        const text = nums.join(', ');
+        setInput(text);
+        parseData(text);
+      }
+    },
+    [parseData],
+  );
 
   const stats = useMemo(() => calculateStats(data), [data]);
   const histogramData = useMemo(() => createHistogramData(data), [data]);
@@ -163,6 +187,8 @@ const DescriptiveStatsPage = () => {
             </p>
           </div>
 
+          <DatasetHandoffBanner onApply={handleDatasetApply} />
+
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Input Section */}
             <div className="space-y-6">
@@ -184,7 +210,7 @@ const DescriptiveStatsPage = () => {
                     className="min-h-[120px] font-mono"
                   />
                   <div className="flex gap-3">
-                    <Button onClick={parseData} className="flex-1 gap-2">
+                    <Button onClick={() => parseData()} className="flex-1 gap-2">
                       <Calculator className="w-4 h-4" />
                       Рассчитать
                     </Button>
