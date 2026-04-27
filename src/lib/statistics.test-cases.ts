@@ -42,15 +42,15 @@ export const STATS_TEST_CASES: StatTestCase[] = [
     id: 'desc-classic',
     group: 'descriptive',
     title: 'Базовая выборка [2, 4, 4, 4, 5, 5, 7, 9]',
-    source: 'Учебниковый пример (повсюду): M=5, s=2, σ≈1.871',
+    source: 'M=5; Σ(x−M)²=32 ⇒ σ²=4, s²≈4.571, σ=2, s≈2.138, SE≈0.756',
     run: () => {
       const x = [2, 4, 4, 4, 5, 5, 7, 9];
       return [
-        { label: 'sampleVariance (s²)', actual: round(sampleVariance(x), 3), expected: 4 },
-        { label: 'populationVariance (σ²)', actual: round(populationVariance(x), 3), expected: 3.5 },
-        { label: 'sampleSd (s)', actual: round(sampleSd(x), 3), expected: 2 },
-        { label: 'populationSd (σ)', actual: round(populationSd(x), 3), expected: 1.871, tol: 0.005 },
-        { label: 'SE = s/√n', actual: round(seMean(x), 3), expected: 0.707, tol: 0.005 },
+        { label: 'sampleVariance (s²)', actual: round(sampleVariance(x), 3), expected: 4.571, tol: 0.005 },
+        { label: 'populationVariance (σ²)', actual: round(populationVariance(x), 3), expected: 4 },
+        { label: 'sampleSd (s)', actual: round(sampleSd(x), 3), expected: 2.138, tol: 0.005 },
+        { label: 'populationSd (σ)', actual: round(populationSd(x), 3), expected: 2 },
+        { label: 'SE = s/√n', actual: round(seMean(x), 3), expected: 0.756, tol: 0.005 },
       ];
     },
   },
@@ -135,13 +135,13 @@ export const STATS_TEST_CASES: StatTestCase[] = [
     id: 'independent-t-welch-unequal',
     group: 't-test',
     title: 'Welch при неравных дисперсиях',
-    source: 'A=[10,12,14,16,18] s=3.16; B=[1,5,9,13,17] s=6.32; t≈1.131, df_W≈5.88',
+    source: 'A=[10,12,14,16,18] s²=10; B=[1,5,9,13,17] s²=40; meanDiff=5, SE=√10≈3.162, t≈1.581, df_W≈5.88',
     run: () => {
       const r = independentT([10, 12, 14, 16, 18], [1, 5, 9, 13, 17]);
       if (!r.ok) return [{ label: 'error', actual: r.reason, expected: 'ok' }];
       return [
-        { label: 't', actual: round(r.t, 3), expected: 1.131, tol: 0.01 },
-        { label: 'df_W', actual: round(r.df, 2), expected: 5.88, tol: 0.1 },
+        { label: 't', actual: round(r.t, 3), expected: 1.581, tol: 0.005 },
+        { label: 'df_W', actual: round(r.df, 2), expected: 5.88, tol: 0.05 },
       ];
     },
   },
@@ -201,12 +201,12 @@ export const STATS_TEST_CASES: StatTestCase[] = [
     id: 'pearson-classic',
     group: 'correlation',
     title: 'Пример Наследова: x=[1,2,3,4,5], y=[2,5,4,5,8]',
-    source: 'r ≈ 0.866',
+    source: 'sxy=12, sxx=10, syy=18.8 ⇒ r=12/√188≈0.875',
     run: () => {
       const r = pearsonCorrelation([1, 2, 3, 4, 5], [2, 5, 4, 5, 8]);
       if (!r.ok) return [{ label: 'error', actual: r.reason, expected: 'ok' }];
       return [
-        { label: 'r', actual: round(r.r, 3), expected: 0.866, tol: 0.005 },
+        { label: 'r', actual: round(r.r, 3), expected: 0.875, tol: 0.005 },
         { label: 'df', actual: r.df, expected: 3 },
       ];
     },
@@ -246,15 +246,15 @@ export const STATS_TEST_CASES: StatTestCase[] = [
   {
     id: 'reg-noise',
     group: 'regression',
-    title: 'Регрессия с шумом x=[1..5], y=[2,5,4,5,8]',
-    source: 'slope=1.2, intercept=1.4, R²≈0.75',
+    title: 'Регрессия x=[1..5], y=[2,5,4,5,8]',
+    source: 'sxy=12, sxx=10 ⇒ slope=1.2; intercept=ȳ−slope·x̄=4.8−3.6=1.2; R²=r²≈0.766',
     run: () => {
       const r = linearRegression([1, 2, 3, 4, 5], [2, 5, 4, 5, 8]);
       if (!r.ok) return [{ label: 'error', actual: r.reason, expected: 'ok' }];
       return [
         { label: 'slope', actual: round(r.slope, 3), expected: 1.2 },
-        { label: 'intercept', actual: round(r.intercept, 3), expected: 1.4 },
-        { label: 'R²', actual: round(r.r2, 3), expected: 0.75, tol: 0.005 },
+        { label: 'intercept', actual: round(r.intercept, 3), expected: 1.2 },
+        { label: 'R²', actual: round(r.r2, 3), expected: 0.766, tol: 0.005 },
       ];
     },
   },
@@ -281,15 +281,14 @@ export const STATS_TEST_CASES: StatTestCase[] = [
     id: 'cohen-medium',
     group: 'cohen',
     title: "d Коэна средний эффект",
-    source: 'M1=10 s=2 n=10; M2=11 s=2 n=10 ⇒ d=-0.5',
+    source: 'Сдвиг на 1 при s_pooled≈1.764 ⇒ d≈-0.567 (диапазон Cohen «средний»)',
     run: () => {
-      // Construct two datasets with M=10, s=2 and M=11, s=2 exactly.
       const a = [7, 8, 9, 10, 10, 10, 10, 11, 12, 13];
       const b = a.map(v => v + 1);
       const r = cohensD(a, b);
       if (!r.ok) return [{ label: 'error', actual: r.reason, expected: 'ok' }];
       return [
-        { label: 'd', actual: round(r.d, 3), expected: -0.5, tol: 0.05 },
+        { label: 'd', actual: round(r.d, 3), expected: -0.567, tol: 0.005 },
         { label: 'magnitude', actual: r.magnitude, expected: 'medium' },
       ];
     },
