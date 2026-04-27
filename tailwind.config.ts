@@ -14,8 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Merriweather', 'Georgia', 'serif'],
-        body: ['Source Sans 3', 'system-ui', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
+      borderWidth: {
+        '3': '3px',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -82,6 +86,8 @@ export default {
       boxShadow: {
         'card': 'var(--shadow-card)',
         'soft': 'var(--shadow-md)',
+        'brutal': '6px 6px 0 0 hsl(var(--foreground))',
+        'brutal-sm': '3px 3px 0 0 hsl(var(--foreground))',
       },
       keyframes: {
         "accordion-down": {
