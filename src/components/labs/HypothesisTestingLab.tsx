@@ -131,6 +131,8 @@ export const HypothesisTestingLab = () => {
                 min={0}
                 max={1.5}
                 step={0.1}
+                ariaLabel="Размер эффекта d Коэна"
+                ariaValueTextFormatter={(v) => `d = ${v.toFixed(2)}`}
               />
               <p className="text-xs text-muted-foreground">
                 d=0: нет эффекта, d=0.5: средний, d=0.8: большой
@@ -148,6 +150,8 @@ export const HypothesisTestingLab = () => {
                 min={10}
                 max={200}
                 step={10}
+                ariaLabel="Размер выборки n"
+                ariaValueTextFormatter={(v) => `n = ${v}`}
               />
               <p className="text-xs text-muted-foreground">
                 Больше n → выше мощность
@@ -165,6 +169,8 @@ export const HypothesisTestingLab = () => {
                 min={0.01}
                 max={0.10}
                 step={0.01}
+                ariaLabel="Уровень значимости α"
+                ariaValueTextFormatter={(v) => `α = ${v.toFixed(2)}`}
               />
               <p className="text-xs text-muted-foreground">
                 Меньше α → меньше ошибок I рода, но ниже мощность
