@@ -7,6 +7,7 @@ import { EffectSizeTheory } from '@/components/theory/EffectSizeTheory';
 import { NormalDistributionVisualizer } from '@/components/NormalDistributionVisualizer';
 import { MathFormula } from '@/components/MathFormula';
 import { motion } from 'framer-motion';
+import { AutoTermify } from '@/components/AutoTermify';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -40,6 +41,7 @@ const TheoryPage = () => {
       <Header />
       
       <main className="container py-8">
+        <AutoTermify>
         <div className="max-w-4xl mx-auto">
           <motion.div className="mb-8" initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
@@ -825,6 +827,7 @@ const TheoryPage = () => {
           </Tabs>
           </motion.div>
         </div>
+        </AutoTermify>
       </main>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
+import { AutoTermify } from '@/components/AutoTermify';
 import {
   BarChart3,
   FlaskConical,
@@ -69,10 +70,12 @@ const CoursesIndexPage = () => {
             <br />
             <span className="text-primary">статистики</span>
           </h1>
-          <p className="font-body text-base md:text-lg text-muted-foreground max-w-2xl mt-4">
-            Последовательное изучение статистики от базовых концепций до продвинутых методов
-            анализа. Каждый курс включает теорию, интерактивные примеры и задания для самопроверки.
-          </p>
+          <AutoTermify>
+            <p className="font-body text-base md:text-lg text-muted-foreground max-w-2xl mt-4">
+              Последовательное изучение статистики от базовых концепций до продвинутых методов
+              анализа. Каждый курс включает теорию, интерактивные примеры и задания для самопроверки.
+            </p>
+          </AutoTermify>
         </div>
 
         <DifficultyFilter value={filter} onChange={setFilter} counts={counts} />

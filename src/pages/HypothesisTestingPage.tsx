@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertTriangle, Info, ArrowRight } from 'lucide-react';
+import { AutoTermify } from '@/components/AutoTermify';
 
 const tests = [
   {
@@ -90,6 +91,7 @@ const HypothesisTestingPage = () => {
       <Header />
       
       <main className="container py-8">
+        <AutoTermify>
         <div className="max-w-5xl mx-auto">
           <div className="mb-8">
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
@@ -275,6 +277,7 @@ const HypothesisTestingPage = () => {
             </CardContent>
           </Card>
         </div>
+        </AutoTermify>
       </main>
     </div>
   );
