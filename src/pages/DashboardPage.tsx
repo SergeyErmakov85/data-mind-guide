@@ -276,7 +276,7 @@ const DashboardPage = () => {
         {/* --- Bookmarks --- */}
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-3">
-            <Bookmark className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <BookmarkIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
             <p className="kicker">BOOKMARKS</p>
           </div>
           <p className="font-heading text-3xl font-bold">{bookmarksQ.data?.length ?? 0}</p>
@@ -326,8 +326,5 @@ const DashboardPage = () => {
     </main>
   );
 };
-
-// keep `UserIcon` referenced so eslint stays happy if used in future header tweak
-void UserIcon;
 
 export default DashboardPage;
