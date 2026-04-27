@@ -80,17 +80,17 @@ const BentoHero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <Link to="/courses" className="block">
-                <Button className="btn-primary gap-2 w-full sm:w-auto">
+                <Button className="btn-primary gap-2 w-full sm:w-auto whitespace-normal text-center h-auto py-3 leading-tight">
                   Начать обучение
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </Button>
               </Link>
               <Link to="/calculators" className="block">
                 <Button
                   variant="outline"
-                  className="border-3 border-foreground rounded-none font-mono uppercase tracking-wider bg-background hover:bg-foreground hover:text-background w-full sm:w-auto"
+                  className="border-3 border-foreground rounded-none font-mono uppercase tracking-wider bg-background hover:bg-foreground hover:text-background w-full sm:w-auto whitespace-normal text-center h-auto py-3 leading-tight gap-2"
                 >
-                  <Calculator className="w-4 h-4" />
+                  <Calculator className="w-4 h-4 shrink-0" />
                   Открыть калькуляторы
                 </Button>
               </Link>
