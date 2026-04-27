@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -180,7 +179,7 @@ export default function AssessmentPage() {
             <Button asChild><Link to="/auth">Войти</Link></Button>
           </Card>
         </main>
-        <Footer />
+        
       </div>
     );
   }
@@ -210,7 +209,7 @@ export default function AssessmentPage() {
             </ul>
           </Card>
         </main>
-        <Footer />
+        
       </div>
     );
   }
@@ -229,7 +228,7 @@ export default function AssessmentPage() {
             </Button>
           </Card>
         </main>
-        <Footer />
+        
       </div>
     );
   }
@@ -250,7 +249,7 @@ export default function AssessmentPage() {
           </Card>
           <Button size="lg" onClick={() => setStarted(true)}>Начать тест</Button>
         </main>
-        <Footer />
+        
       </div>
     );
   }
@@ -298,7 +297,7 @@ export default function AssessmentPage() {
           </Button>
         </div>
       </main>
-      <Footer />
+      
     </div>
   );
 }

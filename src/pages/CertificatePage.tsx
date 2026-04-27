@@ -4,7 +4,6 @@ import QRCode from 'qrcode';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Download, ShieldCheck } from 'lucide-react';
@@ -75,7 +74,7 @@ export default function CertificatePage() {
           <h1 className="font-serif text-3xl mb-4">Сертификат не найден</h1>
           <Button asChild variant="outline"><Link to="/assessment">К аттестации</Link></Button>
         </main>
-        <Footer />
+        
       </div>
     );
   }
@@ -136,7 +135,7 @@ export default function CertificatePage() {
           Подлинность можно проверить по QR-коду или ссылке /verify/{cert.hash.slice(0, 12)}…
         </p>
       </main>
-      <Footer />
+      
     </div>
   );
 }
