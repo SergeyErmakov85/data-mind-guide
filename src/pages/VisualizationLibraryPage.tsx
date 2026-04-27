@@ -57,6 +57,77 @@ const fPDF = (x: number, d1: number, d2: number) => {
 
 const betaFn = (a: number, b: number) => gamma(a) * gamma(b) / gamma(a + b);
 
+interface DistItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  difficulty: Difficulty;
+  indexLabel: string;
+  badges: string[];
+  tabValue: string;
+}
+
+const distItems: DistItem[] = [
+  { id: 'normal', title: 'Нормальное N(μ, σ²)', description: 'Симметричный «колокол» — основа большинства параметрических методов и описания психологических признаков.', icon: BarChart3, difficulty: 'beginner', indexLabel: 'NORMAL', badges: ['μ, σ', '68/95'], tabValue: 'normal' },
+  { id: 't', title: 't Стьюдента', description: 'Тяжёлые хвосты при малых df. Используется в t-тестах для сравнения средних.', icon: Activity, difficulty: 'intermediate', indexLabel: 'STUDENT', badges: ['df', 't-test'], tabValue: 't' },
+  { id: 'chi', title: 'χ² (хи-квадрат)', description: 'Правосторонняя асимметрия. Применяется для категориальных данных и таблиц сопряжённости.', icon: Sigma, difficulty: 'intermediate', indexLabel: 'CHI-SQ', badges: ['k', 'категории'], tabValue: 'chi' },
+  { id: 'f', title: 'F Фишера', description: 'Отношение дисперсий. Лежит в основе ANOVA и сравнения двух выборочных дисперсий.', icon: GitBranch, difficulty: 'advanced', indexLabel: 'FISHER', badges: ['d₁, d₂', 'ANOVA'], tabValue: 'f' },
+];
+
+const DistributionsBento = () => {
+  const [filter, setFilter] = useState<Difficulty | 'all'>('all');
+  const sorted = sortByDifficulty(distItems);
+  const visible = filter === 'all' ? sorted : sorted.filter((d) => d.difficulty === filter);
+
+  const counts = {
+    all: distItems.length,
+    beginner: distItems.filter((d) => d.difficulty === 'beginner').length,
+    intermediate: distItems.filter((d) => d.difficulty === 'intermediate').length,
+    advanced: distItems.filter((d) => d.difficulty === 'advanced').length,
+  };
+
+  const onJump = (tabValue: string) => {
+    const triggers = document.querySelectorAll<HTMLButtonElement>('#dist-tabs [role="tab"]');
+    const idx = ['normal', 't', 'chi', 'f'].indexOf(tabValue);
+    triggers[idx]?.click();
+    setTimeout(() => {
+      document.getElementById('dist-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  return (
+    <div className="mb-10">
+      <DifficultyFilter value={filter} onChange={setFilter} counts={counts} />
+      <motion.div
+        key={filter}
+        className="grid grid-cols-1 md:grid-cols-12 auto-rows-fr gap-5"
+        initial="hidden"
+        animate="visible"
+        variants={tileGridMotion}
+      >
+        {visible.map((d, i) => (
+          <div
+            key={d.id}
+            onClick={() => onJump(d.tabValue)}
+            className="contents cursor-pointer"
+          >
+            <BentoTile
+              index={i}
+              difficulty={d.difficulty}
+              badges={d.badges}
+              title={d.title}
+              description={d.description}
+              indexLabel={d.indexLabel}
+              icon={d.icon}
+            />
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
 const VisualizationLibraryPage = () => {
   // Normal params
   const [nMu, setNMu] = useState(0);
