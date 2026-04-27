@@ -6,6 +6,12 @@ import { Search, BookOpen } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { MathFormula } from '@/components/MathFormula';
+import {
+  GlassDialog,
+  GlassDialogContent,
+  GlassDialogTitle,
+  GlassDialogDescription,
+} from '@/components/ui/glass-dialog';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
