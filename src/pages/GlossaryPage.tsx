@@ -123,7 +123,18 @@ const GlossaryPage = () => {
         <motion.div className="grid gap-3" initial="hidden" animate="visible" variants={stagger} key={search + selectedCategory}>
           {filtered.map((entry, i) => (
             <motion.div key={i} variants={fadeUp} transition={{ duration: 0.3 }}>
-            <Card>
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() => setActiveEntry(entry)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveEntry(entry);
+                }
+              }}
+              className="cursor-pointer transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-sm"
+            >
               <CardContent className="py-4">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-2">
                   <div className="flex-1">
@@ -147,6 +158,38 @@ const GlossaryPage = () => {
             <p className="text-center text-muted-foreground py-8">Ничего не найдено</p>
           )}
         </motion.div>
+
+        <GlassDialog
+          open={activeEntry !== null}
+          onOpenChange={(open) => {
+            if (!open) setActiveEntry(null);
+          }}
+        >
+          <GlassDialogContent dialogId={`TERM / ${activeEntry?.category?.toUpperCase() ?? ''}`}>
+            {activeEntry && (
+              <div className="space-y-4">
+                <GlassDialogTitle>{activeEntry.term}</GlassDialogTitle>
+                <GlassDialogDescription className="text-base text-foreground/80">
+                  {activeEntry.definition}
+                </GlassDialogDescription>
+                {activeEntry.formula && (
+                  <div className="border-3 border-foreground p-4 bg-background">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                      // FORMULA
+                    </p>
+                    <MathFormula formula={activeEntry.formula} display />
+                  </div>
+                )}
+                <div className="flex items-center gap-2 pt-2">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Категория:
+                  </span>
+                  <Badge variant="outline">{activeEntry.category}</Badge>
+                </div>
+              </div>
+            )}
+          </GlassDialogContent>
+        </GlassDialog>
       </main>
     </div>
   );
