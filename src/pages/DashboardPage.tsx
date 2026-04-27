@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { History } from 'lucide-react';
+import {
+  ArrowRight,
+  Bookmark as BookmarkIcon,
+  Calculator,
+  GraduationCap,
+  History,
+} from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
