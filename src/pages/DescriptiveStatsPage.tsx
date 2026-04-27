@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Calculator, RefreshCw, Info, TrendingUp, TrendingDown } from 'lucide-react';
+import { DatasetHandoffBanner } from '@/components/DatasetHandoffBanner';
 
 const calculateStats = (data: number[]) => {
   if (data.length === 0) return null;
