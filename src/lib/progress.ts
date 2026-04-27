@@ -58,6 +58,19 @@ export const markTopicCompleted = (courseId: string, topicId: string) => {
   }
 };
 
+/**
+ * Generic progress helper (used by trainers / inline tasks).
+ * Stores task IDs under a course key in completedCourseTopics.
+ */
+export const addProgress = (courseId: string, taskId: string) => {
+  markTopicCompleted(courseId, taskId);
+};
+
+export const hasProgress = (courseId: string, taskId: string): boolean => {
+  const p = getProgress();
+  return !!p.completedCourseTopics[courseId]?.includes(taskId);
+};
+
 export const getLabProgress = (labId: string): boolean => {
   return getProgress().completedLabs.includes(labId);
 };
