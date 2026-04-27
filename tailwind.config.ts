@@ -86,6 +86,8 @@ export default {
       boxShadow: {
         'card': 'var(--shadow-card)',
         'soft': 'var(--shadow-md)',
+        'brutal': '6px 6px 0 0 hsl(var(--foreground))',
+        'brutal-sm': '3px 3px 0 0 hsl(var(--foreground))',
       },
       keyframes: {
         "accordion-down": {
