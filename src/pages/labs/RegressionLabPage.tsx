@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LinearRegressionLab from '@/components/labs/LinearRegressionLab';
+import RegressionInspector from '@/components/visualizations/RegressionInspector';
 
 const RegressionLabPage = () => {
   return (
@@ -29,7 +30,19 @@ const RegressionLabPage = () => {
           </p>
         </div>
         
-        <LinearRegressionLab />
+        <section className="mb-12">
+          <h2 className="font-heading text-2xl font-semibold mb-4">Инспектор регрессии</h2>
+          <p className="text-muted-foreground mb-6">
+            Полная диагностика на ваших данных: confidence band, остатки, Q-Q plot, Cook's distance,
+            робастные SE (HC3).
+          </p>
+          <RegressionInspector />
+        </section>
+
+        <section>
+          <h2 className="font-heading text-2xl font-semibold mb-4">Симуляция: МНК с нуля</h2>
+          <LinearRegressionLab />
+        </section>
       </main>
     </div>
   );
