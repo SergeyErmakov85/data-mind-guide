@@ -112,15 +112,24 @@ const VisualizationLibraryPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
-            <Eye className="w-8 h-8 text-primary" />
-            Визуальная библиотека распределений
+        <div className="mb-10">
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            # Library · Распределения
+          </p>
+          <h1 className="font-heading uppercase tracking-tight font-bold text-4xl md:text-6xl leading-[0.95] flex items-center gap-4">
+            <Eye className="w-10 h-10 md:w-12 md:h-12 text-primary shrink-0" />
+            Визуальная
+            <span className="text-primary">библиотека</span>
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Интерактивные графики основных статистических распределений
+          <p className="font-body text-base md:text-lg text-muted-foreground max-w-2xl mt-4">
+            Интерактивные графики основных статистических распределений: меняйте параметры
+            и наблюдайте поведение функций плотности.
           </p>
         </div>
+
+        {/* Bento overview of distributions */}
+        <DistributionsBento />
+
 
         <Tabs defaultValue="normal" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
