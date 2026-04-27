@@ -30,6 +30,7 @@ import {
   SheetTrigger,
 } from './ui/sheet';
 import { cn } from '@/lib/utils';
+import { navLinkVariants } from './nav/navLinkVariants';
 
 interface NavItem {
   path: string;
@@ -111,10 +112,10 @@ export const Header = () => {
                       <NavigationMenuLink asChild>
                         <Link
                           to={item.path}
-                          className={cn(
-                            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-                            location.pathname === item.path && 'bg-accent'
-                          )}
+                          className={navLinkVariants({
+                            variant: 'dropdown',
+                            active: location.pathname === item.path,
+                          })}
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="w-4 h-4" />
@@ -141,10 +142,10 @@ export const Header = () => {
                       <NavigationMenuLink asChild>
                         <Link
                           to={item.path}
-                          className={cn(
-                            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-                            location.pathname === item.path && 'bg-accent'
-                          )}
+                          className={navLinkVariants({
+                            variant: 'dropdown',
+                            active: location.pathname === item.path,
+                          })}
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="w-4 h-4" />
@@ -163,12 +164,11 @@ export const Header = () => {
               <NavigationMenuItem key={item.path}>
                 <Link
                   to={item.path}
-                  className={cn(
-                    'nav-link flex items-center gap-2 text-sm px-4 py-2',
-                    location.pathname === item.path
-                      ? 'bg-primary text-primary-foreground rounded-lg'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
+                  className={navLinkVariants({
+                    variant: 'desktop',
+                    active: location.pathname === item.path,
+                    tone: 'muted',
+                  })}
                 >
                   <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
@@ -218,13 +218,10 @@ export const Header = () => {
                         key={item.path}
                         to={item.path}
                         onClick={close}
-                        className={cn(
-                          'flex items-center gap-3 px-2 rounded-md min-h-11',
-                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
-                          location.pathname === item.path
-                            ? 'text-primary font-medium bg-primary/5'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        )}
+                        className={navLinkVariants({
+                          variant: 'mobile',
+                          active: location.pathname === item.path,
+                        })}
                       >
                         <item.icon className="w-5 h-5 shrink-0" />
                         <span>{item.label}</span>
@@ -244,13 +241,10 @@ export const Header = () => {
                         key={item.path}
                         to={item.path}
                         onClick={close}
-                        className={cn(
-                          'flex items-center gap-3 px-2 rounded-md min-h-11',
-                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
-                          location.pathname === item.path
-                            ? 'text-primary font-medium bg-primary/5'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        )}
+                        className={navLinkVariants({
+                          variant: 'mobile',
+                          active: location.pathname === item.path,
+                        })}
                       >
                         <item.icon className="w-5 h-5 shrink-0" />
                         <span className="text-sm">{item.label}</span>
@@ -270,13 +264,10 @@ export const Header = () => {
                         key={item.path}
                         to={item.path}
                         onClick={close}
-                        className={cn(
-                          'flex items-center gap-3 px-2 rounded-md min-h-11',
-                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
-                          location.pathname === item.path
-                            ? 'text-primary font-medium bg-primary/5'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                        )}
+                        className={navLinkVariants({
+                          variant: 'mobile',
+                          active: location.pathname === item.path,
+                        })}
                       >
                         <item.icon className="w-5 h-5 shrink-0" />
                         <span className="text-sm">{item.label}</span>
