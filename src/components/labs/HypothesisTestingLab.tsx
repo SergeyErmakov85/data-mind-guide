@@ -15,6 +15,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { generateSample, mean, standardError, tStatistic, approximatePValue, normalPDF } from '@/lib/statistics';
+import { ChartA11y } from '@/components/ChartA11y';
 
 // Null hypothesis: μ = 50
 const NULL_MEAN = 50;
@@ -279,48 +280,53 @@ export const HypothesisTestingLab = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={tDistData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="x" 
-                domain={[-4, 4]}
-                ticks={[-4, -3, -2, -1, 0, 1, 2, 3, 4]}
-                className="text-xs"
-              />
-              <YAxis className="text-xs" hide />
-              <Area
-                type="monotone"
-                dataKey="y"
-                stroke="hsl(var(--primary))"
-                fill="hsl(var(--primary) / 0.3)"
-              />
-              <ReferenceLine 
-                x={-criticalT} 
-                stroke="hsl(var(--destructive))" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-              <ReferenceLine 
-                x={criticalT} 
-                stroke="hsl(var(--destructive))" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-              {stats && (
-                <ReferenceLine 
-                  x={stats.t} 
-                  stroke="hsl(var(--accent))" 
-                  strokeWidth={3}
-                  label={{ 
-                    value: `t=${stats.t.toFixed(2)}`, 
-                    position: 'top',
-                    fill: 'hsl(var(--accent))'
-                  }}
+          <ChartA11y
+            label={`t-распределение под H₀, α=${alpha}, критическое t=±${criticalT.toFixed(2)}${stats ? `, наблюдаемое t=${stats.t.toFixed(2)}` : ''}`}
+            summary={`Распределение t-статистики под нулевой гипотезой. α = ${alpha}. Критические значения ±${criticalT.toFixed(2)}.${stats ? ` Наблюдаемое t = ${stats.t.toFixed(2)}.` : ''}`}
+          >
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={tDistData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="x" 
+                  domain={[-4, 4]}
+                  ticks={[-4, -3, -2, -1, 0, 1, 2, 3, 4]}
+                  className="text-xs"
                 />
-              )}
-            </AreaChart>
-          </ResponsiveContainer>
+                <YAxis className="text-xs" hide />
+                <Area
+                  type="monotone"
+                  dataKey="y"
+                  stroke="hsl(var(--primary))"
+                  fill="hsl(var(--primary) / 0.3)"
+                />
+                <ReferenceLine 
+                  x={-criticalT} 
+                  stroke="hsl(var(--destructive))" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+                <ReferenceLine 
+                  x={criticalT} 
+                  stroke="hsl(var(--destructive))" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+                {stats && (
+                  <ReferenceLine 
+                    x={stats.t} 
+                    stroke="hsl(var(--accent))" 
+                    strokeWidth={3}
+                    label={{ 
+                      value: `t=${stats.t.toFixed(2)}`, 
+                      position: 'top',
+                      fill: 'hsl(var(--accent))'
+                    }}
+                  />
+                )}
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartA11y>
         </CardContent>
       </Card>
 
