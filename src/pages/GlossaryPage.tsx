@@ -1,195 +1,300 @@
+import { useMemo, useRef, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Search, BookOpen, X } from 'lucide-react';
+
 import { Header } from '@/components/Header';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Search, BookOpen } from 'lucide-react';
-import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { MathFormula } from '@/components/MathFormula';
+import { Button } from '@/components/ui/button';
+
 import {
-  GlassDialog,
-  GlassDialogContent,
-  GlassDialogTitle,
-  GlassDialogDescription,
-} from '@/components/ui/glass-dialog';
+  GLOSSARY,
+  CATEGORY_LABEL,
+  totalLinks,
+  type GlossaryCategory,
+  type GlossaryTerm,
+} from '@/data/glossary';
 
-const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
-const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
+/* ─────────────────────────── Helpers ─────────────────────────── */
 
-interface GlossaryEntry {
-  term: string;
-  definition: string;
-  category: string;
-  formula?: string;
-}
+/** Размер плитки по числу связей. */
+const tileSpan = (links: number): string => {
+  if (links >= 6) return 'md:col-span-6';
+  if (links >= 3) return 'md:col-span-4';
+  return 'md:col-span-3';
+};
 
-const entries: GlossaryEntry[] = [
-  // Русский алфавит
-  { term: 'Альтернативная гипотеза (H₁)', definition: 'Гипотеза о наличии эффекта или различий. Принимается при отвержении H₀.', category: 'Вывод' },
-  { term: 'Асимметрия (skewness)', definition: 'Мера несимметричности распределения. Положительная — хвост вправо, отрицательная — влево.', category: 'Описательная' },
-  { term: 'Биномиальное распределение', definition: 'Распределение числа успехов в n независимых испытаниях Бернулли с вероятностью успеха p.', category: 'Распределения' },
-  { term: 'Выборка', definition: 'Подмножество генеральной совокупности, отобранное для исследования.', category: 'Основы' },
-  { term: 'Генеральная совокупность', definition: 'Полная совокупность всех объектов, которые являются предметом исследования.', category: 'Основы' },
-  { term: 'Дисперсия', definition: 'Среднее квадратов отклонений значений от среднего. Мера разброса данных.', category: 'Описательная', formula: 'S^2 = \\frac{\\sum (x_i - M)^2}{n-1}' },
-  { term: 'Доверительный интервал', definition: 'Диапазон значений, который с заданной вероятностью содержит истинный параметр популяции.', category: 'Вывод', formula: 'CI = M \\pm z \\cdot SE' },
-  { term: 'Коэффициент детерминации (R²)', definition: 'Доля дисперсии зависимой переменной, объяснённая моделью. R² = r².', category: 'Регрессия', formula: 'R^2 = r^2' },
-  { term: 'Коэффициент Коэна d', definition: 'Размер эффекта для сравнения двух средних. Малый: 0.2, средний: 0.5, большой: 0.8.', category: 'Размер эффекта', formula: 'd = \\frac{M_1 - M_2}{SD_{pooled}}' },
-  { term: 'Коэффициент корреляции Пирсона', definition: 'Мера линейной связи между двумя количественными переменными. Диапазон от −1 до +1.', category: 'Корреляция', formula: 'r = \\frac{\\sum (x_i - M_x)(y_i - M_y)}{\\sqrt{\\sum (x_i - M_x)^2 \\cdot \\sum (y_i - M_y)^2}}' },
-  { term: 'Коэффициент Спирмена', definition: 'Ранговая корреляция. Измеряет монотонную (не обязательно линейную) связь между переменными.', category: 'Корреляция' },
-  { term: 'Медиана', definition: 'Значение, делящее упорядоченный ряд данных пополам. Устойчива к выбросам.', category: 'Описательная' },
-  { term: 'Мода', definition: 'Наиболее часто встречающееся значение в наборе данных.', category: 'Описательная' },
-  { term: 'Мощность теста', definition: 'Вероятность обнаружить реальный эффект (1 − β). Рекомендуемый минимум: 0.80.', category: 'Вывод' },
-  { term: 'Нормальное распределение', definition: 'Симметричное колоколообразное распределение, определяемое средним (μ) и стандартным отклонением (σ).', category: 'Распределения' },
-  { term: 'Нулевая гипотеза (H₀)', definition: 'Гипотеза об отсутствии эффекта или различий. Предполагается верной, пока не доказано обратное.', category: 'Вывод' },
-  { term: 'Объяснённая дисперсия', definition: 'Часть общего разброса данных, которую удаётся объяснить с помощью модели. Доля объяснённой дисперсии = объяснённая дисперсия / общая дисперсия. Выражается через R² (коэффициент детерминации). Например, R² = 0.36 означает, что модель объясняет 36 % разброса.', category: 'Регрессия', formula: 'R^2 = \\frac{SS_{reg}}{SS_{total}}' },
-  { term: 'Остатки (residuals)', definition: 'Разность между наблюдаемым и предсказанным значением: eᵢ = yᵢ − ŷᵢ.', category: 'Регрессия', formula: 'e_i = y_i - \\hat{y}_i' },
-  { term: 'Ошибка I рода (α)', definition: 'Вероятность отвергнуть верную нулевую гипотезу (ложноположительный результат).', category: 'Вывод' },
-  { term: 'Ошибка II рода (β)', definition: 'Вероятность не отвергнуть ложную нулевую гипотезу (ложноотрицательный результат).', category: 'Вывод' },
-  { term: 'Регрессионный коэффициент (β)', definition: 'Показывает, на сколько единиц изменится Y при увеличении X на 1 единицу.', category: 'Регрессия' },
-  { term: 'Среднее арифметическое', definition: 'Сумма всех значений, делённая на их количество.', category: 'Описательная', formula: 'M = \\frac{\\sum x_i}{n}' },
-  { term: 'Стандартная ошибка', definition: 'Стандартное отклонение выборочного распределения статистики. Показывает точность оценки.', category: 'Вывод', formula: 'SE = \\frac{SD}{\\sqrt{n}}' },
-  { term: 'Стандартное отклонение', definition: 'Корень из дисперсии. Показывает типичное отклонение от среднего в единицах измерения.', category: 'Описательная', formula: 'SD = \\sqrt{S^2}' },
-  { term: 'Хи-квадрат (χ²)', definition: 'Критерий для анализа категориальных данных. Сравнивает наблюдаемые и ожидаемые частоты.', category: 'Критерии' },
-  { term: 'Центральная предельная теорема', definition: 'При достаточно большом n распределение выборочных средних приближается к нормальному, независимо от формы исходного распределения.', category: 'Распределения' },
-  { term: 'Эксцесс (kurtosis)', definition: 'Мера «тяжести хвостов» распределения. Нормальное распределение имеет эксцесс = 0 (excess kurtosis).', category: 'Описательная' },
-  // Английский алфавит / латиница
-  { term: 'ANOVA', definition: 'Дисперсионный анализ для сравнения средних трёх и более групп. Использует F-статистику.', category: 'Критерии' },
-  { term: 'Cramér\'s V', definition: 'Размер эффекта для хи-квадрат. Диапазон от 0 до 1.', category: 'Размер эффекта', formula: 'V = \\sqrt{\\frac{\\chi^2}{n(\\min(r,c) - 1)}}' },
-  { term: 'p-value', definition: 'Вероятность получить наблюдаемый или более экстремальный результат при условии, что нулевая гипотеза верна.', category: 'Вывод' },
-  { term: 't-тест Стьюдента', definition: 'Критерий для сравнения средних. Одновыборочный, для зависимых и независимых выборок.', category: 'Критерии' },
-  { term: 'η² (эта-квадрат)', definition: 'Размер эффекта в ANOVA. Доля общей дисперсии, объяснённая фактором.', category: 'Размер эффекта', formula: '\\eta^2 = \\frac{SS_{between}}{SS_{total}}' },
-];
+/** Безопасная подсветка совпадения в обычном тексте. */
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const categories = Array.from(new Set(entries.map(e => e.category)));
+const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
+  if (!query.trim()) return <>{text}</>;
+  const re = new RegExp(`(${escapeRegExp(query.trim())})`, 'gi');
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((part, i) =>
+        re.test(part) ? (
+          <mark key={i} className="bg-primary/30 text-foreground rounded-none px-0.5">
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+};
+
+/** Алфавит А-Я + латиница для терминов вроде ANOVA, p-value. */
+const RU_ALPHABET = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ'.split('');
+
+const firstLetter = (term: string): string => {
+  const ch = term.trim().charAt(0).toUpperCase();
+  // Латиница объединена в одну группу "A-Z"
+  if (/[A-Z]/.test(ch)) return 'A–Z';
+  return ch;
+};
+
+/* ─────────────────────────── Page ─────────────────────────── */
 
 const GlossaryPage = () => {
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [activeEntry, setActiveEntry] = useState<GlossaryEntry | null>(null);
+  const reduced = useReducedMotion();
+  const [query, setQuery] = useState('');
+  const [activeCat, setActiveCat] = useState<GlossaryCategory | null>(null);
+  const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
-  const filtered = useMemo(() => {
-    return entries.filter(e => {
-      const matchesSearch = !search || e.term.toLowerCase().includes(search.toLowerCase()) || e.definition.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = !selectedCategory || e.category === selectedCategory;
-      return matchesSearch && matchesCat;
+  const allCategories: GlossaryCategory[] = ['descriptive', 'inference', 'effect', 'design'];
+
+  const filtered = useMemo<GlossaryTerm[]>(() => {
+    const q = query.trim().toLowerCase();
+    return GLOSSARY.filter((t) => {
+      if (activeCat && t.category !== activeCat) return false;
+      if (!q) return true;
+      const haystack = [t.term, t.short, t.long, ...(t.aliases ?? [])]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
     });
-  }, [search, selectedCategory]);
+  }, [query, activeCat]);
+
+  /** Группировка по первой букве + сортировка. */
+  const grouped = useMemo(() => {
+    const map = new Map<string, GlossaryTerm[]>();
+    [...filtered]
+      .sort((a, b) => a.term.localeCompare(b.term, 'ru'))
+      .forEach((t) => {
+        const k = firstLetter(t.term);
+        if (!map.has(k)) map.set(k, []);
+        map.get(k)!.push(t);
+      });
+    return map;
+  }, [filtered]);
+
+  /** Какие буквы вообще есть среди отфильтрованных — для подсветки в индексе. */
+  const availableLetters = useMemo(() => new Set(grouped.keys()), [grouped]);
+
+  const scrollToLetter = useCallback((letter: string) => {
+    const el = sectionsRef.current[letter];
+    if (el) el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }, [reduced]);
+
+  const indexLetters = ['A–Z', ...RU_ALPHABET];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main id="main-content" className="container py-8">
-        <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-primary" />
+      <main id="main-content" className="container mx-auto px-4 py-10 max-w-7xl">
+        {/* Header */}
+        <header className="mb-8">
+          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-3 flex items-center gap-3">
+            <BookOpen className="w-9 h-9 text-primary" aria-hidden="true" />
             Глоссарий
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Основные термины математической статистики для психологов
+          <p className="text-muted-foreground max-w-2xl">
+            Энциклопедия терминов математической статистики для психологов. {GLOSSARY.length} статей,
+            формулы, перекрёстные ссылки, упоминания в курсе и лабах.
           </p>
-        </motion.div>
+        </header>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        {/* Search + category chips */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
-              placeholder="Поиск термина..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-10"
+              type="search"
+              placeholder="Поиск по терминам, синонимам, определениям..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="pl-10 pr-10 h-11"
+              aria-label="Поиск термина"
             />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={selectedCategory === null ? 'default' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setSelectedCategory(null)}
-            >
-              Все ({entries.length})
-            </Badge>
-            {categories.map(cat => (
-              <Badge
-                key={cat}
-                variant={selectedCategory === cat ? 'default' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Очистить поиск"
               >
-                {cat}
-              </Badge>
-            ))}
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Category chips: rounded-none, active = bg-foreground text-background */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveCat(null)}
+              className={[
+                'px-3 py-1.5 text-sm border border-foreground rounded-none transition-colors',
+                activeCat === null
+                  ? 'bg-foreground text-background'
+                  : 'bg-background text-foreground hover:bg-foreground/10',
+              ].join(' ')}
+              aria-pressed={activeCat === null}
+            >
+              Все ({GLOSSARY.length})
+            </button>
+            {allCategories.map((cat) => {
+              const count = GLOSSARY.filter((t) => t.category === cat).length;
+              const active = activeCat === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setActiveCat(active ? null : cat)}
+                  className={[
+                    'px-3 py-1.5 text-sm border border-foreground rounded-none transition-colors',
+                    active
+                      ? 'bg-foreground text-background'
+                      : 'bg-background text-foreground hover:bg-foreground/10',
+                  ].join(' ')}
+                  aria-pressed={active}
+                >
+                  {CATEGORY_LABEL[cat]} ({count})
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <motion.div className="grid gap-3" initial="hidden" animate="visible" variants={stagger} key={search + selectedCategory}>
-          {filtered.map((entry, i) => (
-            <motion.div key={i} variants={fadeUp} transition={{ duration: 0.3 }}>
-            <Card
-              role="button"
-              tabIndex={0}
-              onClick={() => setActiveEntry(entry)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setActiveEntry(entry);
-                }
-              }}
-              className="cursor-pointer transition-all hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-brutal-sm"
-            >
-              <CardContent className="py-4">
-                <div className="flex flex-col sm:flex-row sm:items-start gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium">{entry.term}</h3>
-                      <Badge variant="secondary" className="text-xs">{entry.category}</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{entry.definition}</p>
-                  </div>
-                  {entry.formula && (
-                    <div className="flex items-center justify-end">
-                      <MathFormula formula={entry.formula} />
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            </motion.div>
-          ))}
-          {filtered.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">Ничего не найдено</p>
-          )}
-        </motion.div>
-
-        <GlassDialog
-          open={activeEntry !== null}
-          onOpenChange={(open) => {
-            if (!open) setActiveEntry(null);
-          }}
+        {/* Sticky alphabet index */}
+        <nav
+          aria-label="Индекс по алфавиту"
+          className="sticky top-16 z-20 -mx-4 px-4 py-2 mb-6 bg-background/95 backdrop-blur border-y border-border"
         >
-          <GlassDialogContent dialogId={`TERM / ${activeEntry?.category?.toUpperCase() ?? ''}`}>
-            {activeEntry && (
-              <div className="space-y-4">
-                <GlassDialogTitle>{activeEntry.term}</GlassDialogTitle>
-                <GlassDialogDescription className="text-base text-foreground/80">
-                  {activeEntry.definition}
-                </GlassDialogDescription>
-                {activeEntry.formula && (
-                  <div className="border-3 border-foreground p-4 bg-background">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-                      // FORMULA
-                    </p>
-                    <MathFormula formula={activeEntry.formula} display />
-                  </div>
-                )}
-                <div className="flex items-center gap-2 pt-2">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    Категория:
-                  </span>
-                  <Badge variant="outline">{activeEntry.category}</Badge>
+          <div className="flex flex-wrap gap-1 text-sm">
+            {indexLetters.map((l) => {
+              const has = availableLetters.has(l);
+              return (
+                <button
+                  key={l}
+                  type="button"
+                  disabled={!has}
+                  onClick={() => scrollToLetter(l)}
+                  className={[
+                    'min-w-[2rem] px-1.5 py-0.5 font-mono transition-colors',
+                    has
+                      ? 'text-foreground hover:bg-foreground hover:text-background cursor-pointer'
+                      : 'text-muted-foreground/40 cursor-not-allowed',
+                  ].join(' ')}
+                  aria-label={`Перейти к ${l}`}
+                >
+                  {l}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Bento grid grouped by letter */}
+        {grouped.size === 0 ? (
+          <p className="text-center text-muted-foreground py-16">
+            Ничего не найдено по запросу «{query}»
+          </p>
+        ) : (
+          <div className="space-y-10">
+            {[...grouped.entries()].map(([letter, terms]) => (
+              <section
+                key={letter}
+                ref={(el) => {
+                  sectionsRef.current[letter] = el;
+                }}
+                aria-labelledby={`letter-${letter}`}
+                className="scroll-mt-32"
+              >
+                <h2
+                  id={`letter-${letter}`}
+                  className="font-serif text-2xl font-bold mb-4 text-muted-foreground"
+                >
+                  {letter}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 auto-rows-fr">
+                  {terms.map((t, i) => {
+                    const links = totalLinks(t);
+                    const span = tileSpan(links);
+                    const fade = reduced
+                      ? {}
+                      : {
+                          initial: { opacity: 0, y: 12 },
+                          whileInView: { opacity: 1, y: 0 },
+                          viewport: { once: true, margin: '-50px' },
+                          transition: { duration: 0.3, delay: Math.min(i * 0.02, 0.2) },
+                        };
+
+                    return (
+                      <motion.div key={t.id} {...fade} className={`col-span-1 ${span}`}>
+                        <Link
+                          to={`/glossary/${t.id}`}
+                          className="group flex h-full flex-col justify-between border-2 border-foreground bg-card p-5 transition-all hover:bg-foreground hover:text-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-2 text-[10px] font-mono uppercase tracking-widest opacity-60">
+                              <span>{CATEGORY_LABEL[t.category]}</span>
+                              {links > 0 && <span aria-label={`${links} связей`}>↔ {links}</span>}
+                            </div>
+                            <h3 className="font-serif text-lg font-bold mb-2 leading-tight">
+                              <HighlightMatch text={t.term} query={query} />
+                            </h3>
+                            <p className="text-sm leading-snug opacity-80">
+                              <HighlightMatch text={t.short} query={query} />
+                            </p>
+                          </div>
+                          <div className="mt-4 text-xs font-mono opacity-50 group-hover:opacity-100">
+                            читать →
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
-          </GlassDialogContent>
-        </GlassDialog>
+              </section>
+            ))}
+          </div>
+        )}
+
+        {/* Result counter */}
+        <p className="mt-8 text-center text-xs text-muted-foreground font-mono">
+          {filtered.length} из {GLOSSARY.length}
+          {activeCat && ` · ${CATEGORY_LABEL[activeCat]}`}
+          {query && ` · «${query}»`}
+        </p>
+
+        {(query || activeCat) && (
+          <div className="mt-4 text-center">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setQuery('');
+                setActiveCat(null);
+              }}
+            >
+              Сбросить фильтры
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );
