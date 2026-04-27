@@ -2,118 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
-/* Academic Design System for Psychology Statistics App */
+/* Minimalist Brutalism Design System */
 
 @layer base {
   :root {
-    /* Academic color palette */
-    --background: 210 25% 98%;
-    --foreground: 220 25% 15%;
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Deep academic blue */
-    --primary: 220 60% 35%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 222 80% 18%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Warm secondary */
-    --secondary: 35 30% 92%;
-    --secondary-foreground: 220 25% 20%;
+    --secondary: 220 14% 90%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 20% 94%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 220 14% 93%;
+    --muted-foreground: 220 10% 35%;
 
-    /* Accent - warm gold */
-    --accent: 38 70% 50%;
+    --accent: 222 80% 18%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 220 60% 35%;
+    --border: 222 47% 11%;
+    --input: 222 47% 11%;
+    --ring: 222 80% 18%;
 
-    --radius: 0.75rem;
+    --radius: 0;
 
-    /* Custom tokens */
     --success: 145 60% 40%;
     --success-foreground: 0 0% 100%;
-    
+
     --warning: 38 90% 50%;
     --warning-foreground: 0 0% 100%;
 
     --info: 200 80% 45%;
     --info-foreground: 0 0% 100%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(220, 60%, 35%), hsl(220, 70%, 25%));
-    --gradient-warm: linear-gradient(135deg, hsl(38, 70%, 50%), hsl(25, 80%, 45%));
-    --gradient-hero: linear-gradient(180deg, hsl(210, 25%, 98%) 0%, hsl(220, 30%, 95%) 100%);
+    /* Solid replacements (no gradients in brutalism) */
+    --gradient-primary: hsl(222 80% 18%);
+    --gradient-warm: hsl(222 80% 18%);
+    --gradient-hero: hsl(220 20% 97%);
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(220 25% 15% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(220 25% 15% / 0.1), 0 2px 4px -2px hsl(220 25% 15% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(220 25% 15% / 0.1), 0 4px 6px -4px hsl(220 25% 15% / 0.1);
-    --shadow-card: 0 4px 20px -2px hsl(220 60% 35% / 0.08);
+    --shadow-sm: 3px 3px 0 0 hsl(222 47% 11%);
+    --shadow-md: 6px 6px 0 0 hsl(222 47% 11%);
+    --shadow-lg: 8px 8px 0 0 hsl(222 47% 11%);
+    --shadow-card: 6px 6px 0 0 hsl(222 47% 11%);
 
-    /* Typography */
-    --font-heading: 'Merriweather', Georgia, serif;
-    --font-body: 'Source Sans 3', system-ui, sans-serif;
+    --font-heading: '"Space Grotesk"', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: '"JetBrains Mono"', ui-monospace, monospace;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 222 80% 18%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 93%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 222 47% 11%;
+    --sidebar-ring: 222 80% 18%;
   }
 
   .dark {
-    --background: 220 25% 10%;
-    --foreground: 210 25% 95%;
+    --background: 222 47% 6%;
+    --foreground: 0 0% 98%;
 
-    --card: 220 25% 13%;
-    --card-foreground: 210 25% 95%;
+    --card: 222 47% 9%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 220 25% 13%;
-    --popover-foreground: 210 25% 95%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 60% 55%;
-    --primary-foreground: 220 25% 10%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 222 47% 6%;
 
-    --secondary: 220 20% 20%;
-    --secondary-foreground: 210 25% 90%;
+    --secondary: 222 30% 16%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 15% 60%;
+    --muted: 222 30% 14%;
+    --muted-foreground: 220 10% 70%;
 
-    --accent: 38 70% 55%;
-    --accent-foreground: 220 25% 10%;
+    --accent: 0 0% 98%;
+    --accent-foreground: 222 47% 6%;
 
     --destructive: 0 62.8% 45%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 22%;
-    --input: 220 20% 22%;
-    --ring: 210 60% 55%;
+    --border: 0 0% 98%;
+    --input: 0 0% 98%;
+    --ring: 0 0% 98%;
 
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 220 20% 22%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --shadow-sm: 3px 3px 0 0 hsl(0 0% 98%);
+    --shadow-md: 6px 6px 0 0 hsl(0 0% 98%);
+    --shadow-lg: 8px 8px 0 0 hsl(0 0% 98%);
+    --shadow-card: 6px 6px 0 0 hsl(0 0% 98%);
+
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 222 30% 14%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 98%;
+    --sidebar-ring: 0 0% 98%;
   }
 }
 
@@ -135,66 +134,69 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    @apply font-semibold tracking-tight;
+    @apply font-bold uppercase tracking-tight;
   }
+
+  h1 { @apply text-6xl md:text-7xl; }
+  h2 { @apply text-4xl md:text-5xl; }
+  h3 { @apply text-2xl md:text-3xl; }
 }
 
 @layer components {
   .card-academic {
-    @apply bg-card rounded-xl border border-border/50;
-    box-shadow: var(--shadow-card);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    @apply bg-card text-card-foreground border-3 border-foreground rounded-none shadow-brutal-sm;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .card-academic:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
+    @apply shadow-brutal;
+    transform: translate(-2px, -2px);
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium;
-    transition: all 0.2s ease;
+    @apply bg-primary text-primary-foreground border-3 border-foreground rounded-none px-6 py-3 font-mono uppercase tracking-wider shadow-brutal-sm;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
 
   .btn-primary:hover {
-    @apply opacity-90;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 hsl(var(--foreground));
+  }
+
+  .btn-primary:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
   }
 
   .module-card {
-    @apply p-6 rounded-xl border border-border/50 bg-card;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    @apply p-6 border-3 border-foreground rounded-none bg-card shadow-brutal-sm;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .module-card:hover {
-    box-shadow: var(--shadow-card);
-    border-color: hsl(var(--primary) / 0.3);
+    @apply shadow-brutal;
+    transform: translate(-2px, -2px);
   }
 
   .stat-highlight {
-    @apply px-3 py-1 rounded-full text-sm font-medium;
-    background: hsl(var(--primary) / 0.1);
-    color: hsl(var(--primary));
+    @apply px-3 py-1 rounded-none text-sm font-mono font-semibold border-2 border-foreground bg-background text-foreground;
   }
 
   .formula-box {
-    @apply p-4 my-4 rounded-lg border border-border/50 bg-muted/30;
+    @apply p-4 my-4 rounded-none border-3 border-foreground bg-muted;
     font-family: 'KaTeX_Main', serif;
   }
 
   .example-box {
-    @apply p-4 my-4 rounded-lg border-l-4 bg-secondary/50;
-    border-left-color: hsl(var(--accent));
+    @apply p-4 my-4 rounded-none border-3 border-foreground bg-secondary;
   }
 
   .nav-link {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+    @apply px-4 py-2 rounded-none font-mono uppercase tracking-wider text-sm transition-colors;
   }
 
   .nav-link:hover {
-    @apply bg-muted;
+    @apply bg-foreground text-background;
   }
 
   .nav-link.active {
@@ -221,20 +223,19 @@
   }
 
   @keyframes slideUp {
-    from { 
+    from {
       opacity: 0;
       transform: translateY(20px);
     }
-    to { 
+    to {
       opacity: 1;
       transform: translateY(0);
     }
   }
 
   .gradient-text {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--primary));
+    background: none;
+    -webkit-text-fill-color: currentColor;
   }
 }
