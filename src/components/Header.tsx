@@ -31,6 +31,7 @@ import {
 } from './ui/sheet';
 import { cn } from '@/lib/utils';
 import { navLinkVariants } from './nav/navLinkVariants';
+import { UserMenu } from './auth/UserMenu';
 
 interface NavItem {
   path: string;
@@ -178,8 +179,12 @@ export const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Mobile / tablet trigger — Sheet drawer (left) */}
-        <Sheet open={open} onOpenChange={setOpen}>
+        {/* Right cluster: profile + mobile menu trigger */}
+        <div className="flex items-center gap-2 shrink-0">
+          <UserMenu />
+
+          {/* Mobile / tablet trigger — Sheet drawer (left) */}
+          <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
               variant="ghost"
@@ -279,6 +284,7 @@ export const Header = () => {
             </nav>
           </SheetContent>
         </Sheet>
+        </div>
         </div>
       </header>
     </>

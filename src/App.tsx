@@ -30,6 +30,10 @@ import VisualizationLibraryPage from "./pages/VisualizationLibraryPage";
 import DescriptiveStatsCourse from "./pages/courses/DescriptiveStatsCourse";
 import ChiSquareCourse from "./pages/courses/ChiSquareCourse";
 import ProbabilityTheoryPage from "./pages/ProbabilityTheoryPage";
+import AuthPage from "./pages/AuthPage";
+import DashboardPage from "./pages/DashboardPage";
+import { AuthProvider } from "./contexts/AuthContext";
+import { RequireAuth } from "./components/auth/RequireAuth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,7 +44,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
+        <AuthProvider>
+          <Routes>
           {/* Main Pages */}
           <Route path="/" element={<Index />} />
           <Route path="/theory" element={<TheoryPage />} />
@@ -79,14 +84,26 @@ const App = () => (
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/faq" element={<FAQPage />} />
           
+          {/* Auth & Dashboard */}
+          <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardPage />
+              </RequireAuth>
+            }
+          />
+
           {/* Legacy routes — permanent client-side redirects (replace ⇒ no history entry) */}
           <Route path="/descriptive" element={<DescriptiveStatsPage />} />
           <Route path="/hypothesis" element={<Navigate to="/labs/hypothesis" replace />} />
           <Route path="/practice" element={<Navigate to="/descriptive" replace />} />
           <Route path="/trainer" element={<Navigate to="/labs" replace />} />
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
