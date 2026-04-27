@@ -19,6 +19,7 @@ import {
   tileGridMotion,
   type Difficulty,
 } from '@/components/BentoTile';
+import { CorrelationExplorer } from '@/components/visualizations/CorrelationExplorer';
 
 const normalPDF = (x: number, mu: number, sigma: number) => {
   return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
@@ -363,6 +364,15 @@ const VisualizationLibraryPage = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <section className="mt-16">
+          <h2 className="font-serif text-2xl md:text-3xl mb-2">Корреляция: интерактивный исследователь</h2>
+          <p className="text-muted-foreground mb-6 max-w-3xl">
+            Управляйте целевой связью, размером выборки и типом данных. Увидите, как форма связи
+            меняет смысл коэффициента r.
+          </p>
+          <CorrelationExplorer />
+        </section>
       </main>
     </div>
   );
