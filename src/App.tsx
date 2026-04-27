@@ -35,6 +35,9 @@ import ChiSquareCourse from "./pages/courses/ChiSquareCourse";
 import ProbabilityTheoryPage from "./pages/ProbabilityTheoryPage";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import AssessmentPage from "./pages/AssessmentPage";
+import CertificatePage from "./pages/CertificatePage";
+import VerifyPage from "./pages/VerifyPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import NotFound from "./pages/NotFound";
@@ -92,6 +95,9 @@ const App = () => (
           
           {/* Auth & Dashboard */}
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/assessment" element={<AssessmentPage />} />
+          <Route path="/certificate/:hash" element={<CertificatePage />} />
+          <Route path="/verify/:hash" element={<VerifyPage />} />
           <Route
             path="/dashboard"
             element={

@@ -35,6 +35,39 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          attempt_id: string
+          display_name: string
+          hash: string
+          id: string
+          issued_at: string
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          attempt_id: string
+          display_name: string
+          hash?: string
+          id?: string
+          issued_at?: string
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Update: {
+          attempt_id?: string
+          display_name?: string
+          hash?: string
+          id?: string
+          issued_at?: string
+          score?: number
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -157,7 +190,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_certificate_hash: {
+        Args: { _attempt_id: string; _user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
