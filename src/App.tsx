@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import TheoryPage from "./pages/TheoryPage";
 import AboutPage from "./pages/AboutPage";
@@ -79,11 +79,11 @@ const App = () => (
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/faq" element={<FAQPage />} />
           
-          {/* Legacy routes - redirect */}
+          {/* Legacy routes — permanent client-side redirects (replace ⇒ no history entry) */}
           <Route path="/descriptive" element={<DescriptiveStatsPage />} />
-          <Route path="/hypothesis" element={<HypothesisLabPage />} />
-          <Route path="/practice" element={<DescriptiveStatsPage />} />
-          <Route path="/trainer" element={<LabsIndexPage />} />
+          <Route path="/hypothesis" element={<Navigate to="/labs/hypothesis" replace />} />
+          <Route path="/practice" element={<Navigate to="/descriptive" replace />} />
+          <Route path="/trainer" element={<Navigate to="/labs" replace />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
