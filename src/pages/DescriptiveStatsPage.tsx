@@ -187,6 +187,8 @@ const DescriptiveStatsPage = () => {
             </p>
           </div>
 
+          <DatasetHandoffBanner onApply={handleDatasetApply} />
+
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Input Section */}
             <div className="space-y-6">
