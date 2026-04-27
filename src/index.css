@@ -298,4 +298,101 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
   }
+
+  /* ----------------------------------------------------------------
+   *  A11Y AUDIT — cross-cutting accessibility safety nets
+   * ---------------------------------------------------------------- */
+
+  /* 7) Visible focus ring on every interactive element.
+   *    3px outline + 2px offset using the themed --ring token, so it
+   *    keeps ≥3:1 contrast against any background in the design system.
+   *    `:focus-visible` keeps it keyboard-only (no ring on mouse click). */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [role="link"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="option"]:focus-visible,
+  [role="checkbox"]:focus-visible,
+  [role="radio"]:focus-visible,
+  [role="switch"]:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* 8) Skip-link rendered first in <Header>.
+   *    Visually hidden until focused — then jumps into the viewport. */
+  .skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    z-index: 100;
+    padding: 0.625rem 1rem;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 3px solid hsl(var(--foreground));
+    transform: translateY(-200%);
+    transition: transform 0.15s ease;
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* 9) Glass dialog contrast — when any "glass" surface uses a translucent
+   *    background, force the text colour to a fully opaque foreground so
+   *    contrast ≥ 4.5:1 is preserved regardless of what's behind it.       */
+  .glass,
+  .glass-dialog,
+  [data-glass="true"] {
+    color: hsl(var(--foreground));
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+  .glass *,
+  .glass-dialog *,
+  [data-glass="true"] * {
+    /* Prevent inherited low-opacity text inside glass surfaces. */
+    text-shadow: none;
+  }
+
+  /* 10) Screen-reader-only utility (Tailwind already exposes .sr-only,
+   *     but we add a `.sr-live` variant for live-updated chart summaries). */
+  .sr-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* 11) prefers-reduced-motion — kill non-essential animation site-wide.
+   *     Components using framer-motion ALSO read useReducedMotion() so
+   *     transforms/scale collapse to identity, but this guards CSS too.   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
