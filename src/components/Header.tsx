@@ -79,8 +79,13 @@ export const Header = () => {
   const close = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between gap-3">
+    <>
+      {/* Skip-link — first focusable element on the page. */}
+      <a href="#main-content" className="skip-link">
+        Перейти к содержимому
+      </a>
+      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between gap-3">
         {/* Logo — never wraps to two lines */}
         <Link to="/" className="flex items-center gap-2 min-w-0 shrink">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
@@ -283,7 +288,8 @@ export const Header = () => {
             </nav>
           </SheetContent>
         </Sheet>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 };
