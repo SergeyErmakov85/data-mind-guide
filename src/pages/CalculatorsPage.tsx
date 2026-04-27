@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MathFormula } from '@/components/MathFormula';
-import { Calculator } from 'lucide-react';
+import { Calculator, CheckCircle2, XCircle, Bug } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { STATS_TEST_CASES, isCasePassing } from '@/lib/statistics.test-cases';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -202,8 +204,85 @@ const TTestCalc = () => {
   );
 };
 
+/* ─── Dev-only debug panel: textbook test cases ─── */
+const DebugPanel = () => {
+  const cases = useMemo(
+    () => STATS_TEST_CASES.map(tc => {
+      const results = tc.run();
+      return { tc, results, passing: isCasePassing(results) };
+    }),
+    []
+  );
+  const passingCount = cases.filter(c => c.passing).length;
+
+  return (
+    <div className="mt-12 border-3 border-foreground p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bug className="w-5 h-5" />
+          <h2 className="font-heading text-xl uppercase tracking-tight">
+            Stat-lib audit · ?debug=1
+          </h2>
+        </div>
+        <Badge variant={passingCount === cases.length ? 'default' : 'destructive'} className="font-mono tabular-nums">
+          {passingCount} / {cases.length} passing
+        </Badge>
+      </div>
+      <p className="text-xs text-muted-foreground font-mono">
+        Эталоны: Сидоренко (2003), Наследов (2004), Navarro & Foxcroft. Только для разработчиков.
+      </p>
+      <div className="grid gap-3">
+        {cases.map(({ tc, results, passing }) => (
+          <div
+            key={tc.id}
+            className={`border-3 p-3 ${passing ? 'border-success/60 bg-success/5' : 'border-destructive/60 bg-destructive/5'}`}
+          >
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <div className="kicker">{tc.group}</div>
+                <div className="font-medium text-sm">{tc.title}</div>
+                <div className="text-xs text-muted-foreground font-mono mt-1">{tc.source}</div>
+              </div>
+              {passing
+                ? <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                : <XCircle className="w-5 h-5 text-destructive shrink-0" />}
+            </div>
+            <table className="w-full text-xs font-mono tabular-nums">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th className="text-left py-1">метрика</th>
+                  <th className="text-right py-1">факт</th>
+                  <th className="text-right py-1">ожид.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((r, i) => {
+                  const okRow =
+                    typeof r.actual === 'number' && typeof r.expected === 'number'
+                      ? Math.abs(r.actual - r.expected) <= (r.tol ?? 0.01)
+                      : r.actual === r.expected;
+                  return (
+                    <tr key={i} className={okRow ? '' : 'text-destructive'}>
+                      <td className="py-0.5">{r.label}</td>
+                      <td className="text-right py-0.5">{String(r.actual)}</td>
+                      <td className="text-right py-0.5">{String(r.expected)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 /* ─── Main Page ─── */
 const CalculatorsPage = () => {
+  const location = useLocation();
+  const debugMode = new URLSearchParams(location.search).get('debug') === '1';
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -232,6 +311,8 @@ const CalculatorsPage = () => {
             <TabsContent value="ttest"><TTestCalc /></TabsContent>
           </Tabs>
           </motion.div>
+
+          {debugMode && <DebugPanel />}
         </div>
       </main>
     </div>

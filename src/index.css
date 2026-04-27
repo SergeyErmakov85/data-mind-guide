@@ -134,32 +134,12 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    @apply font-bold uppercase;
+    @apply font-bold uppercase tracking-tight;
   }
 
-  h1 { @apply text-5xl md:text-7xl font-bold uppercase; letter-spacing: -0.02em; line-height: 0.95; }
-  h2 { @apply text-3xl md:text-5xl font-bold uppercase leading-tight; letter-spacing: -0.01em; }
-  h3 { @apply text-xl md:text-2xl font-bold uppercase; }
-
-  /* Decorative grid background overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.05;
-    color: hsl(var(--foreground));
-    background-image:
-      linear-gradient(to right, currentColor 1px, transparent 1px),
-      linear-gradient(to bottom, currentColor 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  body > * {
-    position: relative;
-    z-index: 1;
-  }
+  h1 { @apply text-6xl md:text-7xl; }
+  h2 { @apply text-4xl md:text-5xl; }
+  h3 { @apply text-2xl md:text-3xl; }
 }
 
 @layer components {
@@ -221,29 +201,6 @@
 
   .nav-link.active {
     @apply bg-primary text-primary-foreground;
-  }
-
-  .kicker {
-    @apply font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground;
-  }
-
-  .lead {
-    @apply text-lg md:text-xl leading-relaxed text-foreground/80;
-  }
-
-  .rule {
-    @apply h-[3px] w-full bg-foreground my-6;
-  }
-
-  .num {
-    @apply font-mono tabular-nums;
-  }
-
-  .grid-bg {
-    background-image:
-      linear-gradient(to right, hsl(var(--foreground) / 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
   }
 }
 

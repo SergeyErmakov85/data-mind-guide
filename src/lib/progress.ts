@@ -58,19 +58,6 @@ export const markTopicCompleted = (courseId: string, topicId: string) => {
   }
 };
 
-/**
- * Generic progress helper (used by trainers / inline tasks).
- * Stores task IDs under a course key in completedCourseTopics.
- */
-export const addProgress = (courseId: string, taskId: string) => {
-  markTopicCompleted(courseId, taskId);
-};
-
-export const hasProgress = (courseId: string, taskId: string): boolean => {
-  const p = getProgress();
-  return !!p.completedCourseTopics[courseId]?.includes(taskId);
-};
-
 export const getLabProgress = (labId: string): boolean => {
   return getProgress().completedLabs.includes(labId);
 };
@@ -93,76 +80,3 @@ export const getTotalProgress = (): { labs: number; quizzes: number; topics: num
 export const resetProgress = () => {
   localStorage.removeItem(PROGRESS_KEY);
 };
-
-/* ===========================================================
- * Learning-path module progress (vertical timeline on /learning-path)
- * Stored separately under `dmg:progress` to keep the legacy
- * progress untouched.
- * =========================================================== */
-
-const MODULE_PROGRESS_KEY = 'dmg:progress';
-
-export type ModuleStatus = 'not-started' | 'in-progress' | 'done';
-
-export interface ModuleProgress {
-  startedAt?: string;   // ISO date
-  completedAt?: string; // ISO date
-  percent: number;      // 0..100
-}
-
-export type ModuleProgressMap = Record<string, ModuleProgress>;
-
-export const getModuleProgressMap = (): ModuleProgressMap => {
-  try {
-    const stored = localStorage.getItem(MODULE_PROGRESS_KEY);
-    if (!stored) return {};
-    const parsed = JSON.parse(stored);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-};
-
-const saveModuleProgressMap = (map: ModuleProgressMap) => {
-  localStorage.setItem(MODULE_PROGRESS_KEY, JSON.stringify(map));
-};
-
-export const getModuleProgress = (moduleId: string): ModuleProgress => {
-  return getModuleProgressMap()[moduleId] ?? { percent: 0 };
-};
-
-export const getModuleStatus = (moduleId: string): ModuleStatus => {
-  const m = getModuleProgress(moduleId);
-  if (m.completedAt || m.percent >= 100) return 'done';
-  if (m.startedAt || m.percent > 0) return 'in-progress';
-  return 'not-started';
-};
-
-export const startModule = (moduleId: string) => {
-  const map = getModuleProgressMap();
-  const existing = map[moduleId] ?? { percent: 0 };
-  map[moduleId] = {
-    ...existing,
-    startedAt: existing.startedAt ?? new Date().toISOString(),
-    percent: Math.max(existing.percent, 5),
-  };
-  saveModuleProgressMap(map);
-};
-
-export const setModulePercent = (moduleId: string, percent: number) => {
-  const map = getModuleProgressMap();
-  const existing = map[moduleId] ?? { percent: 0 };
-  const clamped = Math.max(0, Math.min(100, Math.round(percent)));
-  map[moduleId] = {
-    ...existing,
-    startedAt: existing.startedAt ?? (clamped > 0 ? new Date().toISOString() : undefined),
-    completedAt: clamped >= 100 ? (existing.completedAt ?? new Date().toISOString()) : existing.completedAt,
-    percent: clamped,
-  };
-  saveModuleProgressMap(map);
-};
-
-export const completeModule = (moduleId: string) => {
-  setModulePercent(moduleId, 100);
-};
-

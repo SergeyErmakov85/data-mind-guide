@@ -1,679 +1,431 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Header } from '@/components/Header';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { motion } from 'framer-motion';
-import Papa from 'papaparse';
-import { Database, Sparkles, ListChecks, BookOpen, Beaker, GraduationCap, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import { Calculator, RefreshCw, Info, TrendingUp, TrendingDown } from 'lucide-react';
 
-import { ConceptBlock } from '@/components/ConceptBlock';
-import { SymbolTip } from '@/components/SymbolTip';
-import { TaskCard } from '@/components/TaskCard';
-import { DescriptiveCalculator } from '@/components/DescriptiveCalculator';
-import { generateParametricSample } from '@/lib/statistics';
-import { addProgress, hasProgress } from '@/lib/progress';
-
-/* --------------------------- Datasets --------------------------- */
-
-interface DatasetMeta {
-  id: string;
-  label: string;
-  file: string;
-  column: string;
-  description: string;
-}
-
-const DATASETS: DatasetMeta[] = [
-  {
-    id: 'big5',
-    label: 'Big5 mini-sample (n=60)',
-    file: '/files/big5-mini.csv',
-    column: 'neuroticism',
-    description: 'Шкалы Big Five, балл «нейротизм» от 1 до 5.',
-  },
-  {
-    id: 'iq',
-    label: 'IQ выборка (n=150)',
-    file: '/files/iq-sample.csv',
-    column: 'iq',
-    description: 'Тестовые IQ-баллы в шкале M=100, SD=15.',
-  },
-  {
-    id: 'beck',
-    label: 'Шкала Бека — депрессия (n=80)',
-    file: '/files/beck-depression.csv',
-    column: 'bdi_score',
-    description: 'BDI-II суммарный балл (0–63), правосторонняя асимметрия.',
-  },
-];
-
-/* --------------------------- Sandbox --------------------------- */
-
-const Sandbox = () => {
-  const [activeDataset, setActiveDataset] = useState<string | null>(null);
-  const [datasetColumns, setDatasetColumns] = useState<Record<string, string[]>>({});
-  const [pickedColumn, setPickedColumn] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [calcInput, setCalcInput] = useState<string>('');
-
-  // Generator state
-  const [genMean, setGenMean] = useState(50);
-  const [genSd, setGenSd] = useState(10);
-  const [genN, setGenN] = useState(60);
-  const [genDist, setGenDist] = useState<'normal' | 'skewed' | 'bimodal'>('normal');
-
-  const loadDataset = async (id: string) => {
-    const meta = DATASETS.find((d) => d.id === id);
-    if (!meta) return;
-    setIsLoading(true);
-    try {
-      const res = await fetch(meta.file);
-      const text = await res.text();
-      const parsed = Papa.parse<Record<string, string>>(text, {
-        header: true,
-        skipEmptyLines: true,
-      });
-      const numericCols: string[] = [];
-      const colData: Record<string, number[]> = {};
-      (parsed.meta.fields ?? []).forEach((field) => {
-        const nums = parsed.data
-          .map((row) => parseFloat(String(row[field] ?? '').trim()))
-          .filter((v) => !isNaN(v));
-        if (nums.length >= 5) {
-          numericCols.push(field);
-          colData[field] = nums;
-        }
-      });
-      setDatasetColumns({ [id]: numericCols });
-      const defaultCol = numericCols.includes(meta.column) ? meta.column : numericCols[0];
-      setPickedColumn(defaultCol);
-      setCalcInput(colData[defaultCol].join(', '));
-      setActiveDataset(id);
-      addProgress('descriptive', `dataset:${id}`);
-    } finally {
-      setIsLoading(false);
-    }
+const calculateStats = (data: number[]) => {
+  if (data.length === 0) return null;
+  
+  const n = data.length;
+  const sorted = [...data].sort((a, b) => a - b);
+  
+  // Mean
+  const mean = data.reduce((a, b) => a + b, 0) / n;
+  
+  // Median
+  const median = n % 2 === 0 
+    ? (sorted[n/2 - 1] + sorted[n/2]) / 2 
+    : sorted[Math.floor(n/2)];
+  
+  // Mode
+  const frequency: Record<number, number> = {};
+  data.forEach(val => frequency[val] = (frequency[val] || 0) + 1);
+  const maxFreq = Math.max(...Object.values(frequency));
+  const modes = Object.entries(frequency)
+    .filter(([, freq]) => freq === maxFreq)
+    .map(([val]) => parseFloat(val));
+  const mode = modes.length === n ? 'Нет' : modes.join(', ');
+  
+  // Variance and SD
+  const variance = data.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (n - 1);
+  const sd = Math.sqrt(variance);
+  
+  // Standard Error
+  const se = sd / Math.sqrt(n);
+  
+  // Min, Max, Range
+  const min = sorted[0];
+  const max = sorted[n - 1];
+  const range = max - min;
+  
+  // Quartiles
+  const q1 = sorted[Math.floor(n * 0.25)];
+  const q3 = sorted[Math.floor(n * 0.75)];
+  const iqr = q3 - q1;
+  
+  // Skewness
+  const skewness = data.reduce((acc, val) => acc + Math.pow((val - mean) / sd, 3), 0) / n;
+  
+  // Kurtosis
+  const kurtosis = data.reduce((acc, val) => acc + Math.pow((val - mean) / sd, 4), 0) / n - 3;
+  
+  // Coefficient of variation
+  const cv = (sd / mean) * 100;
+  
+  // 95% CI for mean
+  const ci95 = 1.96 * se;
+  
+  return {
+    n,
+    mean: mean.toFixed(2),
+    median: median.toFixed(2),
+    mode,
+    variance: variance.toFixed(2),
+    sd: sd.toFixed(2),
+    se: se.toFixed(2),
+    min: min.toFixed(2),
+    max: max.toFixed(2),
+    range: range.toFixed(2),
+    q1: q1.toFixed(2),
+    q3: q3.toFixed(2),
+    iqr: iqr.toFixed(2),
+    skewness: skewness.toFixed(3),
+    kurtosis: kurtosis.toFixed(3),
+    cv: cv.toFixed(1),
+    ciLower: (mean - ci95).toFixed(2),
+    ciUpper: (mean + ci95).toFixed(2),
   };
+};
 
-  const switchColumn = async (col: string) => {
-    if (!activeDataset) return;
-    const meta = DATASETS.find((d) => d.id === activeDataset);
-    if (!meta) return;
-    const res = await fetch(meta.file);
-    const text = await res.text();
-    const parsed = Papa.parse<Record<string, string>>(text, {
-      header: true,
-      skipEmptyLines: true,
+const createHistogramData = (data: number[], bins = 10) => {
+  if (data.length === 0) return [];
+  
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const binWidth = (max - min) / bins || 1;
+  
+  const histogram: { range: string; count: number; start: number }[] = [];
+  
+  for (let i = 0; i < bins; i++) {
+    const start = min + i * binWidth;
+    const end = start + binWidth;
+    const count = data.filter(v => v >= start && (i === bins - 1 ? v <= end : v < end)).length;
+    histogram.push({
+      range: `${start.toFixed(1)}-${end.toFixed(1)}`,
+      count,
+      start,
     });
-    const nums = parsed.data
-      .map((row) => parseFloat(String(row[col] ?? '').trim()))
-      .filter((v) => !isNaN(v));
-    setPickedColumn(col);
-    setCalcInput(nums.join(', '));
-  };
-
-  const generate = () => {
-    const sample = generateParametricSample(genDist, genMean, genSd, genN);
-    setCalcInput(sample.map((v) => Number(v.toFixed(2))).join(', '));
-    setActiveDataset(null);
-    addProgress('descriptive', `generated:${genDist}`);
-  };
-
-  return (
-    <div className="space-y-8">
-      {/* Datasets */}
-      <section className="border-3 border-foreground bg-card p-5 md:p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Database className="w-4 h-4" />
-          <div className="kicker">// 01 — готовые психологические данные</div>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-3">
-          {DATASETS.map((d) => {
-            const isActive = activeDataset === d.id;
-            return (
-              <button
-                key={d.id}
-                onClick={() => loadDataset(d.id)}
-                className={`text-left border-3 rounded-none p-4 transition-transform hover:-translate-x-[2px] hover:-translate-y-[2px] ${
-                  isActive
-                    ? 'border-foreground bg-primary text-primary-foreground'
-                    : 'border-foreground bg-background'
-                }`}
-              >
-                <div className="kicker mb-2 opacity-70">{`#0${DATASETS.indexOf(d) + 1}`}</div>
-                <div className="font-bold text-sm uppercase mb-2">{d.label}</div>
-                <div className={`text-xs leading-snug ${isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                  {d.description}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {isLoading && (
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-            <Loader2 className="w-3 h-3 animate-spin" /> загружаем CSV…
-          </div>
-        )}
-
-        {activeDataset && datasetColumns[activeDataset] && (
-          <div className="flex items-center gap-3 flex-wrap pt-2 border-t-2 border-foreground/20">
-            <span className="kicker">столбец:</span>
-            {datasetColumns[activeDataset].map((c) => (
-              <button
-                key={c}
-                onClick={() => switchColumn(c)}
-                className={`px-3 py-1 border-2 border-foreground rounded-none font-mono text-xs uppercase ${
-                  c === pickedColumn ? 'bg-foreground text-background' : 'bg-background'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Generator */}
-      <section className="border-3 border-foreground bg-card p-5 md:p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4" />
-          <div className="kicker">// 02 — сгенерировать выборку</div>
-        </div>
-        <div className="grid sm:grid-cols-4 gap-3">
-          <div>
-            <Label className="kicker">Mean (M)</Label>
-            <Input
-              type="number"
-              value={genMean}
-              onChange={(e) => setGenMean(parseFloat(e.target.value) || 0)}
-              className="font-mono tabular-nums border-3 border-foreground rounded-none mt-1"
-            />
-          </div>
-          <div>
-            <Label className="kicker">SD</Label>
-            <Input
-              type="number"
-              value={genSd}
-              min={0.1}
-              step={0.1}
-              onChange={(e) => setGenSd(Math.max(0.1, parseFloat(e.target.value) || 1))}
-              className="font-mono tabular-nums border-3 border-foreground rounded-none mt-1"
-            />
-          </div>
-          <div>
-            <Label className="kicker">n</Label>
-            <Input
-              type="number"
-              value={genN}
-              min={5}
-              max={1000}
-              onChange={(e) => setGenN(Math.max(5, Math.min(1000, parseInt(e.target.value) || 30)))}
-              className="font-mono tabular-nums border-3 border-foreground rounded-none mt-1"
-            />
-          </div>
-          <div>
-            <Label className="kicker">Распределение</Label>
-            <Select value={genDist} onValueChange={(v) => setGenDist(v as typeof genDist)}>
-              <SelectTrigger className="border-3 border-foreground rounded-none mt-1 font-mono text-xs uppercase">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="rounded-none border-3 border-foreground">
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="skewed">Skewed (right)</SelectItem>
-                <SelectItem value="bimodal">Bimodal</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <Button onClick={generate} className="btn-primary">
-          Сгенерировать выборку
-        </Button>
-      </section>
-
-      {/* Calculator */}
-      <section className="border-3 border-foreground bg-card p-5 md:p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Beaker className="w-4 h-4" />
-          <div className="kicker">// 03 — описательная статистика</div>
-        </div>
-        <DescriptiveCalculator initialInput={calcInput || undefined} />
-      </section>
-    </div>
-  );
+  }
+  
+  return histogram;
 };
 
-/* --------------------------- Trainer --------------------------- */
-
-const TRAINER_TASKS = [
-  {
-    id: 't1',
-    question: (
-      <>
-        Дана выборка времён реакции (мс): <span className="num">220, 245, 260, 280, 310</span>.
-        Чему равна <SymbolTip symbol="Me">медиана — середина упорядоченного ряда</SymbolTip>?
-      </>
-    ),
-    answer: 260,
-    tolerance: 0.01,
-    suffix: 'мс',
-    explanation: <>n = 5, центральный элемент <span className="num">x₃ = 260</span>.</>,
-  },
-  {
-    id: 't2',
-    question: (
-      <>
-        Баллы тревожности: <span className="num">8, 10, 12, 14, 18, 22</span>. Найдите медиану.
-      </>
-    ),
-    answer: 13,
-    tolerance: 0.01,
-    explanation: <>n = 6, чётное → среднее двух центральных: (12 + 14) / 2 = <span className="num">13</span>.</>,
-  },
-  {
-    id: 't3',
-    question: (
-      <>
-        Q1 = <span className="num">12</span>, Q3 = <span className="num">28</span>. Чему равен{' '}
-        <SymbolTip symbol="IQR">интерквартильный размах: Q₃ − Q₁</SymbolTip>?
-      </>
-    ),
-    answer: 16,
-    tolerance: 0.01,
-    explanation: <>IQR = 28 − 12 = <span className="num">16</span>.</>,
-  },
-  {
-    id: 't4',
-    question: (
-      <>
-        В правосторонне скошенной выборке доходов (хвост справа) больше: M или Mdn? Введите{' '}
-        <span className="font-mono">M</span> или <span className="font-mono">Mdn</span>.
-      </>
-    ),
-    answer: 'M',
-    inputLabel: 'M или Mdn',
-    explanation: (
-      <>
-        Среднее «тянется» в сторону длинного хвоста, поэтому <span className="num">M &gt; Mdn</span>.
-        Для скошенных распределений в статье отчитывают <strong>медиану</strong>.
-      </>
-    ),
-  },
-  {
-    id: 't5',
-    question: (
-      <>
-        Стандартное отклонение выборки SD = <span className="num">8</span>, n = <span className="num">64</span>.
-        Чему равна <SymbolTip symbol="SE">стандартная ошибка среднего: SD / √n</SymbolTip>?
-      </>
-    ),
-    answer: 1,
-    tolerance: 0.01,
-    explanation: <>SE = 8 / √64 = 8 / 8 = <span className="num">1</span>.</>,
-  },
-  {
-    id: 't6',
-    question: (
-      <>
-        Q1 = <span className="num">10</span>, Q3 = <span className="num">22</span>. Значение{' '}
-        <span className="num">42</span> — это выброс по правилу 1.5·IQR? Введите{' '}
-        <span className="font-mono">да</span> или <span className="font-mono">нет</span>.
-      </>
-    ),
-    answer: 'да',
-    inputLabel: 'да / нет',
-    hint: <>Верхняя граница: Q₃ + 1.5·IQR.</>,
-    explanation: <>IQR = 12; верх. граница = 22 + 1.5·12 = <span className="num">40</span>. 42 &gt; 40 → выброс.</>,
-  },
-  {
-    id: 't7',
-    question: (
-      <>
-        Какая мера центра наиболее устойчива к выбросам?{' '}
-        Введите <span className="font-mono">mean</span>, <span className="font-mono">median</span> или{' '}
-        <span className="font-mono">mode</span>.
-      </>
-    ),
-    answer: 'median',
-    inputLabel: 'mean / median / mode',
-    explanation: <>Медиана не зависит от значений в хвостах — только от их положения в ряду.</>,
-  },
-  {
-    id: 't8',
-    question: (
-      <>
-        Дисперсия равна <span className="num">144</span>. Чему равно стандартное отклонение{' '}
-        <SymbolTip symbol="SD">квадратный корень из дисперсии</SymbolTip>?
-      </>
-    ),
-    answer: 12,
-    tolerance: 0.01,
-    explanation: <>SD = √144 = <span className="num">12</span>.</>,
-  },
-];
-
-const Trainer = () => {
-  const [tick, setTick] = useState(0);
-  // refresh percentage when localStorage changes
-  useEffect(() => {
-    const i = setInterval(() => setTick((t) => t + 1), 1500);
-    return () => clearInterval(i);
-  }, []);
-
-  const solved = useMemo(
-    () => TRAINER_TASKS.filter((t) => hasProgress('descriptive', t.id)).length,
-    [tick],
-  );
-  const pct = Math.round((solved / TRAINER_TASKS.length) * 100);
-
-  return (
-    <div className="space-y-6">
-      <div className="border-3 border-foreground p-5 bg-card">
-        <div className="flex items-baseline justify-between mb-3">
-          <div className="kicker">// прогресс тренажёра</div>
-          <div className="font-mono tabular-nums text-sm">
-            {solved} / {TRAINER_TASKS.length} · {pct}%
-          </div>
-        </div>
-        <div className="h-3 border-2 border-foreground bg-background">
-          <div className="h-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-5">
-        {TRAINER_TASKS.map((t, i) => (
-          <TaskCard
-            key={t.id}
-            taskId={t.id}
-            index={i + 1}
-            question={t.question}
-            answer={t.answer}
-            tolerance={t.tolerance}
-            inputLabel={t.inputLabel}
-            suffix={t.suffix}
-            hint={t.hint}
-            explanation={t.explanation}
-          />
-        ))}
-      </div>
-    </div>
-  );
+const createBoxPlotData = (data: number[]) => {
+  if (data.length === 0) return null;
+  
+  const sorted = [...data].sort((a, b) => a - b);
+  const n = sorted.length;
+  const q1 = sorted[Math.floor(n * 0.25)];
+  const median = n % 2 === 0 ? (sorted[n/2 - 1] + sorted[n/2]) / 2 : sorted[Math.floor(n/2)];
+  const q3 = sorted[Math.floor(n * 0.75)];
+  const iqr = q3 - q1;
+  const min = Math.max(sorted[0], q1 - 1.5 * iqr);
+  const max = Math.min(sorted[n-1], q3 + 1.5 * iqr);
+  
+  return { min, q1, median, q3, max };
 };
 
-/* --------------------------- Checklist --------------------------- */
-
-const CHECKLIST = [
-  'Выборка проверена на пропущенные значения; n указано явно.',
-  'Для симметричных распределений отчитываю M (SD); для скошенных — Mdn [Q1; Q3].',
-  'SD записываю в скобках после M: «M = 4.32 (SD = 0.81)» (APA 7).',
-  'Числовые значения с тем же количеством знаков, что и шкала измерения (обычно 2 знака).',
-  'Использую курсив для обозначений: M, Mdn, SD, SE, n, p.',
-  'Перед t-, F-, ANOVA-тестами проверена нормальность (Shapiro–Wilk / гистограмма / Q–Q).',
-  'Указан 95% доверительный интервал для среднего: 95% CI [нижн.; верхн.].',
-  'Выбросы по правилу 1.5·IQR проанализированы; описано, как с ними поступили.',
-  'При множественных группах привожу описательные по каждой группе отдельной таблицей.',
-  'Размер эффекта (например, Cohen’s d) сопровождает любые сравнения средних.',
-  'p-value сопровождается фактическим значением (не «p < 0.05»), кроме p < .001.',
-  'Источник данных, протокол сбора и инструмент шкалирования описаны в разделе «Метод».',
-];
-
-const Checklist = () => {
-  const [checked, setChecked] = useState<boolean[]>(() => {
-    try {
-      const raw = localStorage.getItem('descriptive-checklist');
-      return raw ? (JSON.parse(raw) as boolean[]) : Array(CHECKLIST.length).fill(false);
-    } catch {
-      return Array(CHECKLIST.length).fill(false);
-    }
-  });
-
-  const toggle = (i: number) => {
-    const next = [...checked];
-    next[i] = !next[i];
-    setChecked(next);
-    localStorage.setItem('descriptive-checklist', JSON.stringify(next));
-    if (next[i]) addProgress('descriptive', `checklist:${i}`);
-  };
-
-  const done = checked.filter(Boolean).length;
-
-  return (
-    <div className="space-y-6">
-      <div className="border-3 border-foreground p-5 bg-card">
-        <div className="kicker mb-2">// чек-лист отчётности (APA 7)</div>
-        <div className="lead">
-          Двенадцать пунктов, которые гарантируют, что описательная статистика в вашей статье
-          читается прозрачно и воспроизводимо.
-        </div>
-        <div className="font-mono tabular-nums text-sm mt-3">
-          {done} / {CHECKLIST.length}
-        </div>
-      </div>
-
-      <ul className="space-y-3">
-        {CHECKLIST.map((item, i) => (
-          <li
-            key={i}
-            className={`border-3 border-foreground p-4 bg-card flex items-start gap-3 transition-colors ${
-              checked[i] ? 'bg-success/5' : ''
-            }`}
-          >
-            <Checkbox
-              id={`chk-${i}`}
-              checked={checked[i]}
-              onCheckedChange={() => toggle(i)}
-              className="mt-1 rounded-none border-3 border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
-            />
-            <label
-              htmlFor={`chk-${i}`}
-              className={`text-sm md:text-base leading-relaxed cursor-pointer ${
-                checked[i] ? 'line-through text-muted-foreground' : ''
-              }`}
-            >
-              <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mr-2">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              {item}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-/* --------------------------- Theory --------------------------- */
-
-const Theory = () => (
-  <div className="space-y-6">
-    <ConceptBlock
-      kicker="// 01 — центр данных"
-      title="Меры центральной тенденции"
-      body={
-        <>
-          Любое описание выборки начинается с вопроса «где находится центр?». Три классических
-          ответа: <SymbolTip symbol="M">среднее арифметическое — сумма / n</SymbolTip>,{' '}
-          <SymbolTip symbol="Mdn">медиана — значение, делящее упорядоченный ряд пополам</SymbolTip>{' '}
-          и <SymbolTip symbol="Mo">мода — самое частое значение</SymbolTip>. Их выбор
-          определяется уровнем шкалы и формой распределения: для симметричных интервальных шкал
-          подходит M, для порядковых или скошенных — Mdn.
-        </>
-      }
-      formula={`M = \\frac{1}{n}\\sum_{i=1}^{n} x_i`}
-      example={
-        <>
-          IQ-выборка <span className="num">98, 102, 100, 99, 101</span> →{' '}
-          M = <span className="num">100</span>, Mdn = <span className="num">100</span>.
-          Для симметричных данных M ≈ Mdn — это диагностический признак нормальности.
-        </>
-      }
-    />
-
-    <ConceptBlock
-      kicker="// 02 — разброс данных"
-      title="Меры разброса"
-      body={
-        <>
-          Центр без разброса — половина истории. Дисперсия и{' '}
-          <SymbolTip symbol="SD">стандартное отклонение — корень из дисперсии</SymbolTip> измеряют
-          среднее квадратичное отклонение от M. Для устойчивости к выбросам используют{' '}
-          <SymbolTip symbol="IQR">межквартильный размах: Q₃ − Q₁</SymbolTip>. Стандартная ошибка{' '}
-          <SymbolTip symbol="SE">SE = SD / √n</SymbolTip> описывает точность оценки M.
-        </>
-      }
-      formula={`SD = \\sqrt{\\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - M)^2}`}
-      example={
-        <>
-          Две группы со средним <span className="num">M = 50</span>, но
-          SD₁ = <span className="num">3</span> и SD₂ = <span className="num">15</span> — психологически
-          это совершенно разные группы: одни однородны, другие очень разнообразны.
-        </>
-      }
-    />
-
-    <ConceptBlock
-      kicker="// 03 — форма распределения"
-      title="Асимметрия и эксцесс"
-      body={
-        <>
-          <SymbolTip symbol="Sk">асимметрия (skewness): знак указывает направление длинного хвоста</SymbolTip>
-          {' '}показывает, в какую сторону «тянется» распределение. Положительная асимметрия
-          (хвост справа) типична для шкал депрессии или времени реакции.{' '}
-          <SymbolTip symbol="Ku">эксцесс — острота пика и тяжесть хвостов относительно нормального</SymbolTip>
-          {' '}отвечает за «остроту» пика. Если |Sk| &lt; 0.5 и |Ku| &lt; 1 — распределение можно
-          считать близким к нормальному.
-        </>
-      }
-      formula={`Sk = \\frac{n}{(n-1)(n-2)} \\sum \\left(\\frac{x_i - M}{SD}\\right)^3`}
-      example={
-        <>
-          BDI-II у студентов: большинство показывает низкие баллы (0–10), но несколько
-          случаев — высокие (20+). Sk ≈ <span className="num">+1.2</span> → нельзя использовать
-          параметрические t-тесты без преобразования.
-        </>
-      }
-    />
-
-    <ConceptBlock
-      kicker="// 04 — края выборки"
-      title="Выбросы"
-      body={
-        <>
-          Выбросы — наблюдения, неестественно далёкие от остальных. Стандартное правило{' '}
-          <SymbolTip symbol="1.5·IQR">наблюдения вне [Q₁ − 1.5·IQR; Q₃ + 1.5·IQR] считаются выбросами</SymbolTip>
-          {' '}консервативно. В психологии важно не удалять выбросы автоматически — за ними часто
-          стоят интересные случаи (например, инсайт-решатели в задаче на креативность).
-          Сначала проверьте: ошибка ввода? отказ от инструкции? редкая, но валидная стратегия?
-        </>
-      }
-      formula={`\\text{Выброс, если } x_i < Q_1 - 1.5 \\cdot IQR \\;\\;\\text{или}\\;\\; x_i > Q_3 + 1.5 \\cdot IQR`}
-      example={
-        <>
-          Время реакции <span className="num">5400 мс</span> при выборке со средним{' '}
-          <span className="num">~600 мс</span>. Возможно, испытуемый отвлёкся —
-          обычно такие пробы исключают и отчитывают долю отбраковки.
-        </>
-      }
-    />
-  </div>
-);
-
-/* --------------------------- Page --------------------------- */
+const sampleData = "45, 52, 38, 61, 47, 55, 42, 59, 51, 44, 48, 63, 39, 57, 46, 53, 41, 58, 49, 56";
 
 const DescriptiveStatsPage = () => {
+  const [input, setInput] = useState(sampleData);
+  const [data, setData] = useState<number[]>([]);
+
+  const parseData = () => {
+    const parsed = input
+      .split(/[,\s\n]+/)
+      .map(s => parseFloat(s.trim()))
+      .filter(n => !isNaN(n));
+    setData(parsed);
+  };
+
+  const stats = useMemo(() => calculateStats(data), [data]);
+  const histogramData = useMemo(() => createHistogramData(data), [data]);
+  const boxData = useMemo(() => createBoxPlotData(data), [data]);
+
+  const getSkewnessInterpretation = (skew: number) => {
+    if (skew < -0.5) return { text: 'Левосторонняя асимметрия (длинный хвост слева)', icon: TrendingDown, color: 'text-info' };
+    if (skew > 0.5) return { text: 'Правосторонняя асимметрия (длинный хвост справа)', icon: TrendingUp, color: 'text-warning' };
+    return { text: 'Симметричное распределение', icon: Info, color: 'text-success' };
+  };
+
+  const getKurtosisInterpretation = (kurt: number) => {
+    if (kurt < -0.5) return 'Платикуртическое (плоское, пологие хвосты)';
+    if (kurt > 0.5) return 'Лептокуртическое (острое, тяжёлые хвосты)';
+    return 'Мезокуртическое (близко к нормальному)';
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
-      <main className="container py-12">
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Page header */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-4"
-          >
-            <div className="kicker">// Модуль 01 — Описательная статистика</div>
-            <h1 className="text-5xl md:text-7xl font-bold uppercase leading-[0.95]">
-              Описательная
-              <br />
-              статистика
+      
+      <main className="container py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
+              Калькулятор описательной статистики
             </h1>
-            <div className="rule" />
-            <p className="lead">
-              Полный модуль: интуиция → формулы → песочница → тренажёр. Все формулы кликабельны —
-              наведите на символ, чтобы прочитать пояснение. Прогресс сохраняется автоматически.
+            <p className="text-muted-foreground text-lg">
+              Введите данные и получите полный анализ с визуализациями
             </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Badge variant="outline" className="rounded-none border-2 font-mono uppercase">
-                Базовый уровень
-              </Badge>
-              <Badge variant="outline" className="rounded-none border-2 font-mono uppercase">
-                Navarro & Foxcroft
-              </Badge>
-              <Badge variant="outline" className="rounded-none border-2 font-mono uppercase">
-                APA 7
-              </Badge>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Input Section */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calculator className="w-5 h-5 text-primary" />
+                    Ввод данных
+                  </CardTitle>
+                  <CardDescription>
+                    Введите числа через запятую, пробел или с новой строки
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Например: 45, 52, 38, 61, 47..."
+                    className="min-h-[120px] font-mono"
+                  />
+                  <div className="flex gap-3">
+                    <Button onClick={parseData} className="flex-1 gap-2">
+                      <Calculator className="w-4 h-4" />
+                      Рассчитать
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => { setInput(sampleData); setData([]); }}
+                      className="gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Сбросить
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {stats && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Результаты анализа</CardTitle>
+                    <CardDescription>n = {stats.n} наблюдений</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Central tendency */}
+                    <div>
+                      <h4 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wide">Меры центра</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="p-4 bg-primary/5 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-primary">{stats.mean}</div>
+                          <div className="text-sm text-muted-foreground">Среднее (M)</div>
+                        </div>
+                        <div className="p-4 bg-info/5 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-info">{stats.median}</div>
+                          <div className="text-sm text-muted-foreground">Медиана</div>
+                        </div>
+                        <div className="p-4 bg-success/5 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-success">{stats.mode}</div>
+                          <div className="text-sm text-muted-foreground">Мода</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Spread */}
+                    <div>
+                      <h4 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wide">Меры разброса</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-muted/30 rounded-lg">
+                          <div className="text-xl font-bold">{stats.sd}</div>
+                          <div className="text-sm text-muted-foreground">Ст. отклонение (SD)</div>
+                        </div>
+                        <div className="p-4 bg-muted/30 rounded-lg">
+                          <div className="text-xl font-bold">{stats.se}</div>
+                          <div className="text-sm text-muted-foreground">Ст. ошибка (SE)</div>
+                        </div>
+                        <div className="p-4 bg-muted/30 rounded-lg">
+                          <div className="text-xl font-bold">{stats.iqr}</div>
+                          <div className="text-sm text-muted-foreground">Интерквартильный размах</div>
+                        </div>
+                        <div className="p-4 bg-muted/30 rounded-lg">
+                          <div className="text-xl font-bold">{stats.cv}%</div>
+                          <div className="text-sm text-muted-foreground">Коэфф. вариации</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Range */}
+                    <div className="flex justify-between text-sm text-muted-foreground p-3 bg-muted/30 rounded-lg">
+                      <span>Min: {stats.min}</span>
+                      <span>Q1: {stats.q1}</span>
+                      <span>Q3: {stats.q3}</span>
+                      <span>Max: {stats.max}</span>
+                    </div>
+
+                    {/* 95% CI */}
+                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                      <h5 className="font-medium mb-2">95% доверительный интервал для среднего</h5>
+                      <p className="text-lg font-bold text-primary">
+                        [{stats.ciLower}; {stats.ciUpper}]
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        С вероятностью 95% истинное среднее находится в этом интервале
+                      </p>
+                    </div>
+
+                    {/* Shape */}
+                    <div>
+                      <h4 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wide">Форма распределения</h4>
+                      {(() => {
+                        const skew = getSkewnessInterpretation(parseFloat(stats.skewness));
+                        return (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="p-4 bg-muted/30 rounded-lg">
+                                <div className="text-xl font-bold">{stats.skewness}</div>
+                                <div className="text-sm text-muted-foreground">Асимметрия</div>
+                              </div>
+                              <div className="p-4 bg-muted/30 rounded-lg">
+                                <div className="text-xl font-bold">{stats.kurtosis}</div>
+                                <div className="text-sm text-muted-foreground">Эксцесс</div>
+                              </div>
+                            </div>
+                            <div className={`p-3 rounded-lg flex items-center gap-2 ${skew.color} bg-current/10`}>
+                              <skew.icon className="w-4 h-4" />
+                              <span className="text-foreground text-sm">{skew.text}</span>
+                            </div>
+                            <div className="p-3 bg-muted/30 rounded-lg text-sm text-muted-foreground">
+                              {getKurtosisInterpretation(parseFloat(stats.kurtosis))}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          </motion.div>
 
-          {/* Tabs */}
-          <Tabs defaultValue="theory" className="w-full">
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full bg-background border-3 border-foreground rounded-none p-0 h-auto">
-              <TabsTrigger
-                value="theory"
-                className="rounded-none border-r-3 border-foreground data-[state=active]:bg-foreground data-[state=active]:text-background font-mono text-xs uppercase tracking-[0.15em] py-3 gap-2"
-              >
-                <BookOpen className="w-3 h-3" /> Теория
-              </TabsTrigger>
-              <TabsTrigger
-                value="sandbox"
-                className="rounded-none border-r-3 border-foreground data-[state=active]:bg-foreground data-[state=active]:text-background font-mono text-xs uppercase tracking-[0.15em] py-3 gap-2"
-              >
-                <Beaker className="w-3 h-3" /> Песочница
-              </TabsTrigger>
-              <TabsTrigger
-                value="trainer"
-                className="rounded-none border-r-3 border-foreground data-[state=active]:bg-foreground data-[state=active]:text-background font-mono text-xs uppercase tracking-[0.15em] py-3 gap-2"
-              >
-                <GraduationCap className="w-3 h-3" /> Тренажёр
-              </TabsTrigger>
-              <TabsTrigger
-                value="checklist"
-                className="rounded-none data-[state=active]:bg-foreground data-[state=active]:text-background font-mono text-xs uppercase tracking-[0.15em] py-3 gap-2"
-              >
-                <ListChecks className="w-3 h-3" /> Чек-лист
-              </TabsTrigger>
-            </TabsList>
+            {/* Visualization Section */}
+            <div className="space-y-6">
+              {stats && histogramData.length > 0 && (
+                <>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Гистограмма</CardTitle>
+                      <CardDescription>Распределение частот по интервалам</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={histogramData}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis 
+                              dataKey="range" 
+                              tick={{ fontSize: 10 }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={60}
+                            />
+                            <YAxis />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: 'hsl(var(--card))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Bar 
+                              dataKey="count" 
+                              fill="hsl(var(--primary))" 
+                              radius={[4, 4, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="theory" className="mt-8">
-              <Theory />
-            </TabsContent>
+                  {boxData && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Пятиточечная сводка</CardTitle>
+                        <CardDescription>Визуализация квартилей</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="relative h-16 bg-muted/30 rounded-lg overflow-hidden">
+                          {/* Box */}
+                          <div 
+                            className="absolute h-full bg-primary/20 border-2 border-primary"
+                            style={{
+                              left: `${((boxData.q1 - boxData.min) / (boxData.max - boxData.min)) * 100}%`,
+                              width: `${((boxData.q3 - boxData.q1) / (boxData.max - boxData.min)) * 100}%`,
+                            }}
+                          >
+                            {/* Median line */}
+                            <div 
+                              className="absolute w-0.5 h-full bg-primary"
+                              style={{
+                                left: `${((boxData.median - boxData.q1) / (boxData.q3 - boxData.q1)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          {/* Whiskers */}
+                          <div className="absolute top-1/2 h-0.5 bg-primary -translate-y-1/2" style={{ left: 0, width: `${((boxData.q1 - boxData.min) / (boxData.max - boxData.min)) * 100}%` }} />
+                          <div className="absolute top-1/2 h-0.5 bg-primary -translate-y-1/2" style={{ right: 0, width: `${((boxData.max - boxData.q3) / (boxData.max - boxData.min)) * 100}%` }} />
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                          <span>{boxData.min.toFixed(1)}</span>
+                          <span>Q1: {boxData.q1.toFixed(1)}</span>
+                          <span>Me: {boxData.median.toFixed(1)}</span>
+                          <span>Q3: {boxData.q3.toFixed(1)}</span>
+                          <span>{boxData.max.toFixed(1)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
-            <TabsContent value="sandbox" className="mt-8">
-              <Sandbox />
-            </TabsContent>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Распределение данных</CardTitle>
+                      <CardDescription>Значения в порядке ввода</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={data.map((value, index) => ({ index: index + 1, value }))}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="index" />
+                            <YAxis domain={['dataMin - 5', 'dataMax + 5']} />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: 'hsl(var(--card))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="value" 
+                              stroke="hsl(var(--accent))" 
+                              fill="hsl(var(--accent))"
+                              fillOpacity={0.2}
+                              strokeWidth={2}
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
 
-            <TabsContent value="trainer" className="mt-8">
-              <Trainer />
-            </TabsContent>
-
-            <TabsContent value="checklist" className="mt-8">
-              <Checklist />
-            </TabsContent>
-          </Tabs>
+              {!stats && (
+                <Card className="h-full flex items-center justify-center min-h-[400px]">
+                  <CardContent className="text-center text-muted-foreground">
+                    <Calculator className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p>Введите данные и нажмите «Рассчитать»</p>
+                    <p className="text-sm mt-2">для отображения результатов и графиков</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>
