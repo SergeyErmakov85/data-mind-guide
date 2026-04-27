@@ -244,7 +244,7 @@ export const TTestLab = () => {
                 <label className="text-sm font-medium">
                   μ₀ (гипотетическое среднее): <span className="font-bold text-primary">{mu0}</span>
                 </label>
-                <Slider value={[mu0]} onValueChange={([v]) => setMu0(v)} min={30} max={70} step={1} />
+                <Slider value={[mu0]} onValueChange={([v]) => setMu0(v)} min={30} max={70} step={1} ariaLabel="μ₀ — гипотетическое среднее" ariaValueTextFormatter={(v) => `μ₀ = ${v}`} />
               </div>
             )}
           </div>
@@ -260,19 +260,19 @@ export const TTestLab = () => {
                 <label className="text-xs text-muted-foreground">
                   Среднее: <span className="font-bold">{mean1}</span>
                 </label>
-                <Slider value={[mean1]} onValueChange={([v]) => setMean1(v)} min={30} max={70} step={1} />
+                <Slider value={[mean1]} onValueChange={([v]) => setMean1(v)} min={30} max={70} step={1} ariaLabel="Среднее группы 1" ariaValueTextFormatter={(v) => `M₁ = ${v}`} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">
                   SD: <span className="font-bold">{sd1}</span>
                 </label>
-                <Slider value={[sd1]} onValueChange={([v]) => setSd1(v)} min={2} max={20} step={1} />
+                <Slider value={[sd1]} onValueChange={([v]) => setSd1(v)} min={2} max={20} step={1} ariaLabel="Стандартное отклонение группы 1" ariaValueTextFormatter={(v) => `SD₁ = ${v}`} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">
                   n: <span className="font-bold">{n1}</span>
                 </label>
-                <Slider value={[n1]} onValueChange={([v]) => setN1(v)} min={5} max={100} step={5} />
+                <Slider value={[n1]} onValueChange={([v]) => setN1(v)} min={5} max={100} step={5} ariaLabel="Размер выборки группы 1" ariaValueTextFormatter={(v) => `n₁ = ${v}`} />
               </div>
             </div>
 
@@ -286,20 +286,20 @@ export const TTestLab = () => {
                   <label className="text-xs text-muted-foreground">
                     Среднее: <span className="font-bold">{mean2}</span>
                   </label>
-                  <Slider value={[mean2]} onValueChange={([v]) => setMean2(v)} min={30} max={70} step={1} />
+                  <Slider value={[mean2]} onValueChange={([v]) => setMean2(v)} min={30} max={70} step={1} ariaLabel="Среднее группы 2" ariaValueTextFormatter={(v) => `M₂ = ${v}`} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs text-muted-foreground">
                     SD: <span className="font-bold">{sd2}</span>
                   </label>
-                  <Slider value={[sd2]} onValueChange={([v]) => setSd2(v)} min={2} max={20} step={1} />
+                  <Slider value={[sd2]} onValueChange={([v]) => setSd2(v)} min={2} max={20} step={1} ariaLabel="Стандартное отклонение группы 2" ariaValueTextFormatter={(v) => `SD₂ = ${v}`} />
                 </div>
                 {testType === 'independent' && (
                   <div className="space-y-2">
                     <label className="text-xs text-muted-foreground">
                       n: <span className="font-bold">{n2}</span>
                     </label>
-                    <Slider value={[n2]} onValueChange={([v]) => setN2(v)} min={5} max={100} step={5} />
+                    <Slider value={[n2]} onValueChange={([v]) => setN2(v)} min={5} max={100} step={5} ariaLabel="Размер выборки группы 2" ariaValueTextFormatter={(v) => `n₂ = ${v}`} />
                   </div>
                 )}
               </div>
