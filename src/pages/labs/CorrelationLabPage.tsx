@@ -1,5 +1,6 @@
 import { Header } from '@/components/Header';
 import { CorrelationLab } from '@/components/labs/CorrelationLab';
+import { CorrelationExplorer } from '@/components/visualizations/CorrelationExplorer';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,11 @@ const CorrelationLabPage = () => {
         </div>
 
         <DatasetHandoffBanner />
+
+        <section className="mb-12">
+          <h2 className="font-serif text-2xl mb-4">Интерактивный исследователь корреляций</h2>
+          <CorrelationExplorer />
+        </section>
 
         <CorrelationLab />
       </main>
