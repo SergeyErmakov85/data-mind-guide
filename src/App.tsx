@@ -23,6 +23,7 @@ import MultipleRegressionLabPage from "./pages/labs/MultipleRegressionLabPage";
 import EffectSizeLabPage from "./pages/labs/EffectSizeLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import CalculatorsPage from "./pages/CalculatorsPage";
+import SampleSizePage from "./pages/SampleSizePage";
 import GlossaryPage from "./pages/GlossaryPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import FAQPage from "./pages/FAQPage";
@@ -70,6 +71,7 @@ const App = () => (
           
           {/* Courses */}
           <Route path="/calculators" element={<CalculatorsPage />} />
+          <Route path="/sample-size" element={<SampleSizePage />} />
           <Route path="/courses" element={<CoursesIndexPage />} />
           <Route path="/courses/descriptive" element={<DescriptiveStatsCourse />} />
           <Route path="/courses/chisquare" element={<ChiSquareCourse />} />
