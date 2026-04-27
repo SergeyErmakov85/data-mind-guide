@@ -5,7 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { MathFormula } from '@/components/MathFormula';
-import { Calculator, Trash2, Upload, FileSpreadsheet, X } from 'lucide-react';
+import { Calculator, Trash2, Upload, FileSpreadsheet, X, Download } from 'lucide-react';
+import {
+  GlassDialog,
+  GlassDialogContent,
+  GlassDialogTitle,
+  GlassDialogDescription,
+  GlassDialogFooter,
+} from '@/components/ui/glass-dialog';
+import { Button as Btn2 } from '@/components/ui/button';
 import Papa from 'papaparse';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -106,6 +114,7 @@ export const DescriptiveCalculator = () => {
   const [csvColumns, setCsvColumns] = useState<{ name: string; values: number[] }[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [csvFileName, setCsvFileName] = useState<string | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -245,6 +254,11 @@ export const DescriptiveCalculator = () => {
         <Button variant="ghost" size="icon" onClick={() => { setInput(''); handleClearCsv(); }}>
           <Trash2 className="w-4 h-4" />
         </Button>
+        {stats && (
+          <Button variant="outline" size="icon" onClick={() => setExportOpen(true)} title="Экспорт">
+            <Download className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
       {/* CSV column selector */}
@@ -577,6 +591,46 @@ export const DescriptiveCalculator = () => {
             </div>
           </StepCard>
         </div>
+      )}
+      {stats && (
+        <GlassDialog open={exportOpen} onOpenChange={setExportOpen}>
+          <GlassDialogContent dialogId="EXPORT / DESCRIPTIVE">
+            <GlassDialogTitle>Экспорт результатов</GlassDialogTitle>
+            <GlassDialogDescription>
+              Скопируйте сводку описательных статистик в буфер обмена.
+            </GlassDialogDescription>
+            <pre className="border-3 border-foreground p-4 bg-background font-mono text-xs overflow-x-auto whitespace-pre-wrap max-h-64">
+{`n = ${stats.n}
+M = ${fmt(stats.mean)}
+Me = ${fmt(stats.median)}
+Mo = ${stats.modes.length ? stats.modes.join(', ') : '—'}
+SD = ${fmt(stats.sd)}
+S² = ${fmt(stats.variance)}
+SE = ${fmt(stats.se)}
+Min = ${stats.min}
+Max = ${stats.max}
+Range = ${fmt(stats.range)}
+Q1 = ${fmt(stats.q1)}
+Q3 = ${fmt(stats.q3)}
+IQR = ${fmt(stats.iqr)}
+Skewness = ${fmt(stats.skewness)}
+Kurtosis = ${fmt(stats.kurtosis)}`}
+            </pre>
+            <GlassDialogFooter>
+              <Btn2
+                className="btn-primary gap-2"
+                onClick={() => {
+                  const txt = `n=${stats.n}; M=${fmt(stats.mean)}; Me=${fmt(stats.median)}; SD=${fmt(stats.sd)}; S²=${fmt(stats.variance)}; SE=${fmt(stats.se)}; Min=${stats.min}; Max=${stats.max}; Range=${fmt(stats.range)}; Q1=${fmt(stats.q1)}; Q3=${fmt(stats.q3)}; IQR=${fmt(stats.iqr)}; Skewness=${fmt(stats.skewness)}; Kurtosis=${fmt(stats.kurtosis)}`;
+                  navigator.clipboard.writeText(txt);
+                  setExportOpen(false);
+                }}
+              >
+                <Download className="w-4 h-4" />
+                Копировать
+              </Btn2>
+            </GlassDialogFooter>
+          </GlassDialogContent>
+        </GlassDialog>
       )}
     </div>
   );
