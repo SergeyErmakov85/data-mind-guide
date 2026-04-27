@@ -102,7 +102,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
+      <div id="main-content">
       {/* Hero — Bento Grid */}
       <BentoHero />
 
