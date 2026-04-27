@@ -8,6 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, Lightbulb, BarChart3, BookOpen, FlaskConical, Shuffle, Layers, GitBranch } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Quiz, QuizQuestion } from '@/components/Quiz';
+import { AutoTermify } from '@/components/AutoTermify';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -171,6 +172,7 @@ const ProbabilityTheoryPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-8">
+        <AutoTermify>
         <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.5 }}>
           <div className="flex items-center gap-3 mb-2">
             <Badge variant="outline" className="gap-1"><Shuffle className="w-3 h-3" /> Теория</Badge>
@@ -619,6 +621,7 @@ const ProbabilityTheoryPage = () => {
             questions={quizQuestions}
           />
         </motion.div>
+        </AutoTermify>
       </div>
     </div>
   );
