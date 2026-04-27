@@ -238,4 +238,64 @@
     background: none;
     -webkit-text-fill-color: currentColor;
   }
+
+  /* ----------------------------------------------------------------
+   *  RESPONSIVE AUDIT — cross-cutting safety nets
+   *  Applied site-wide so individual pages stay clean.
+   * ---------------------------------------------------------------- */
+
+  /* 1) Long display formulas must not blow up the layout on mobile.
+   *    KaTeX block formulas can be wider than the viewport — let them
+   *    scroll horizontally instead of pushing the page sideways.       */
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
+    max-width: 100%;
+  }
+  .katex-display > .katex {
+    white-space: normal;
+  }
+  .katex {
+    max-width: 100%;
+  }
+
+  /* 2) Recharts: never render below readable height.
+   *    Pages set explicit heights, but if a parent collapses (e.g. a
+   *    flex child) we still want a sane minimum.                       */
+  .recharts-responsive-container {
+    min-height: 280px;
+  }
+  @media (min-width: 768px) {
+    .recharts-responsive-container {
+      min-height: 320px;
+    }
+  }
+
+  /* 3) Touch targets ≥ 44×44 px on coarse pointers (mobile/tablet).   */
+  @media (pointer: coarse) {
+    button:not([data-slot="checkbox"]):not([role="checkbox"]),
+    [role="button"],
+    a.btn,
+    .nav-link {
+      min-height: 44px;
+    }
+  }
+
+  /* 4) Global guard against accidental horizontal page overflow.      */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* 5) Long-form prose readability cap.                               */
+  .prose-cap {
+    max-width: 65ch;
+  }
+
+  /* 6) Mobile table scroll wrapper used together with <SwipeHint>.   */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
 }
