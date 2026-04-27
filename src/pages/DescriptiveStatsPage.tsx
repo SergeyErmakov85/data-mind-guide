@@ -125,13 +125,36 @@ const DescriptiveStatsPage = () => {
   const [input, setInput] = useState(sampleData);
   const [data, setData] = useState<number[]>([]);
 
-  const parseData = () => {
-    const parsed = input
+  const parseData = useCallback((text?: string) => {
+    const src = text ?? input;
+    const parsed = src
       .split(/[,\s\n]+/)
       .map(s => parseFloat(s.trim()))
       .filter(n => !isNaN(n));
     setData(parsed);
-  };
+  }, [input]);
+
+  const handleDatasetApply = useCallback(
+    (_h: unknown, parsed: { headers: string[]; rows: string[][] }) => {
+      // Pre-fill all numeric values from all columns of the FULL CSV (not just preview).
+      // The banner gives us first 10 rows; for full dataset we re-fetch via the same handoff csv.
+      // Simpler: collect numeric cells from the preview rows for instant feedback,
+      // and let user click "Рассчитать". For full data, we use what's stored.
+      const nums: number[] = [];
+      parsed.rows.forEach((row) => {
+        row.forEach((cell) => {
+          const v = parseFloat((cell ?? '').trim());
+          if (!Number.isNaN(v)) nums.push(v);
+        });
+      });
+      if (nums.length > 0) {
+        const text = nums.join(', ');
+        setInput(text);
+        parseData(text);
+      }
+    },
+    [parseData],
+  );
 
   const stats = useMemo(() => calculateStats(data), [data]);
   const histogramData = useMemo(() => createHistogramData(data), [data]);
