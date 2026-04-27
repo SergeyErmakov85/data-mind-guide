@@ -208,7 +208,7 @@ const DescriptiveStatsPage = () => {
                     className="min-h-[120px] font-mono"
                   />
                   <div className="flex gap-3">
-                    <Button onClick={parseData} className="flex-1 gap-2">
+                    <Button onClick={() => parseData()} className="flex-1 gap-2">
                       <Calculator className="w-4 h-4" />
                       Рассчитать
                     </Button>
