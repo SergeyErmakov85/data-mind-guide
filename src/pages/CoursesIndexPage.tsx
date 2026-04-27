@@ -1,24 +1,21 @@
-import { Link } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { getCourseProgress } from '@/lib/progress';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BarChart3, 
-  FlaskConical, 
-  Library, 
-  ArrowRight, 
-  GraduationCap,
+import { Header } from '@/components/Header';
+import {
+  BarChart3,
+  FlaskConical,
+  Library,
   TrendingUp,
   Sigma,
-  Grid3X3
+  Grid3X3,
 } from 'lucide-react';
-
-const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
-const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
+import {
+  BentoTile,
+  DifficultyFilter,
+  sortByDifficulty,
+  tileGridMotion,
+  type Difficulty,
+} from '@/components/BentoTile';
 
 interface Course {
   id: string;
@@ -29,151 +26,77 @@ interface Course {
   topics: string[];
   status: 'available' | 'coming-soon';
   lessonsCount: number;
+  difficulty: Difficulty;
+  indexLabel: string;
 }
 
 const courses: Course[] = [
-  {
-    id: 'descriptive',
-    title: 'Описательная статистика',
-    description: 'Меры центральной тенденции, разброса и формы распределения. Визуализация данных и интерпретация результатов в психологическом контексте.',
-    icon: BarChart3,
-    path: '/courses/descriptive',
-    topics: ['Среднее, медиана, мода', 'Дисперсия и стандартное отклонение', 'Квартили и процентили', 'Визуализация данных'],
-    status: 'available',
-    lessonsCount: 8,
-  },
-  {
-    id: 'probability',
-    title: 'Теория вероятностей',
-    description: 'Основные законы вероятности, распределения случайных величин и их применение в психологических исследованиях.',
-    icon: Library,
-    path: '/courses/probability',
-    topics: ['Законы вероятности', 'Нормальное распределение', 'Биномиальное распределение', 'Z-оценки'],
-    status: 'coming-soon',
-    lessonsCount: 6,
-  },
-  {
-    id: 'inference',
-    title: 'Статистический вывод',
-    description: 'От выборки к популяции: доверительные интервалы, проверка гипотез и оценка мощности исследования.',
-    icon: FlaskConical,
-    path: '/courses/inference',
-    topics: ['Центральная предельная теорема', 'Доверительные интервалы', 'Проверка гипотез', 'Мощность теста'],
-    status: 'coming-soon',
-    lessonsCount: 8,
-  },
-  {
-    id: 'ttests',
-    title: 't-тесты',
-    description: 'Сравнение средних значений: одновыборочный, независимый и парный t-тесты с примерами из клинической психологии.',
-    icon: Sigma,
-    path: '/courses/ttests',
-    topics: ['Одновыборочный t-тест', 'Независимый t-тест', 'Парный t-тест', 'd Коэна'],
-    status: 'coming-soon',
-    lessonsCount: 5,
-  },
-  {
-    id: 'correlation',
-    title: 'Корреляция и регрессия',
-    description: 'Анализ связей между переменными: от корреляции до множественной регрессии в психологических исследованиях.',
-    icon: TrendingUp,
-    path: '/courses/correlation',
-    topics: ['Корреляция Пирсона', 'Корреляция Спирмена', 'Простая регрессия', 'Множественная регрессия'],
-    status: 'coming-soon',
-    lessonsCount: 6,
-  },
-  {
-    id: 'categorical',
-    title: 'Категориальные данные',
-    description: 'Анализ номинальных и порядковых данных: таблицы сопряжённости, хи-квадрат и точный тест Фишера.',
-    icon: Grid3X3,
-    path: '/courses/categorical',
-    topics: ['Таблицы сопряжённости', 'Тест χ²', 'Точный тест Фишера', 'Относительный риск'],
-    status: 'coming-soon',
-    lessonsCount: 4,
-  },
+  { id: 'descriptive', title: 'Описательная статистика', description: 'Меры центральной тенденции, разброса и формы распределения. Визуализация данных и интерпретация результатов в психологическом контексте.', icon: BarChart3, path: '/courses/descriptive', topics: ['Среднее, медиана, мода', 'Дисперсия и стандартное отклонение', 'Квартили и процентили', 'Визуализация данных'], status: 'available', lessonsCount: 8, difficulty: 'beginner', indexLabel: 'DESCRIPTIVE' },
+  { id: 'probability', title: 'Теория вероятностей', description: 'Основные законы вероятности, распределения случайных величин и их применение в психологических исследованиях.', icon: Library, path: '/courses/probability', topics: ['Законы вероятности', 'Нормальное распределение', 'Биномиальное распределение', 'Z-оценки'], status: 'coming-soon', lessonsCount: 6, difficulty: 'beginner', indexLabel: 'PROBABILITY' },
+  { id: 'inference', title: 'Статистический вывод', description: 'От выборки к популяции: доверительные интервалы, проверка гипотез и оценка мощности исследования.', icon: FlaskConical, path: '/courses/inference', topics: ['Центральная предельная теорема', 'Доверительные интервалы', 'Проверка гипотез', 'Мощность теста'], status: 'coming-soon', lessonsCount: 8, difficulty: 'intermediate', indexLabel: 'INFERENCE' },
+  { id: 'ttests', title: 't-тесты', description: 'Сравнение средних значений: одновыборочный, независимый и парный t-тесты с примерами из клинической психологии.', icon: Sigma, path: '/courses/ttests', topics: ['Одновыборочный t-тест', 'Независимый t-тест', 'Парный t-тест', 'd Коэна'], status: 'coming-soon', lessonsCount: 5, difficulty: 'intermediate', indexLabel: 'T-TESTS' },
+  { id: 'correlation', title: 'Корреляция и регрессия', description: 'Анализ связей между переменными: от корреляции до множественной регрессии в психологических исследованиях.', icon: TrendingUp, path: '/courses/correlation', topics: ['Корреляция Пирсона', 'Корреляция Спирмена', 'Простая регрессия', 'Множественная регрессия'], status: 'coming-soon', lessonsCount: 6, difficulty: 'advanced', indexLabel: 'KORRELATION' },
+  { id: 'categorical', title: 'Категориальные данные', description: 'Анализ номинальных и порядковых данных: таблицы сопряжённости, хи-квадрат и точный тест Фишера.', icon: Grid3X3, path: '/courses/categorical', topics: ['Таблицы сопряжённости', 'Тест χ²', 'Точный тест Фишера', 'Относительный риск'], status: 'coming-soon', lessonsCount: 4, difficulty: 'advanced', indexLabel: 'CATEGORICAL' },
 ];
 
 const CoursesIndexPage = () => {
+  const [filter, setFilter] = useState<Difficulty | 'all'>('all');
+
+  const sorted = useMemo(() => sortByDifficulty(courses), []);
+  const visible = useMemo(
+    () => (filter === 'all' ? sorted : sorted.filter((c) => c.difficulty === filter)),
+    [sorted, filter],
+  );
+
+  const counts = {
+    all: courses.length,
+    beginner: courses.filter((c) => c.difficulty === 'beginner').length,
+    intermediate: courses.filter((c) => c.difficulty === 'intermediate').length,
+    advanced: courses.filter((c) => c.difficulty === 'advanced').length,
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container py-12">
-        {/* Hero */}
-        <motion.div className="text-center mb-12" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.12 } } }}>
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <GraduationCap className="w-4 h-4" />
-            <span>Структурированное обучение</span>
-          </motion.div>
-          
-          <motion.h1 variants={fadeUp} className="font-heading text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-text">Курсы</span> статистики
-          </motion.h1>
-          
-          <motion.p variants={fadeUp} className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Последовательное изучение статистики от базовых концепций до продвинутых методов анализа. 
-            Каждый курс включает теорию, интерактивные примеры и задания для самопроверки.
-          </motion.p>
-        </motion.div>
 
-        {/* Courses Grid */}
-        <motion.div className="grid md:grid-cols-2 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}>
-          {courses.map((course) => (
-            <motion.div key={course.id} variants={fadeUp} transition={{ duration: 0.4 }}>
-            <Card 
-              className={`group transition-all duration-300 hover:shadow-lg h-full ${
-                course.status === 'coming-soon' ? 'opacity-60' : ''
-              }`}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <course.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {course.lessonsCount} тем
-                    </Badge>
-                  </div>
-                </div>
-                {course.status === 'available' && (() => {
-                  const progress = getCourseProgress(course.id, course.lessonsCount);
-                  return progress > 0 ? (
-                    <div className="flex items-center gap-2 mb-1">
-                      <Progress value={progress} className="h-1.5 flex-1" />
-                      <span className="text-xs text-muted-foreground">{progress}%</span>
-                    </div>
-                  ) : null;
-                })()}
-                <CardTitle className="text-xl">{course.title}</CardTitle>
-                <CardDescription className="text-base">{course.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {course.topics.map((topic) => (
-                    <Badge key={topic} variant="outline" className="text-xs">
-                      {topic}
-                    </Badge>
-                  ))}
-                </div>
-                
-                {course.status === 'available' ? (
-                  <Link to={course.path}>
-                    <Button className="w-full gap-2">
-                      <GraduationCap className="w-4 h-4" />
-                      Начать курс
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button disabled className="w-full gap-2">
-                    Скоро
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-            </motion.div>
+      <main className="container py-12">
+        <div className="mb-10">
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            # Courses · Структурированное обучение
+          </p>
+          <h1 className="font-heading uppercase tracking-tight font-bold text-4xl md:text-6xl leading-[0.95]">
+            Курсы
+            <br />
+            <span className="text-primary">статистики</span>
+          </h1>
+          <p className="font-body text-base md:text-lg text-muted-foreground max-w-2xl mt-4">
+            Последовательное изучение статистики от базовых концепций до продвинутых методов
+            анализа. Каждый курс включает теорию, интерактивные примеры и задания для самопроверки.
+          </p>
+        </div>
+
+        <DifficultyFilter value={filter} onChange={setFilter} counts={counts} />
+
+        <motion.div
+          key={filter}
+          className="grid grid-cols-1 md:grid-cols-12 auto-rows-fr gap-5"
+          initial="hidden"
+          animate="visible"
+          variants={tileGridMotion}
+        >
+          {visible.map((course, i) => (
+            <BentoTile
+              key={course.id}
+              index={i}
+              to={course.status === 'available' ? course.path : undefined}
+              disabled={course.status === 'coming-soon'}
+              difficulty={course.difficulty}
+              badges={[`${course.lessonsCount} тем`, course.topics[0]]}
+              title={course.title}
+              description={course.description}
+              indexLabel={course.indexLabel}
+              icon={course.icon}
+            />
           ))}
         </motion.div>
       </main>

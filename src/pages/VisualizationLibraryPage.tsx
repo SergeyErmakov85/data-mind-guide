@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,11 +7,18 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, BarChart3, TrendingUp } from 'lucide-react';
+import { Eye, BarChart3, TrendingUp, Sigma, Activity, GitBranch } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
+import {
+  BentoTile,
+  DifficultyFilter,
+  sortByDifficulty,
+  tileGridMotion,
+  type Difficulty,
+} from '@/components/BentoTile';
 
 const normalPDF = (x: number, mu: number, sigma: number) => {
   return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
@@ -48,6 +56,77 @@ const fPDF = (x: number, d1: number, d2: number) => {
 };
 
 const betaFn = (a: number, b: number) => gamma(a) * gamma(b) / gamma(a + b);
+
+interface DistItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  difficulty: Difficulty;
+  indexLabel: string;
+  badges: string[];
+  tabValue: string;
+}
+
+const distItems: DistItem[] = [
+  { id: 'normal', title: 'Нормальное N(μ, σ²)', description: 'Симметричный «колокол» — основа большинства параметрических методов и описания психологических признаков.', icon: BarChart3, difficulty: 'beginner', indexLabel: 'NORMAL', badges: ['μ, σ', '68/95'], tabValue: 'normal' },
+  { id: 't', title: 't Стьюдента', description: 'Тяжёлые хвосты при малых df. Используется в t-тестах для сравнения средних.', icon: Activity, difficulty: 'intermediate', indexLabel: 'STUDENT', badges: ['df', 't-test'], tabValue: 't' },
+  { id: 'chi', title: 'χ² (хи-квадрат)', description: 'Правосторонняя асимметрия. Применяется для категориальных данных и таблиц сопряжённости.', icon: Sigma, difficulty: 'intermediate', indexLabel: 'CHI-SQ', badges: ['k', 'категории'], tabValue: 'chi' },
+  { id: 'f', title: 'F Фишера', description: 'Отношение дисперсий. Лежит в основе ANOVA и сравнения двух выборочных дисперсий.', icon: GitBranch, difficulty: 'advanced', indexLabel: 'FISHER', badges: ['d₁, d₂', 'ANOVA'], tabValue: 'f' },
+];
+
+const DistributionsBento = () => {
+  const [filter, setFilter] = useState<Difficulty | 'all'>('all');
+  const sorted = sortByDifficulty(distItems);
+  const visible = filter === 'all' ? sorted : sorted.filter((d) => d.difficulty === filter);
+
+  const counts = {
+    all: distItems.length,
+    beginner: distItems.filter((d) => d.difficulty === 'beginner').length,
+    intermediate: distItems.filter((d) => d.difficulty === 'intermediate').length,
+    advanced: distItems.filter((d) => d.difficulty === 'advanced').length,
+  };
+
+  const onJump = (tabValue: string) => {
+    const triggers = document.querySelectorAll<HTMLButtonElement>('#dist-tabs [role="tab"]');
+    const idx = ['normal', 't', 'chi', 'f'].indexOf(tabValue);
+    triggers[idx]?.click();
+    setTimeout(() => {
+      document.getElementById('dist-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  return (
+    <div className="mb-10">
+      <DifficultyFilter value={filter} onChange={setFilter} counts={counts} />
+      <motion.div
+        key={filter}
+        className="grid grid-cols-1 md:grid-cols-12 auto-rows-fr gap-5"
+        initial="hidden"
+        animate="visible"
+        variants={tileGridMotion}
+      >
+        {visible.map((d, i) => (
+          <div
+            key={d.id}
+            onClick={() => onJump(d.tabValue)}
+            className="contents cursor-pointer"
+          >
+            <BentoTile
+              index={i}
+              difficulty={d.difficulty}
+              badges={d.badges}
+              title={d.title}
+              description={d.description}
+              indexLabel={d.indexLabel}
+              icon={d.icon}
+            />
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
 
 const VisualizationLibraryPage = () => {
   // Normal params
@@ -104,17 +183,26 @@ const VisualizationLibraryPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold mb-2 flex items-center gap-3">
-            <Eye className="w-8 h-8 text-primary" />
-            Визуальная библиотека распределений
+        <div className="mb-10">
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            # Library · Распределения
+          </p>
+          <h1 className="font-heading uppercase tracking-tight font-bold text-4xl md:text-6xl leading-[0.95] flex items-center gap-4">
+            <Eye className="w-10 h-10 md:w-12 md:h-12 text-primary shrink-0" />
+            Визуальная
+            <span className="text-primary">библиотека</span>
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Интерактивные графики основных статистических распределений
+          <p className="font-body text-base md:text-lg text-muted-foreground max-w-2xl mt-4">
+            Интерактивные графики основных статистических распределений: меняйте параметры
+            и наблюдайте поведение функций плотности.
           </p>
         </div>
 
-        <Tabs defaultValue="normal" className="space-y-6">
+        {/* Bento overview of distributions */}
+        <DistributionsBento />
+
+
+        <Tabs id="dist-tabs" defaultValue="normal" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="normal">Нормальное</TabsTrigger>
             <TabsTrigger value="t">t Стьюдента</TabsTrigger>

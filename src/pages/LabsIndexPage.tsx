@@ -1,27 +1,27 @@
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ProgressBadge } from '@/components/ProgressIndicators';
-import { getLabProgress, getTotalProgress } from '@/lib/progress';
-import { Progress } from '@/components/ui/progress';
-import { 
-  LineChart, 
-  BarChart3, 
-  Beaker, 
-  FlaskConical, 
+import { getLabProgress } from '@/lib/progress';
+import {
+  LineChart,
+  BarChart3,
+  Beaker,
+  FlaskConical,
   TrendingUp,
-  ArrowRight,
-  Play,
   Sigma,
   ScatterChart,
   Layers,
   Shuffle,
   Trophy,
-  Ruler
+  Ruler,
 } from 'lucide-react';
+import {
+  BentoTile,
+  DifficultyFilter,
+  sortByDifficulty,
+  tileGridMotion,
+  type Difficulty,
+} from '@/components/BentoTile';
 
 interface Lab {
   id: string;
@@ -29,259 +29,94 @@ interface Lab {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  difficulty: Difficulty;
   concepts: string[];
   status: 'available' | 'coming-soon';
+  indexLabel: string;
 }
 
 const labs: Lab[] = [
-  {
-    id: 'effect-size',
-    title: 'Размер эффекта',
-    description: 'p-value значим — но насколько велик эффект? Сравнивайте d Коэна, η² и r Пирсона. Визуализируйте перекрытие распределений и учитесь отличать статистическую значимость от практической.',
-    icon: Ruler,
-    path: '/labs/effect-size',
-    difficulty: 'beginner',
-    concepts: ['d Коэна', 'η² (eta-квадрат)', 'r Пирсона'],
-    status: 'available',
-  },
-  {
-    id: 'clt',
-    title: 'Центральная предельная теорема',
-    description: 'Почему результаты тестов IQ распределены нормально? Наблюдайте, как распределение выборочных средних сходится к нормальному — это объясняет, почему многие психологические переменные имеют колоколообразную форму.',
-    icon: LineChart,
-    path: '/labs/clt',
-    difficulty: 'beginner',
-    concepts: ['Выборочное распределение', 'Нормальное распределение', 'Закон больших чисел'],
-    status: 'available',
-  },
-  {
-    id: 'sampling',
-    title: 'Выборочные статистики',
-    description: 'Сколько участников нужно для исследования тревожности? Генерируйте выборки и изучайте, как размер группы влияет на точность оценки среднего балла по шкале.',
-    icon: BarChart3,
-    path: '/labs/sampling',
-    difficulty: 'beginner',
-    concepts: ['Выборочное среднее', 'Стандартная ошибка', 'Смещение оценок'],
-    status: 'available',
-  },
-  {
-    id: 'confidence',
-    title: 'Доверительные интервалы',
-    description: 'Как интерпретировать «среднее 45±3 балла по шкале депрессии»? Визуализируйте, что означает 95% доверительный интервал через повторные выборки из популяции.',
-    icon: Beaker,
-    path: '/labs/confidence',
-    difficulty: 'intermediate',
-    concepts: ['Уровень доверия', 'Покрытие', 'Ширина интервала'],
-    status: 'available',
-  },
-  {
-    id: 'hypothesis',
-    title: 'Проверка гипотез',
-    description: 'Работает ли когнитивно-поведенческая терапия? Исследуйте p-value и мощность теста — ключевые понятия для оценки эффективности психологических интервенций.',
-    icon: FlaskConical,
-    path: '/labs/hypothesis',
-    difficulty: 'intermediate',
-    concepts: ['P-value', 'Ошибки I и II рода', 'Мощность теста'],
-    status: 'available',
-  },
-  {
-    id: 'regression',
-    title: 'Линейная регрессия',
-    description: 'Предсказывает ли уровень стресса академическую успеваемость? Стройте регрессионные модели и анализируйте силу связи между психологическими переменными.',
-    icon: TrendingUp,
-    path: '/labs/regression',
-    difficulty: 'advanced',
-    concepts: ['Метод наименьших квадратов', 'R²', 'Остатки'],
-    status: 'available',
-  },
-  {
-    id: 'correlation',
-    title: 'Корреляция и ковариация',
-    description: 'Связаны ли тревожность и успеваемость? Генерируйте данные с заданной корреляцией, добавляйте выбросы и наблюдайте их влияние на коэффициент Пирсона.',
-    icon: ScatterChart,
-    path: '/labs/correlation',
-    difficulty: 'beginner',
-    concepts: ['Корреляция Пирсона', 'Ковариация', 'Выбросы'],
-    status: 'available',
-  },
-  {
-    id: 'ttest',
-    title: 't-тесты',
-    description: 'Работает ли терапия? Сравните уровень депрессии до и после лечения с помощью одновыборочного, независимого и парного t-тестов.',
-    icon: Sigma,
-    path: '/labs/ttest',
-    difficulty: 'intermediate',
-    concepts: ['t-статистика', 'd Коэна', 'Степени свободы'],
-    status: 'available',
-  },
-  {
-    id: 'anova',
-    title: 'ANOVA (Дисперсионный анализ)',
-    description: 'Какой метод терапии эффективнее? Сравните средние трёх и более групп, изучите F-статистику, таблицу ANOVA и размер эффекта η².',
-    icon: Layers,
-    path: '/labs/anova',
-    difficulty: 'advanced',
-    concepts: ['F-статистика', 'η² (eta-квадрат)', 'Post-hoc тесты'],
-    status: 'available',
-  },
-  {
-    id: 'nonparametric',
-    title: 'Непараметрические тесты',
-    description: 'Что делать, если данные не нормальны? Сравните результаты параметрических и непараметрических тестов на данных шкал Лайкерта.',
-    icon: Shuffle,
-    path: '/labs/nonparametric',
-    difficulty: 'intermediate',
-    concepts: ['Манна-Уитни', 'Вилкоксон', 'Спирмен'],
-    status: 'available',
-  },
-  {
-    id: 'binomial',
-    title: 'Биномиальное распределение',
-    description: 'Какова вероятность, что 15 из 20 пациентов покажут улучшение? Визуализируйте биномиальное распределение и его нормальное приближение.',
-    icon: BarChart3,
-    path: '/labs/binomial',
-    difficulty: 'beginner',
-    concepts: ['Биномиальное распределение', 'Нормальное приближение', 'z-тест для доли'],
-    status: 'available',
-  },
-  {
-    id: 'chisquare',
-    title: 'Хи-квадрат (χ²)',
-    description: 'Зависит ли выбор терапии от пола? Создавайте таблицы сопряжённости и проверяйте связь между категориальными переменными.',
-    icon: Layers,
-    path: '/labs/chisquare',
-    difficulty: 'intermediate',
-    concepts: ['Тест независимости', 'Ожидаемые частоты', 'V Крамера'],
-    status: 'available',
-  },
+  { id: 'effect-size', title: 'Размер эффекта', description: 'p-value значим — но насколько велик эффект? Сравнивайте d Коэна, η² и r Пирсона. Визуализируйте перекрытие распределений и учитесь отличать статистическую значимость от практической.', icon: Ruler, path: '/labs/effect-size', difficulty: 'beginner', concepts: ['d Коэна', 'η² (eta-квадрат)', 'r Пирсона'], status: 'available', indexLabel: 'EFFECT' },
+  { id: 'clt', title: 'Центральная предельная теорема', description: 'Почему результаты тестов IQ распределены нормально? Наблюдайте, как распределение выборочных средних сходится к нормальному — это объясняет, почему многие психологические переменные имеют колоколообразную форму.', icon: LineChart, path: '/labs/clt', difficulty: 'beginner', concepts: ['Выборочное распределение', 'Нормальное распределение', 'Закон больших чисел'], status: 'available', indexLabel: 'CLT' },
+  { id: 'sampling', title: 'Выборочные статистики', description: 'Сколько участников нужно для исследования тревожности? Генерируйте выборки и изучайте, как размер группы влияет на точность оценки среднего балла по шкале.', icon: BarChart3, path: '/labs/sampling', difficulty: 'beginner', concepts: ['Выборочное среднее', 'Стандартная ошибка', 'Смещение оценок'], status: 'available', indexLabel: 'SAMPLING' },
+  { id: 'confidence', title: 'Доверительные интервалы', description: 'Как интерпретировать «среднее 45±3 балла по шкале депрессии»? Визуализируйте, что означает 95% доверительный интервал через повторные выборки из популяции.', icon: Beaker, path: '/labs/confidence', difficulty: 'intermediate', concepts: ['Уровень доверия', 'Покрытие', 'Ширина интервала'], status: 'available', indexLabel: 'CONFIDENCE' },
+  { id: 'hypothesis', title: 'Проверка гипотез', description: 'Работает ли когнитивно-поведенческая терапия? Исследуйте p-value и мощность теста — ключевые понятия для оценки эффективности психологических интервенций.', icon: FlaskConical, path: '/labs/hypothesis', difficulty: 'intermediate', concepts: ['P-value', 'Ошибки I и II рода', 'Мощность теста'], status: 'available', indexLabel: 'HYPOTHESIS' },
+  { id: 'regression', title: 'Линейная регрессия', description: 'Предсказывает ли уровень стресса академическую успеваемость? Стройте регрессионные модели и анализируйте силу связи между психологическими переменными.', icon: TrendingUp, path: '/labs/regression', difficulty: 'advanced', concepts: ['Метод наименьших квадратов', 'R²', 'Остатки'], status: 'available', indexLabel: 'REGRESSION' },
+  { id: 'correlation', title: 'Корреляция и ковариация', description: 'Связаны ли тревожность и успеваемость? Генерируйте данные с заданной корреляцией, добавляйте выбросы и наблюдайте их влияние на коэффициент Пирсона.', icon: ScatterChart, path: '/labs/correlation', difficulty: 'beginner', concepts: ['Корреляция Пирсона', 'Ковариация', 'Выбросы'], status: 'available', indexLabel: 'KORRELATION' },
+  { id: 'ttest', title: 't-тесты', description: 'Работает ли терапия? Сравните уровень депрессии до и после лечения с помощью одновыборочного, независимого и парного t-тестов.', icon: Sigma, path: '/labs/ttest', difficulty: 'intermediate', concepts: ['t-статистика', 'd Коэна', 'Степени свободы'], status: 'available', indexLabel: 'T-TEST' },
+  { id: 'anova', title: 'ANOVA (Дисперсионный анализ)', description: 'Какой метод терапии эффективнее? Сравните средние трёх и более групп, изучите F-статистику, таблицу ANOVA и размер эффекта η².', icon: Layers, path: '/labs/anova', difficulty: 'advanced', concepts: ['F-статистика', 'η² (eta-квадрат)', 'Post-hoc тесты'], status: 'available', indexLabel: 'ANOVA' },
+  { id: 'nonparametric', title: 'Непараметрические тесты', description: 'Что делать, если данные не нормальны? Сравните результаты параметрических и непараметрических тестов на данных шкал Лайкерта.', icon: Shuffle, path: '/labs/nonparametric', difficulty: 'intermediate', concepts: ['Манна-Уитни', 'Вилкоксон', 'Спирмен'], status: 'available', indexLabel: 'NONPARAM' },
+  { id: 'binomial', title: 'Биномиальное распределение', description: 'Какова вероятность, что 15 из 20 пациентов покажут улучшение? Визуализируйте биномиальное распределение и его нормальное приближение.', icon: BarChart3, path: '/labs/binomial', difficulty: 'beginner', concepts: ['Биномиальное распределение', 'Нормальное приближение', 'z-тест для доли'], status: 'available', indexLabel: 'BINOMIAL' },
+  { id: 'chisquare', title: 'Хи-квадрат (χ²)', description: 'Зависит ли выбор терапии от пола? Создавайте таблицы сопряжённости и проверяйте связь между категориальными переменными.', icon: Layers, path: '/labs/chisquare', difficulty: 'intermediate', concepts: ['Тест независимости', 'Ожидаемые частоты', 'V Крамера'], status: 'available', indexLabel: 'CHI-SQUARE' },
 ];
 
-const difficultyColors = {
-  beginner: 'bg-success/10 text-success border-success/20',
-  intermediate: 'bg-warning/10 text-warning border-warning/20',
-  advanced: 'bg-destructive/10 text-destructive border-destructive/20',
-};
-
-const difficultyLabels = {
-  beginner: 'Начальный',
-  intermediate: 'Средний',
-  advanced: 'Продвинутый',
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const staggerGrid = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07 } },
-};
-
 const LabsIndexPage = () => {
-  const completedCount = labs.filter(l => getLabProgress(l.id)).length;
-  const progressPercent = labs.length > 0 ? Math.round((completedCount / labs.length) * 100) : 0;
+  const [filter, setFilter] = useState<Difficulty | 'all'>('all');
+
+  const sorted = useMemo(() => sortByDifficulty(labs), []);
+  const visible = useMemo(
+    () => (filter === 'all' ? sorted : sorted.filter((l) => l.difficulty === filter)),
+    [sorted, filter],
+  );
+
+  const counts = {
+    all: labs.length,
+    beginner: labs.filter((l) => l.difficulty === 'beginner').length,
+    intermediate: labs.filter((l) => l.difficulty === 'intermediate').length,
+    advanced: labs.filter((l) => l.difficulty === 'advanced').length,
+  };
+
+  const completedCount = labs.filter((l) => getLabProgress(l.id)).length;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container py-12">
         {/* Hero */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
+              # Labs · Интерактивные эксперименты
+            </p>
+            <h1 className="font-heading uppercase tracking-tight font-bold text-4xl md:text-6xl leading-[0.95]">
+              Статистические
+              <br />
+              <span className="text-primary">лаборатории</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-3 font-mono text-sm uppercase tracking-widest">
+            <Trophy className="w-5 h-5 text-primary" />
+            <span>
+              {completedCount}/{labs.length} пройдено
+            </span>
+          </div>
+        </div>
+
+        {/* Filter */}
+        <DifficultyFilter value={filter} onChange={setFilter} counts={counts} />
+
+        {/* Bento grid */}
         <motion.div
-          className="text-center mb-12"
+          key={filter}
+          className="grid grid-cols-1 md:grid-cols-12 auto-rows-fr gap-5"
           initial="hidden"
           animate="visible"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+          variants={tileGridMotion}
         >
-          <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Beaker className="w-4 h-4" />
-            <span>Интерактивные эксперименты</span>
-          </motion.div>
-          
-          <motion.h1 variants={fadeUp} transition={{ duration: 0.5 }} className="font-heading text-4xl md:text-5xl font-bold mb-4">
-            Статистические <span className="gradient-text">лаборатории</span>
-          </motion.h1>
-          
-          <motion.p variants={fadeUp} transition={{ duration: 0.5 }} className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Исследуйте статистические концепции через интерактивные симуляции. 
-            Меняйте параметры и наблюдайте закономерности в реальном времени.
-          </motion.p>
-        </motion.div>
-
-        {/* Progress Summary */}
-        {completedCount > 0 && (
-          <motion.div
-            className="mb-8 p-6 rounded-xl border bg-card"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Trophy className="w-5 h-5 text-primary" />
-              <span className="font-semibold">Ваш прогресс</span>
-              <span className="text-sm text-muted-foreground ml-auto">{completedCount} из {labs.length} лабораторий</span>
-            </div>
-            <Progress value={progressPercent} className="h-2" />
-          </motion.div>
-        )}
-
-        {/* Labs Grid */}
-        <motion.div
-          className="grid md:grid-cols-2 gap-6"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-30px" }}
-          variants={staggerGrid}
-        >
-          {labs.map((lab) => (
-            <motion.div key={lab.id} variants={fadeUp} transition={{ duration: 0.4 }}>
-              <Card 
-                className={`group transition-all duration-300 hover:shadow-lg h-full ${
-                  lab.status === 'coming-soon' ? 'opacity-60' : ''
-                }`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <lab.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getLabProgress(lab.id) && <ProgressBadge completed={true} />}
-                      <Badge variant="outline" className={difficultyColors[lab.difficulty]}>
-                        {difficultyLabels[lab.difficulty]}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl">{lab.title}</CardTitle>
-                  <CardDescription className="text-base">{lab.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {lab.concepts.map((concept) => (
-                      <Badge key={concept} variant="secondary" className="text-xs">
-                        {concept}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  {lab.status === 'available' ? (
-                    <Link to={lab.path}>
-                      <Button className="w-full gap-2">
-                        <Play className="w-4 h-4" />
-                        Запустить лабораторию
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button disabled className="w-full gap-2">
-                      Скоро
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
+          {visible.map((lab, i) => (
+            <BentoTile
+              key={lab.id}
+              index={i}
+              to={lab.status === 'available' ? lab.path : undefined}
+              disabled={lab.status === 'coming-soon'}
+              difficulty={lab.difficulty}
+              badges={lab.concepts.slice(0, 2)}
+              title={lab.title}
+              description={lab.description}
+              indexLabel={lab.indexLabel}
+              icon={lab.icon}
+            />
           ))}
         </motion.div>
       </main>
