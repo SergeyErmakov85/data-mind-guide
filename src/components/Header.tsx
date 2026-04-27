@@ -1,17 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  BookOpen, 
-  FlaskConical, 
-  BarChart3, 
-  GraduationCap, 
-  Menu, 
-  X,
+import {
+  BookOpen,
+  FlaskConical,
+  BarChart3,
+  GraduationCap,
+  Menu,
   Beaker,
   LineChart,
   Library,
   Info,
   ScatterChart,
-  Sigma
+  Sigma,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
@@ -23,6 +22,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from './ui/navigation-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from './ui/sheet';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -65,52 +71,51 @@ const mainNavItems: NavItem[] = [
 
 export const Header = () => {
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const isLabActive = location.pathname.startsWith('/labs');
   const isCourseActive = location.pathname.startsWith('/courses');
 
+  const close = () => setOpen(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-primary-foreground" />
+      <div className="container flex h-16 items-center justify-between gap-3">
+        {/* Logo — never wraps to two lines */}
+        <Link to="/" className="flex items-center gap-2 min-w-0 shrink">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
           </div>
-          <span className="font-heading font-bold text-xl hidden sm:inline">МатСтат для психологов</span>
+          <span className="font-heading font-bold text-base sm:text-xl whitespace-nowrap truncate hidden xs:inline sm:inline">
+            МатСтат для психологов
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation (lg+) */}
         <NavigationMenu className="hidden lg:flex">
           <NavigationMenuList>
-            {/* Labs Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={cn(
-                "gap-2",
-                isLabActive && "bg-primary text-primary-foreground"
-              )}>
+              <NavigationMenuTrigger className={cn('gap-2', isLabActive && 'bg-primary text-primary-foreground')}>
                 <Beaker className="w-4 h-4" />
                 Лаборатории
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
+                <ul className="grid w-[min(90vw,400px)] gap-3 p-4 md:w-[500px] md:grid-cols-2">
                   {labItems.map((item) => (
                     <li key={item.path}>
                       <NavigationMenuLink asChild>
                         <Link
                           to={item.path}
                           className={cn(
-                            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                            location.pathname === item.path && "bg-accent"
+                            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                            location.pathname === item.path && 'bg-accent'
                           )}
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="w-4 h-4" />
                             {item.label}
                           </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {item.description}
-                          </p>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{item.description}</p>
                         </Link>
                       </NavigationMenuLink>
                     </li>
@@ -119,34 +124,28 @@ export const Header = () => {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Courses Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={cn(
-                "gap-2",
-                isCourseActive && "bg-primary text-primary-foreground"
-              )}>
+              <NavigationMenuTrigger className={cn('gap-2', isCourseActive && 'bg-primary text-primary-foreground')}>
                 <GraduationCap className="w-4 h-4" />
                 Курсы
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[400px] gap-3 p-4">
+                <ul className="grid w-[min(90vw,400px)] gap-3 p-4">
                   {courseItems.map((item) => (
                     <li key={item.path}>
                       <NavigationMenuLink asChild>
                         <Link
                           to={item.path}
                           className={cn(
-                            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                            location.pathname === item.path && "bg-accent"
+                            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                            location.pathname === item.path && 'bg-accent'
                           )}
                         >
                           <div className="flex items-center gap-2 text-sm font-medium leading-none">
                             <item.icon className="w-4 h-4" />
                             {item.label}
                           </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {item.description}
-                          </p>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{item.description}</p>
                         </Link>
                       </NavigationMenuLink>
                     </li>
@@ -155,15 +154,14 @@ export const Header = () => {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Direct Links */}
             {mainNavItems.map((item) => (
               <NavigationMenuItem key={item.path}>
                 <Link
                   to={item.path}
                   className={cn(
-                    "nav-link flex items-center gap-2 text-sm px-4 py-2",
-                    location.pathname === item.path 
-                      ? 'bg-primary text-primary-foreground rounded-lg' 
+                    'nav-link flex items-center gap-2 text-sm px-4 py-2',
+                    location.pathname === item.path
+                      ? 'bg-primary text-primary-foreground rounded-lg'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
@@ -175,95 +173,117 @@ export const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
+        {/* Mobile / tablet trigger — Sheet drawer (left) */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Открыть меню"
+              className={cn(
+                'lg:hidden shrink-0',
+                'h-11 w-11 min-w-11 min-h-11', // 44×44 touch target
+                'focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2'
+              )}
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="w-[88vw] max-w-sm p-0 flex flex-col"
+          >
+            <SheetHeader className="px-4 py-4 border-b border-border">
+              <SheetTitle className="flex items-center gap-2 text-left">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-heading text-base">Навигация</span>
+              </SheetTitle>
+            </SheetHeader>
+
+            <nav className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="flex flex-col gap-6">
+                {/* Main */}
+                <div>
+                  <h3 className="kicker mb-2">Основное</h3>
+                  <div className="flex flex-col">
+                    {mainNavItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={close}
+                        className={cn(
+                          'flex items-center gap-3 px-2 rounded-md min-h-11',
+                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
+                          location.pathname === item.path
+                            ? 'text-primary font-medium bg-primary/5'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        )}
+                      >
+                        <item.icon className="w-5 h-5 shrink-0" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Labs */}
+                <div>
+                  <h3 className="kicker mb-2 flex items-center gap-2">
+                    <Beaker className="w-3.5 h-3.5" /> Лаборатории
+                  </h3>
+                  <div className="flex flex-col">
+                    {labItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={close}
+                        className={cn(
+                          'flex items-center gap-3 px-2 rounded-md min-h-11',
+                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
+                          location.pathname === item.path
+                            ? 'text-primary font-medium bg-primary/5'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        )}
+                      >
+                        <item.icon className="w-5 h-5 shrink-0" />
+                        <span className="text-sm">{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Courses */}
+                <div>
+                  <h3 className="kicker mb-2 flex items-center gap-2">
+                    <GraduationCap className="w-3.5 h-3.5" /> Курсы
+                  </h3>
+                  <div className="flex flex-col">
+                    {courseItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={close}
+                        className={cn(
+                          'flex items-center gap-3 px-2 rounded-md min-h-11',
+                          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring',
+                          location.pathname === item.path
+                            ? 'text-primary font-medium bg-primary/5'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        )}
+                      >
+                        <item.icon className="w-5 h-5 shrink-0" />
+                        <span className="text-sm">{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
-
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <nav className="lg:hidden border-t border-border/50 bg-background p-4 animate-fade-in max-h-[80vh] overflow-y-auto">
-          <div className="flex flex-col gap-4">
-            {/* Labs Section */}
-            <div>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-                <Beaker className="w-4 h-4" />
-                Лаборатории
-              </h3>
-              <div className="flex flex-col gap-1">
-                {labItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      "nav-link flex items-center gap-3 py-2",
-                      location.pathname === item.path 
-                        ? 'text-primary font-medium' 
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Courses Section */}
-            <div>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-                <GraduationCap className="w-4 h-4" />
-                Курсы
-              </h3>
-              <div className="flex flex-col gap-1">
-                {courseItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      "nav-link flex items-center gap-3 py-2",
-                      location.pathname === item.path 
-                        ? 'text-primary font-medium' 
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Main Links */}
-            <div className="border-t border-border pt-4">
-              {mainNavItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "nav-link flex items-center gap-3 py-2",
-                    location.pathname === item.path 
-                      ? 'text-primary font-medium' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </nav>
-      )}
     </header>
   );
 };
