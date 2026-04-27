@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
+import BentoHero from '@/components/BentoHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -102,62 +103,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        <div className="container py-16 md:py-24 relative">
-          <motion.div
-            className="max-w-3xl mx-auto text-center"
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Beaker className="w-4 h-4" />
-              <span>Интерактивная образовательная платформа</span>
-            </motion.div>
-            
-            <motion.h1 variants={fadeUp} transition={{ duration: 0.5 }} className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
-              Математическая статистика
-              <span className="block gradient-text">для психологов</span>
-            </motion.h1>
-            
-            <motion.p variants={fadeUp} transition={{ duration: 0.5 }} className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Понимайте статистические концепции не через формулы, а через интерактивные 
-              симуляции. Меняйте параметры — наблюдайте закономерности.
-            </motion.p>
-            
-            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/labs">
-                <Button size="lg" className="btn-primary gap-2">
-                  <Beaker className="w-4 h-4" />
-                  Открыть лаборатории
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link to="/theory">
-                <Button size="lg" variant="outline" className="gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Справочник теории
-                </Button>
-              </Link>
-            </motion.div>
+      {/* Hero — Bento Grid */}
+      <BentoHero />
 
-            <motion.div variants={fadeUp} transition={{ duration: 0.5 }} className="mt-6">
-              <Link to="/theory?tab=effectsize">
-                <Button
-                  size="lg"
-                  className="gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300 hover:scale-105 border-0"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  Новый раздел: Размер эффекта
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
       {/* Probability Theory Section */}
       <section className="container py-6">
         <motion.div
@@ -191,7 +139,7 @@ const Index = () => {
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
                     <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <item.icon className="w-4.5 h-4.5 text-primary" />
+                      <item.icon className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{item.title}</p>
@@ -229,7 +177,7 @@ const Index = () => {
             Каждая лаборатория — это симуляция статистического явления с полным контролем параметров
           </p>
         </motion.div>
-        
+
         <motion.div
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
           initial="hidden"
@@ -239,7 +187,7 @@ const Index = () => {
         >
           {featuredLabs.map((lab) => (
             <motion.div key={lab.path} variants={fadeUp} transition={{ duration: 0.4 }}>
-              <Link 
+              <Link
                 to={lab.path}
                 className="module-card group block h-full"
               >
