@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -108,8 +108,17 @@ const StepCard = ({ title, children }: { title: string; children: React.ReactNod
   </Card>
 );
 
-export const DescriptiveCalculator = () => {
-  const [input, setInput] = useState('12, 15, 14, 13, 18, 21, 14, 16, 14, 19');
+interface DescriptiveCalculatorProps {
+  initialInput?: string;
+}
+
+export const DescriptiveCalculator = ({ initialInput }: DescriptiveCalculatorProps = {}) => {
+  const [input, setInput] = useState(initialInput ?? '12, 15, 14, 13, 18, 21, 14, 16, 14, 19');
+
+  useEffect(() => {
+    if (initialInput !== undefined) setInput(initialInput);
+  }, [initialInput]);
+
   const fileRef = useRef<HTMLInputElement>(null);
   const [csvColumns, setCsvColumns] = useState<{ name: string; values: number[] }[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);

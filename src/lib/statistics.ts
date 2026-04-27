@@ -1,7 +1,46 @@
 // Statistical utility functions for labs
 
 /**
- * Generate random samples from different distributions
+ * Box–Muller transform: draws single standard normal sample
+ */
+export const randNormal = (): number => {
+  let u1 = Math.random();
+  if (u1 === 0) u1 = 1e-12;
+  const u2 = Math.random();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+};
+
+/**
+ * Parametrized sample generator for the sandbox.
+ * - normal:   N(mean, sd)
+ * - skewed:   exponential shifted/scaled, then biased toward `mean`
+ * - bimodal:  mixture of N(mean - sd, sd*0.6) and N(mean + sd, sd*0.6)
+ */
+export const generateParametricSample = (
+  distribution: 'normal' | 'skewed' | 'bimodal',
+  mean: number,
+  sd: number,
+  n: number,
+): number[] => {
+  const out: number[] = [];
+  const N = Math.max(1, Math.floor(n));
+  for (let i = 0; i < N; i++) {
+    if (distribution === 'normal') {
+      out.push(mean + sd * randNormal());
+    } else if (distribution === 'skewed') {
+      // Exponential with rate 1, shift so result has approx desired mean & sd
+      const e = -Math.log(Math.max(1e-12, Math.random())); // mean=1, sd=1
+      out.push(mean + sd * (e - 1));
+    } else {
+      const sign = Math.random() < 0.5 ? -1 : 1;
+      out.push(mean + sign * sd + sd * 0.6 * randNormal());
+    }
+  }
+  return out;
+};
+
+/**
+ * Generate random samples from different distributions (legacy fixed-params helper)
  */
 export const generateSample = (
   distribution: 'uniform' | 'normal' | 'exponential' | 'bimodal',
