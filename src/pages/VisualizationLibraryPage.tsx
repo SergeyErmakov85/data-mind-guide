@@ -202,7 +202,7 @@ const VisualizationLibraryPage = () => {
         <DistributionsBento />
 
 
-        <Tabs defaultValue="normal" className="space-y-6">
+        <Tabs id="dist-tabs" defaultValue="normal" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="normal">Нормальное</TabsTrigger>
             <TabsTrigger value="t">t Стьюдента</TabsTrigger>
