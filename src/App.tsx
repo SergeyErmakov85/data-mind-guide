@@ -25,6 +25,7 @@ import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import CalculatorsPage from "./pages/CalculatorsPage";
 import SampleSizePage from "./pages/SampleSizePage";
 import GlossaryPage from "./pages/GlossaryPage";
+import DatasetsPage from "./pages/DatasetsPage";
 import GlossaryTermPage from "./pages/GlossaryTermPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import FAQPage from "./pages/FAQPage";
