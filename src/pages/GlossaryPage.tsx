@@ -65,6 +65,7 @@ const categories = Array.from(new Set(entries.map(e => e.category)));
 const GlossaryPage = () => {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeEntry, setActiveEntry] = useState<GlossaryEntry | null>(null);
 
   const filtered = useMemo(() => {
     return entries.filter(e => {
