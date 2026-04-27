@@ -135,18 +135,18 @@ const DescriptiveStatsPage = () => {
   }, [input]);
 
   const handleDatasetApply = useCallback(
-    (_h: unknown, parsed: { headers: string[]; rows: string[][] }) => {
-      // Pre-fill all numeric values from all columns of the FULL CSV (not just preview).
-      // The banner gives us first 10 rows; for full dataset we re-fetch via the same handoff csv.
-      // Simpler: collect numeric cells from the preview rows for instant feedback,
-      // and let user click "Рассчитать". For full data, we use what's stored.
+    (h: { csv: string }) => {
+      // Parse the FULL csv (not just the 10-row preview) and pre-fill all numeric values.
+      const lines = h.csv.split(/\r?\n/).filter((l) => l.trim().length > 0);
       const nums: number[] = [];
-      parsed.rows.forEach((row) => {
-        row.forEach((cell) => {
-          const v = parseFloat((cell ?? '').trim());
+      // skip header line
+      for (let i = 1; i < lines.length; i++) {
+        const cells = lines[i].split(',');
+        for (const c of cells) {
+          const v = parseFloat(c.trim());
           if (!Number.isNaN(v)) nums.push(v);
-        });
-      });
+        }
+      }
       if (nums.length > 0) {
         const text = nums.join(', ');
         setInput(text);
