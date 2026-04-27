@@ -285,6 +285,7 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
         </div>
+        </div>
       </header>
     </>
   );
