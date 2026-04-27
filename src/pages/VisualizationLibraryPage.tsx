@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,11 +7,18 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, BarChart3, TrendingUp } from 'lucide-react';
+import { Eye, BarChart3, TrendingUp, Sigma, Activity, GitBranch } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
+import {
+  BentoTile,
+  DifficultyFilter,
+  sortByDifficulty,
+  tileGridMotion,
+  type Difficulty,
+} from '@/components/BentoTile';
 
 const normalPDF = (x: number, mu: number, sigma: number) => {
   return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
