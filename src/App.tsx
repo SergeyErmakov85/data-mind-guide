@@ -85,6 +85,7 @@ const App = () => (
           
           {/* Info pages */}
           <Route path="/glossary" element={<GlossaryPage />} />
+          <Route path="/datasets" element={<DatasetsPage />} />
           <Route path="/glossary/:id" element={<GlossaryTermPage />} />
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/faq" element={<FAQPage />} />
