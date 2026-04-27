@@ -65,6 +65,8 @@ export const NormalDistributionVisualizer = ({ className = '' }: NormalDistribut
               max={150}
               step={1}
               className="w-full"
+              ariaLabel="Среднее μ"
+              ariaValueTextFormatter={(v) => `μ = ${v}`}
             />
             <p className="text-xs text-muted-foreground">
               Центр распределения. Например, средний IQ = 100.
@@ -83,6 +85,8 @@ export const NormalDistributionVisualizer = ({ className = '' }: NormalDistribut
               max={30}
               step={1}
               className="w-full"
+              ariaLabel="Стандартное отклонение σ"
+              ariaValueTextFormatter={(v) => `σ = ${v}`}
             />
             <p className="text-xs text-muted-foreground">
               Ширина распределения. Чем больше σ, тем шире кривая.
@@ -91,7 +95,11 @@ export const NormalDistributionVisualizer = ({ className = '' }: NormalDistribut
         </div>
 
         {/* График — min 280px на мобильных, 420px на md+ */}
-        <div className="w-full min-h-[280px] md:min-h-[420px] h-[280px] md:h-[420px]">
+        <figure
+          className="w-full min-h-[280px] md:min-h-[420px] h-[280px] md:h-[420px]"
+          role="img"
+          aria-label={`Нормальное распределение, M=${mu}, SD=${sigma}. Зоны 68%, 95% и 99.7% выделены цветом.`}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 16, right: 24, left: 48, bottom: 32 }}>
               <defs>
@@ -168,7 +176,13 @@ export const NormalDistributionVisualizer = ({ className = '' }: NormalDistribut
               <ReferenceLine x={zones.sigma1.right} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+          <figcaption className="sr-live" aria-live="polite">
+            Нормальное распределение со средним M={mu}, SD={sigma}.
+            На графике выделены три зоны: ±1σ от {Math.round(zones.sigma1.left)} до {Math.round(zones.sigma1.right)} (≈68% наблюдений),
+            ±2σ от {Math.round(zones.sigma2.left)} до {Math.round(zones.sigma2.right)} (≈95% наблюдений),
+            ±3σ от {Math.round(zones.sigma3.left)} до {Math.round(zones.sigma3.right)} (≈99.7% наблюдений).
+          </figcaption>
+        </figure>
 
         {/* Легенда */}
         <div className="flex flex-wrap gap-4 justify-center text-sm">

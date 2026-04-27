@@ -59,7 +59,7 @@ const CoursesIndexPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container py-12">
+      <main id="main-content" className="container py-12">
         <div className="mb-10">
           <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
             # Courses · Структурированное обучение

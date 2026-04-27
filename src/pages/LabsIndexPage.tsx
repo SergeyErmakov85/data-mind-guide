@@ -72,7 +72,7 @@ const LabsIndexPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container py-12">
+      <main id="main-content" className="container py-12">
         {/* Hero */}
         <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>

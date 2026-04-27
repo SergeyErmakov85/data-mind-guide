@@ -7,7 +7,7 @@ import MultipleRegressionLab from '@/components/labs/MultipleRegressionLab';
 const MultipleRegressionLabPage = () => (
   <div className="min-h-screen bg-background">
     <Header />
-    <main className="container py-8">
+    <main id="main-content" className="container py-8">
       <div className="mb-6">
         <Link to="/labs">
           <Button variant="ghost" size="sm" className="gap-2">

@@ -15,7 +15,7 @@ const AboutPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-12">
+      <main id="main-content" className="container py-12">
         <div className="max-w-4xl mx-auto">
           {/* Hero */}
           <div className="text-center mb-12">

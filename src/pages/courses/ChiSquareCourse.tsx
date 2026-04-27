@@ -119,7 +119,7 @@ const ChiSquareCourse = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8">
+      <main id="main-content" className="container py-8">
         <div className="max-w-5xl mx-auto space-y-8">
 
           {/* ─── Hero ─── */}

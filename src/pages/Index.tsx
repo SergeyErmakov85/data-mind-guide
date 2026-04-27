@@ -102,7 +102,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
+      <div id="main-content">
       {/* Hero — Bento Grid */}
       <BentoHero />
 
@@ -467,6 +468,7 @@ const Index = () => {
           <p>© 2024 Математическая статистика для психологов — Интерактивная образовательная платформа</p>
         </div>
       </footer>
+      </div>
     </div>
   );
 };

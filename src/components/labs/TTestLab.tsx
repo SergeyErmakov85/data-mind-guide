@@ -20,6 +20,7 @@ import {
   AreaChart,
 } from 'recharts';
 import { mean, standardDeviation, normalPDF } from '@/lib/statistics';
+import { ChartA11y } from '@/components/ChartA11y';
 
 type TestType = 'one-sample' | 'independent' | 'paired';
 
@@ -243,7 +244,7 @@ export const TTestLab = () => {
                 <label className="text-sm font-medium">
                   μ₀ (гипотетическое среднее): <span className="font-bold text-primary">{mu0}</span>
                 </label>
-                <Slider value={[mu0]} onValueChange={([v]) => setMu0(v)} min={30} max={70} step={1} />
+                <Slider value={[mu0]} onValueChange={([v]) => setMu0(v)} min={30} max={70} step={1} ariaLabel="μ₀ — гипотетическое среднее" ariaValueTextFormatter={(v) => `μ₀ = ${v}`} />
               </div>
             )}
           </div>
@@ -259,19 +260,19 @@ export const TTestLab = () => {
                 <label className="text-xs text-muted-foreground">
                   Среднее: <span className="font-bold">{mean1}</span>
                 </label>
-                <Slider value={[mean1]} onValueChange={([v]) => setMean1(v)} min={30} max={70} step={1} />
+                <Slider value={[mean1]} onValueChange={([v]) => setMean1(v)} min={30} max={70} step={1} ariaLabel="Среднее группы 1" ariaValueTextFormatter={(v) => `M₁ = ${v}`} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">
                   SD: <span className="font-bold">{sd1}</span>
                 </label>
-                <Slider value={[sd1]} onValueChange={([v]) => setSd1(v)} min={2} max={20} step={1} />
+                <Slider value={[sd1]} onValueChange={([v]) => setSd1(v)} min={2} max={20} step={1} ariaLabel="Стандартное отклонение группы 1" ariaValueTextFormatter={(v) => `SD₁ = ${v}`} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">
                   n: <span className="font-bold">{n1}</span>
                 </label>
-                <Slider value={[n1]} onValueChange={([v]) => setN1(v)} min={5} max={100} step={5} />
+                <Slider value={[n1]} onValueChange={([v]) => setN1(v)} min={5} max={100} step={5} ariaLabel="Размер выборки группы 1" ariaValueTextFormatter={(v) => `n₁ = ${v}`} />
               </div>
             </div>
 
@@ -285,20 +286,20 @@ export const TTestLab = () => {
                   <label className="text-xs text-muted-foreground">
                     Среднее: <span className="font-bold">{mean2}</span>
                   </label>
-                  <Slider value={[mean2]} onValueChange={([v]) => setMean2(v)} min={30} max={70} step={1} />
+                  <Slider value={[mean2]} onValueChange={([v]) => setMean2(v)} min={30} max={70} step={1} ariaLabel="Среднее группы 2" ariaValueTextFormatter={(v) => `M₂ = ${v}`} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs text-muted-foreground">
                     SD: <span className="font-bold">{sd2}</span>
                   </label>
-                  <Slider value={[sd2]} onValueChange={([v]) => setSd2(v)} min={2} max={20} step={1} />
+                  <Slider value={[sd2]} onValueChange={([v]) => setSd2(v)} min={2} max={20} step={1} ariaLabel="Стандартное отклонение группы 2" ariaValueTextFormatter={(v) => `SD₂ = ${v}`} />
                 </div>
                 {testType === 'independent' && (
                   <div className="space-y-2">
                     <label className="text-xs text-muted-foreground">
                       n: <span className="font-bold">{n2}</span>
                     </label>
-                    <Slider value={[n2]} onValueChange={([v]) => setN2(v)} min={5} max={100} step={5} />
+                    <Slider value={[n2]} onValueChange={([v]) => setN2(v)} min={5} max={100} step={5} ariaLabel="Размер выборки группы 2" ariaValueTextFormatter={(v) => `n₂ = ${v}`} />
                   </div>
                 )}
               </div>
@@ -336,18 +337,23 @@ export const TTestLab = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={hist1}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="x" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Bar dataKey="freq" fill="hsl(var(--primary))" opacity={0.6} radius={[2, 2, 0, 0]} name="Группа 1" />
-                    <ReferenceLine x={mean(group1)} stroke="hsl(var(--primary))" strokeWidth={2} strokeDasharray="5 5" />
-                    {testType === 'one-sample' && (
-                      <ReferenceLine x={mu0} stroke="hsl(var(--destructive))" strokeWidth={2} label={{ value: `μ₀=${mu0}`, position: 'top' }} />
-                    )}
-                  </BarChart>
-                </ResponsiveContainer>
+                <ChartA11y
+                  label={`Гистограмма группы 1, n=${group1.length}, M=${mean(group1).toFixed(2)}`}
+                  summary={`Группа 1: n=${group1.length}, M=${mean(group1).toFixed(2)}, SD=${standardDeviation(group1).toFixed(2)}.`}
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={hist1}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="x" className="text-xs" />
+                      <YAxis className="text-xs" />
+                      <Bar dataKey="freq" fill="hsl(var(--primary))" opacity={0.6} radius={[2, 2, 0, 0]} name="Группа 1" />
+                      <ReferenceLine x={mean(group1)} stroke="hsl(var(--primary))" strokeWidth={2} strokeDasharray="5 5" />
+                      {testType === 'one-sample' && (
+                        <ReferenceLine x={mu0} stroke="hsl(var(--destructive))" strokeWidth={2} label={{ value: `μ₀=${mu0}`, position: 'top' }} />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartA11y>
                 {testType !== 'one-sample' && hist2.length > 0 && (
                   <ResponsiveContainer width="100%" height={200} className="mt-4">
                     <BarChart data={hist2}>
@@ -371,17 +377,22 @@ export const TTestLab = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={tCurve}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="x" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <Area type="monotone" dataKey="y" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth={2} />
-                    <ReferenceLine x={result.t} stroke="hsl(var(--primary))" strokeWidth={2} label={{ value: `t=${result.t.toFixed(2)}`, position: 'top' }} />
-                    <ReferenceLine x={tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
-                    <ReferenceLine x={-tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <ChartA11y
+                  label={`t-распределение, df=${result.df.toFixed(1)}, t-наблюдаемое=${result.t.toFixed(2)}, α=${alpha}`}
+                  summary={`Кривая t-распределения с df=${result.df.toFixed(1)}. Наблюдаемое значение t=${result.t.toFixed(2)}. Критические значения: ±${tCrit.toFixed(2)}.`}
+                >
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={tCurve}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="x" className="text-xs" />
+                      <YAxis className="text-xs" />
+                      <Area type="monotone" dataKey="y" fill="hsl(var(--muted))" stroke="hsl(var(--foreground))" strokeWidth={2} />
+                      <ReferenceLine x={result.t} stroke="hsl(var(--primary))" strokeWidth={2} label={{ value: `t=${result.t.toFixed(2)}`, position: 'top' }} />
+                      <ReferenceLine x={tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
+                      <ReferenceLine x={-tCrit} stroke="hsl(var(--destructive))" strokeWidth={1} strokeDasharray="5 5" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartA11y>
               </CardContent>
             </Card>
           </div>

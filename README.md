@@ -71,3 +71,48 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Проверка доступности (a11y)
+
+Проект следует базовым требованиям WCAG 2.1 AA:
+
+- **Skip-link** «Перейти к содержимому» — первый focusable элемент на каждой странице (`#main-content`).
+- **Focus-ring**: `outline: 3px solid hsl(var(--ring))` с `outline-offset: 2px` на всех интерактивных элементах (см. `src/index.css`).
+- **Слайдеры** (Radix Slider) экспонируют корректный `aria-valuetext` с единицами (`α = 0.05`, `μ = 100`, и т.д.) — см. `src/components/ui/slider.tsx`.
+- **Графики**: каждая SVG-визуализация обёрнута в `<ChartA11y>` (`role="img"` + `aria-label` + `aria-live` summary) — см. `src/components/ChartA11y.tsx`.
+- **Reduced motion**: глобальный `@media (prefers-reduced-motion: reduce)` + хук `usePrefersReducedMotion()` из `src/lib/a11y.ts` для всех framer-motion анимаций.
+- **Контраст**: текст на основном фоне ≥ 4.5:1; `.glass` / `.glass-dialog` форсируют непрозрачный `--foreground`.
+
+### Запуск автоматической проверки axe-core
+
+`package.json` в Lovable read-only, поэтому используйте `npx` напрямую:
+
+```sh
+# 1) Запустите dev-сервер в одной вкладке:
+npm run dev
+
+# 2) В другой вкладке прогоните axe-core CLI:
+npx -y @axe-core/cli http://localhost:8080 \
+  --tags wcag2a,wcag2aa,wcag21a,wcag21aa \
+  --exit
+```
+
+Для прохода по нескольким страницам:
+
+```sh
+npx -y @axe-core/cli \
+  http://localhost:8080 \
+  http://localhost:8080/theory \
+  http://localhost:8080/labs/ttest \
+  http://localhost:8080/glossary \
+  --tags wcag2a,wcag2aa --exit
+```
+
+Эквивалентный alias (если вы хотите положить его себе в `~/.bashrc`):
+
+```sh
+alias a11y:check='npx -y @axe-core/cli http://localhost:8080 --tags wcag2a,wcag2aa,wcag21a,wcag21aa --exit'
+```
+
+Команда вернёт код `1` при наличии нарушений и распечатает список проблем с селекторами и ссылками на правила.
+

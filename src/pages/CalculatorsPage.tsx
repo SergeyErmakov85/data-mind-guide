@@ -286,7 +286,7 @@ const CalculatorsPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8">
+      <main id="main-content" className="container py-8">
         <div className="max-w-4xl mx-auto">
           <motion.div className="mb-8 text-center" initial="hidden" animate="visible" variants={fadeUp}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">

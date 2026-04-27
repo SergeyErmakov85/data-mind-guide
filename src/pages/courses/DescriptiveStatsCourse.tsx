@@ -528,7 +528,7 @@ const DescriptiveStatsCourse = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 max-w-4xl">
+      <main id="main-content" className="container py-8 max-w-4xl">
         <div className="mb-6">
           <Link to="/courses">
             <Button variant="ghost" size="sm" className="gap-2">
