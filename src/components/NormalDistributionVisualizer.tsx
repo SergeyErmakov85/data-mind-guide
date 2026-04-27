@@ -1,242 +1,469 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import {
+  AreaChart,
+  Area,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  Label as RechartsLabel,
+} from 'recharts';
 import { Slider } from '@/components/ui/slider';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer, Tooltip } from 'recharts';
-import { MathFormula } from '@/components/MathFormula';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  normalPDF,
+  normalCDFGeneral,
+  normalIntervalProb,
+  zScore,
+} from '@/lib/distributions';
 
-interface NormalDistributionVisualizerProps {
+interface Preset {
+  label: string;
+  mu: number;
+  sigma: number;
+  hint?: string;
+}
+
+const PRESETS: Preset[] = [
+  { label: 'IQ (μ=100, σ=15)', mu: 100, sigma: 15, hint: 'Шкала Векслера' },
+  { label: 't-баллы (μ=50, σ=10)', mu: 50, sigma: 10, hint: 'MMPI, MCMI' },
+  { label: 'z-шкала (0, 1)', mu: 0, sigma: 1, hint: 'Стандартная нормальная' },
+  { label: 'Бек ~ (μ=12, σ=8)', mu: 12, sigma: 8, hint: 'Приближение для BDI' },
+];
+
+const NUM_POINTS = 200;
+const fmt = (v: number, d = 2) => v.toFixed(d);
+
+interface Props {
   className?: string;
 }
 
-// Функция плотности нормального распределения
-const normalPDF = (x: number, mu: number, sigma: number): number => {
-  const coefficient = 1 / (sigma * Math.sqrt(2 * Math.PI));
-  const exponent = -Math.pow(x - mu, 2) / (2 * Math.pow(sigma, 2));
-  return coefficient * Math.exp(exponent);
-};
+export const NormalDistributionVisualizer = ({ className = '' }: Props) => {
+  // Primary distribution
+  const [mu, setMu] = useState(0);
+  const [sigma, setSigma] = useState(1);
 
-export const NormalDistributionVisualizer = ({ className = '' }: NormalDistributionVisualizerProps) => {
-  const [mu, setMu] = useState(100);
-  const [sigma, setSigma] = useState(15);
+  // Region of interest
+  const [interval, setInterval] = useState<[number, number]>([-1, 1]);
 
-  // Генерируем данные для графика
-  const chartData = useMemo(() => {
-    const data = [];
-    const range = 4 * sigma; // 4 стандартных отклонения в каждую сторону
-    const step = range / 100;
-    
-    for (let x = mu - range; x <= mu + range; x += step) {
-      data.push({
-        x: Math.round(x * 10) / 10,
-        y: normalPDF(x, mu, sigma),
-        // Зоны для правила 68-95-99.7
-        zone1: Math.abs(x - mu) <= sigma ? normalPDF(x, mu, sigma) : 0,
-        zone2: Math.abs(x - mu) <= 2 * sigma && Math.abs(x - mu) > sigma ? normalPDF(x, mu, sigma) : 0,
-        zone3: Math.abs(x - mu) <= 3 * sigma && Math.abs(x - mu) > 2 * sigma ? normalPDF(x, mu, sigma) : 0,
-      });
-    }
-    return data;
+  // Toggles
+  const [showZ, setShowZ] = useState(true);
+  const [cumulative, setCumulative] = useState(false);
+  const [compare, setCompare] = useState(false);
+
+  // Comparison distribution
+  const [mu2, setMu2] = useState(1);
+  const [sigma2, setSigma2] = useState(1.5);
+
+  // Keep [a,b] within sensible bounds when μ/σ change
+  useEffect(() => {
+    const lo = mu - 4 * sigma;
+    const hi = mu + 4 * sigma;
+    setInterval(([a, b]) => [
+      Math.max(lo, Math.min(hi, a)),
+      Math.max(lo, Math.min(hi, b)),
+    ]);
   }, [mu, sigma]);
 
-  // Границы зон
-  const zones = useMemo(() => ({
-    sigma1: { left: mu - sigma, right: mu + sigma },
-    sigma2: { left: mu - 2 * sigma, right: mu + 2 * sigma },
-    sigma3: { left: mu - 3 * sigma, right: mu + 3 * sigma },
-  }), [mu, sigma]);
+  const xMin = useMemo(() => {
+    const a = mu - 4 * sigma;
+    if (compare) return Math.min(a, mu2 - 4 * sigma2);
+    return a;
+  }, [mu, sigma, compare, mu2, sigma2]);
+
+  const xMax = useMemo(() => {
+    const b = mu + 4 * sigma;
+    if (compare) return Math.max(b, mu2 + 4 * sigma2);
+    return b;
+  }, [mu, sigma, compare, mu2, sigma2]);
+
+  const data = useMemo(() => {
+    const step = (xMax - xMin) / (NUM_POINTS - 1);
+    const arr: Array<{
+      x: number;
+      y: number;
+      y2?: number;
+      yArea: number | null;
+    }> = [];
+    const [a, b] = interval;
+    for (let i = 0; i < NUM_POINTS; i++) {
+      const x = xMin + i * step;
+      const y = cumulative
+        ? normalCDFGeneral(x, mu, sigma)
+        : normalPDF(x, mu, sigma);
+      const y2 = compare
+        ? cumulative
+          ? normalCDFGeneral(x, mu2, sigma2)
+          : normalPDF(x, mu2, sigma2)
+        : undefined;
+      const inRange = x >= a && x <= b;
+      arr.push({
+        x,
+        y,
+        y2,
+        yArea: inRange && !cumulative ? y : null,
+      });
+    }
+    return arr;
+  }, [xMin, xMax, mu, sigma, compare, mu2, sigma2, cumulative, interval]);
+
+  // Stats
+  const prob = useMemo(
+    () => normalIntervalProb(interval[0], interval[1], mu, sigma),
+    [interval, mu, sigma],
+  );
+  const zA = zScore(interval[0], mu, sigma);
+  const zB = zScore(interval[1], mu, sigma);
+
+  const ariaLabel = `Нормальное распределение, среднее ${fmt(mu)}, сигма ${fmt(
+    sigma,
+  )}. Вероятность попасть в интервал от ${fmt(interval[0])} до ${fmt(
+    interval[1],
+  )} равна ${fmt(prob, 4)}.`;
+
+  // Reference lines (μ ± kσ) for primary curve only
+  const refs = [
+    { x: mu - 3 * sigma, label: 'μ−3σ' },
+    { x: mu - 2 * sigma, label: 'μ−2σ' },
+    { x: mu - sigma, label: 'μ−σ' },
+    { x: mu, label: 'μ' },
+    { x: mu + sigma, label: 'μ+σ' },
+    { x: mu + 2 * sigma, label: 'μ+2σ' },
+    { x: mu + 3 * sigma, label: 'μ+3σ' },
+  ];
+
+  const applyPreset = (p: Preset) => {
+    setMu(p.mu);
+    setSigma(p.sigma);
+    setInterval([p.mu - p.sigma, p.mu + p.sigma]);
+  };
+
+  const ChartCmp = cumulative ? LineChart : AreaChart;
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-lg">Интерактивная визуализация</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Слайдеры */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">Среднее (μ)</label>
-              <span className="text-sm font-mono bg-muted px-2 py-1 rounded">{mu}</span>
+    <TooltipProvider>
+      <div className={`grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 ${className}`}>
+        {/* Controls — sticky on md+ */}
+        <aside className="md:sticky md:top-20 md:self-start space-y-5 border border-border p-4">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+              Пресеты
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {PRESETS.map((p) => (
+                <Button
+                  key={p.label}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start font-mono text-xs h-auto py-1.5"
+                  onClick={() => applyPreset(p)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs">
+              <Label>μ (среднее)</Label>
+              <span className="font-mono">{fmt(mu)}</span>
             </div>
             <Slider
+              min={-5}
+              max={5}
+              step={0.1}
               value={[mu]}
-              onValueChange={(value) => setMu(value[0])}
-              min={50}
-              max={150}
-              step={1}
-              className="w-full"
-              ariaLabel="Среднее μ"
-              ariaValueTextFormatter={(v) => `μ = ${v}`}
+              onValueChange={([v]) => setMu(v)}
             />
-            <p className="text-xs text-muted-foreground">
-              Центр распределения. Например, средний IQ = 100.
-            </p>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">Стандартное отклонение (σ)</label>
-              <span className="text-sm font-mono bg-muted px-2 py-1 rounded">{sigma}</span>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs">
+              <Label>σ (стандартное отклонение)</Label>
+              <span className="font-mono">{fmt(sigma)}</span>
             </div>
             <Slider
+              min={0.1}
+              max={3}
+              step={0.05}
               value={[sigma]}
-              onValueChange={(value) => setSigma(value[0])}
-              min={5}
-              max={30}
-              step={1}
-              className="w-full"
-              ariaLabel="Стандартное отклонение σ"
-              ariaValueTextFormatter={(v) => `σ = ${v}`}
+              onValueChange={([v]) => setSigma(v)}
             />
-            <p className="text-xs text-muted-foreground">
-              Ширина распределения. Чем больше σ, тем шире кривая.
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs">
+              <Label>Область [a, b]</Label>
+              <span className="font-mono">
+                [{fmt(interval[0])}; {fmt(interval[1])}]
+              </span>
+            </div>
+            <Slider
+              min={xMin}
+              max={xMax}
+              step={(xMax - xMin) / 200}
+              value={interval}
+              onValueChange={(v) =>
+                setInterval([v[0], v[1]] as [number, number])
+              }
+            />
+          </div>
+
+          <div className="space-y-3 pt-2 border-t border-border">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="z-toggle" className="text-xs">
+                z-преобразование
+              </Label>
+              <Switch id="z-toggle" checked={showZ} onCheckedChange={setShowZ} />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="cdf-toggle" className="text-xs">
+                Накопительное (CDF)
+              </Label>
+              <Switch
+                id="cdf-toggle"
+                checked={cumulative}
+                onCheckedChange={setCumulative}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="cmp-toggle" className="text-xs">
+                Сравнить с другим
+              </Label>
+              <Switch
+                id="cmp-toggle"
+                checked={compare}
+                onCheckedChange={setCompare}
+              />
+            </div>
+          </div>
+
+          {compare && (
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <Label>μ₂</Label>
+                  <span className="font-mono">{fmt(mu2)}</span>
+                </div>
+                <Slider
+                  min={-5}
+                  max={5}
+                  step={0.1}
+                  value={[mu2]}
+                  onValueChange={([v]) => setMu2(v)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <Label>σ₂</Label>
+                  <span className="font-mono">{fmt(sigma2)}</span>
+                </div>
+                <Slider
+                  min={0.1}
+                  max={3}
+                  step={0.05}
+                  value={[sigma2]}
+                  onValueChange={([v]) => setSigma2(v)}
+                />
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Visualization */}
+        <div className="space-y-4">
+          {/* Live report */}
+          <div
+            className="border border-border p-4 font-mono text-sm space-y-1 bg-muted/30"
+            role="status"
+            aria-live="polite"
+          >
+            <div>
+              P({fmt(interval[0])} ≤ X ≤ {fmt(interval[1])}) ={' '}
+              <span className="font-bold">{fmt(prob, 4)}</span>
+            </div>
+            <div className="text-muted-foreground">
+              z(a) = {fmt(zA, 3)} · z(b) = {fmt(zB, 3)}
+            </div>
+            {compare && (
+              <div className="text-muted-foreground">
+                сравнение: N({fmt(mu2)}, {fmt(sigma2)}²)
+              </div>
+            )}
+          </div>
+
+          {/* Chart */}
+          <div
+            className="h-[420px] border border-border p-2"
+            role="img"
+            aria-label={ariaLabel}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <ChartCmp data={data} margin={{ top: 24, right: 16, bottom: showZ ? 48 : 24, left: 8 }}>
+                <XAxis
+                  dataKey="x"
+                  type="number"
+                  domain={[xMin, xMax]}
+                  tickFormatter={(v) => fmt(v, 1)}
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                >
+                  {showZ && (
+                    <RechartsLabel
+                      value={`z-шкала: x → (x − ${fmt(mu)}) / ${fmt(sigma)}`}
+                      position="bottom"
+                      offset={20}
+                      style={{
+                        fill: 'hsl(var(--muted-foreground))',
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      }}
+                    />
+                  )}
+                </XAxis>
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                  tickFormatter={(v) => v.toFixed(2)}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                  }}
+                  formatter={(value: number, name: string) => {
+                    const label = name === 'y' ? (cumulative ? 'F(x)' : 'f(x)') : 'curve₂';
+                    return [fmt(value, 4), label];
+                  }}
+                  labelFormatter={(x: number) => {
+                    const z = zScore(x, mu, sigma);
+                    return `x = ${fmt(x, 2)}${showZ ? ` · z = ${fmt(z, 2)}` : ''}`;
+                  }}
+                />
+
+                {/* Reference lines μ ± kσ */}
+                {refs.map((r) => (
+                  <ReferenceLine
+                    key={r.label}
+                    x={r.x}
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeDasharray="3 3"
+                    strokeOpacity={r.label === 'μ' ? 0.8 : 0.4}
+                  >
+                    <RechartsLabel
+                      value={r.label}
+                      position="top"
+                      style={{
+                        fill: 'hsl(var(--muted-foreground))',
+                        fontSize: 10,
+                        fontFamily: 'monospace',
+                      }}
+                    />
+                  </ReferenceLine>
+                ))}
+
+                {cumulative ? (
+                  <>
+                    <Line
+                      type="monotone"
+                      dataKey="y"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                    {compare && (
+                      <Line
+                        type="monotone"
+                        dataKey="y2"
+                        stroke="hsl(var(--foreground))"
+                        strokeWidth={2}
+                        strokeDasharray="5 3"
+                        dot={false}
+                        isAnimationActive={false}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Area
+                      type="monotone"
+                      dataKey="y"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.05}
+                      isAnimationActive={false}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="yArea"
+                      stroke="none"
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.25}
+                      isAnimationActive={false}
+                      connectNulls={false}
+                    />
+                    {compare && (
+                      <Area
+                        type="monotone"
+                        dataKey="y2"
+                        stroke="hsl(var(--foreground))"
+                        strokeDasharray="5 3"
+                        strokeWidth={2}
+                        fill="hsl(var(--foreground))"
+                        fillOpacity={0.04}
+                        isAnimationActive={false}
+                      />
+                    )}
+                  </>
+                )}
+              </ChartCmp>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Psychological context */}
+          <div className="border border-border p-4 text-sm leading-relaxed">
+            <h4 className="font-serif text-base mb-2">
+              Что значит{' '}
+              <UITooltip>
+                <TooltipTrigger asChild>
+                  <span className="underline decoration-dotted cursor-help">
+                    σ
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Стандартное отклонение — типичный «шаг» отклонения значений
+                  от среднего.
+                </TooltipContent>
+              </UITooltip>{' '}
+              в шкале IQ?
+            </h4>
+            <p className="text-muted-foreground">
+              При μ = 100 и σ = 15 примерно 68% людей имеют IQ в диапазоне
+              85–115, около 95% — в 70–130. То есть сдвиг на одну σ — это
+              переход к границе «обычной» части популяции; две σ — уже редкое
+              значение (≈2.5% сверху).
             </p>
           </div>
         </div>
-
-        {/* График — min 280px на мобильных, 420px на md+ */}
-        <figure
-          className="w-full min-h-[280px] md:min-h-[420px] h-[280px] md:h-[420px]"
-          role="img"
-          aria-label={`Нормальное распределение, M=${mu}, SD=${sigma}. Зоны 68%, 95% и 99.7% выделены цветом.`}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 16, right: 24, left: 48, bottom: 32 }}>
-              <defs>
-                <linearGradient id="zone1Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.6}/>
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                </linearGradient>
-                <linearGradient id="zone2Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--info))" stopOpacity={0.5}/>
-                  <stop offset="95%" stopColor="hsl(var(--info))" stopOpacity={0.1}/>
-                </linearGradient>
-                <linearGradient id="zone3Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <XAxis 
-                dataKey="x" 
-                tick={{ fontSize: 11 }}
-                tickFormatter={(value) => Math.round(value).toString()}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickLine={{ stroke: 'hsl(var(--border))' }}
-              />
-              <YAxis hide />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const x = payload[0].payload.x;
-                    const zScore = ((x - mu) / sigma).toFixed(2);
-                    return (
-                      <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
-                        <p className="text-sm font-medium">X = {x.toFixed(1)}</p>
-                        <p className="text-xs text-muted-foreground">z = {zScore}</p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              {/* Зоны 68-95-99.7 */}
-              <Area 
-                type="monotone" 
-                dataKey="zone3" 
-                stroke="none" 
-                fill="url(#zone3Gradient)" 
-                isAnimationActive={false}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="zone2" 
-                stroke="none" 
-                fill="url(#zone2Gradient)" 
-                isAnimationActive={false}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="zone1" 
-                stroke="none" 
-                fill="url(#zone1Gradient)" 
-                isAnimationActive={false}
-              />
-              {/* Основная кривая */}
-              <Area 
-                type="monotone" 
-                dataKey="y" 
-                stroke="hsl(var(--foreground))" 
-                strokeWidth={2}
-                fill="none"
-                isAnimationActive={false}
-              />
-              {/* Линии границ */}
-              <ReferenceLine x={mu} stroke="hsl(var(--foreground))" strokeDasharray="5 5" strokeWidth={1.5} />
-              <ReferenceLine x={zones.sigma1.left} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
-              <ReferenceLine x={zones.sigma1.right} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
-            </AreaChart>
-          </ResponsiveContainer>
-          <figcaption className="sr-live" aria-live="polite">
-            Нормальное распределение со средним M={mu}, SD={sigma}.
-            На графике выделены три зоны: ±1σ от {Math.round(zones.sigma1.left)} до {Math.round(zones.sigma1.right)} (≈68% наблюдений),
-            ±2σ от {Math.round(zones.sigma2.left)} до {Math.round(zones.sigma2.right)} (≈95% наблюдений),
-            ±3σ от {Math.round(zones.sigma3.left)} до {Math.round(zones.sigma3.right)} (≈99.7% наблюдений).
-          </figcaption>
-        </figure>
-
-        {/* Легенда */}
-        <div className="flex flex-wrap gap-4 justify-center text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-primary/60" />
-            <span>±1σ (68%)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-info/50" />
-            <span>±2σ (95%)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-success/40" />
-            <span>±3σ (99.7%)</span>
-          </div>
-        </div>
-
-        {/* Текущие значения */}
-        <div className="p-4 bg-muted/30 rounded-lg">
-          <div className="text-center mb-3">
-            <MathFormula formula={`X \\sim N(${mu}, ${sigma}^2)`} />
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-center text-sm">
-            <div>
-              <p className="text-muted-foreground mb-1">68% данных</p>
-              <p className="font-mono font-medium">
-                {Math.round(zones.sigma1.left)} — {Math.round(zones.sigma1.right)}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground mb-1">95% данных</p>
-              <p className="font-mono font-medium">
-                {Math.round(zones.sigma2.left)} — {Math.round(zones.sigma2.right)}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground mb-1">99.7% данных</p>
-              <p className="font-mono font-medium">
-                {Math.round(zones.sigma3.left)} — {Math.round(zones.sigma3.right)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Пример интерпретации */}
-        <div className="p-4 border border-primary/20 bg-primary/5 rounded-lg">
-          <h5 className="font-semibold mb-2 text-sm">Пример интерпретации</h5>
-          <p className="text-sm text-muted-foreground">
-            При μ = {mu} и σ = {sigma}: если человек имеет показатель {mu + sigma}, 
-            его z-оценка = +1.0 (выше среднего на 1 стандартное отклонение). 
-            Это лучше, чем примерно 84% выборки.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </TooltipProvider>
   );
 };
+
+export default NormalDistributionVisualizer;
