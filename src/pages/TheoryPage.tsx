@@ -518,7 +518,7 @@ const sections: TheorySection[] = [
       'Когда применять Welch вместо классического t',
       'Какие предположения должны выполняться',
     ],
-    labPath: '/labs/t-test',
+    labPath: '/labs/ttest',
     labLabel: 'Лаба «t-тест»',
     pitfalls: [
       'Применять независимый t к зависимым (повторным) измерениям.',
@@ -678,7 +678,7 @@ const sections: TheorySection[] = [
       'Как сопоставить параметрические и непараметрические тесты',
       'Что такое тест Манна–Уитни U',
     ],
-    labPath: '/labs/non-parametric',
+    labPath: '/labs/nonparametric',
     labLabel: 'Лаба «Непараметрика»',
     pitfalls: [
       'Применять Манна–Уитни к зависимым выборкам — нужен Вилкоксон.',
@@ -734,7 +734,7 @@ const sections: TheorySection[] = [
       'Когда применять тест независимости и тест согласия',
       'Когда нужен точный тест Фишера',
     ],
-    labPath: '/labs/chi-square',
+    labPath: '/labs/chisquare',
     labLabel: 'Лаба «χ²»',
     pitfalls: [
       'Применять χ² при ожидаемых частотах < 5 — нужен Фишер.',
