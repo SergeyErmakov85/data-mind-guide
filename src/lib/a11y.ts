@@ -24,16 +24,16 @@ export const motionTransition = (
  * Helper to neutralise translate/scale variants when reduced motion is on.
  * Pass a variants object; when reduced, all animated entries become identity.
  */
-export const motionVariants = <T extends Record<string, any>>(
+export const motionVariants = <T extends Record<string, unknown>>(
   reduced: boolean,
   variants: T
 ): T => {
   if (!reduced) return variants;
-  const out: Record<string, any> = {};
+  const out: Record<string, unknown> = {};
   for (const k of Object.keys(variants)) {
     const v = variants[k];
     if (v && typeof v === 'object') {
-      out[k] = { ...v, x: 0, y: 0, scale: 1, rotate: 0, transition: { duration: 0 } };
+      out[k] = { ...(v as Record<string, unknown>), x: 0, y: 0, scale: 1, rotate: 0, transition: { duration: 0 } };
     } else {
       out[k] = v;
     }

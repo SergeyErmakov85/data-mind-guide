@@ -254,6 +254,9 @@ export const fDistUpperP = (F: number, df1: number, df2: number): number => {
 /* ---------- Special functions ---------- */
 
 const logGamma = (x: number): number => {
+  // Lanczos approximation (Numerical Recipes coefficients).
+  // The literals exceed JS double precision but rounding is the standard reference behaviour.
+  /* eslint-disable no-loss-of-precision */
   const c = [
     76.18009172947146, -86.50532032941677, 24.01409824083091,
     -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5,
@@ -266,6 +269,7 @@ const logGamma = (x: number): number => {
     ser += c[j] / y;
   }
   return -tmp + Math.log(2.5066282746310005 * ser / x);
+  /* eslint-enable no-loss-of-precision */
 };
 
 /** Regularised incomplete beta I_x(a, b). */
