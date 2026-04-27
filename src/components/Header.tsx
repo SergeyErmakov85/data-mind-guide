@@ -179,8 +179,12 @@ export const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Mobile / tablet trigger — Sheet drawer (left) */}
-        <Sheet open={open} onOpenChange={setOpen}>
+        {/* Right cluster: profile + mobile menu trigger */}
+        <div className="flex items-center gap-2 shrink-0">
+          <UserMenu />
+
+          {/* Mobile / tablet trigger — Sheet drawer (left) */}
+          <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
               variant="ghost"
