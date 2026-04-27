@@ -64,34 +64,31 @@ const BentoHero = () => {
         {/* 1. HERO */}
         <motion.article
           variants={tile}
-          className={`${tileBase} col-span-1 md:col-span-7 md:row-span-2 p-8 md:p-10 flex gap-6`}
+          className={`${tileBase} col-span-1 md:col-span-7 md:row-span-2 p-5 sm:p-8 md:p-10 flex gap-3 sm:gap-6 min-w-0`}
         >
-          <div className="font-mono text-5xl md:text-6xl font-bold text-foreground/80 leading-none shrink-0">
+          <div className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold text-foreground/80 leading-none shrink-0">
             01
           </div>
-          <div className="flex flex-col gap-6">
-            <h1 className="font-heading uppercase tracking-tight font-bold text-4xl md:text-6xl leading-[0.95]">
-              Математическая
-              <br />
-              статистика
-              <br />
+          <div className="flex flex-col gap-5 sm:gap-6 min-w-0 flex-1">
+            <h1 className="font-heading uppercase tracking-tight font-bold text-2xl sm:text-4xl md:text-6xl leading-[0.95] break-words hyphens-auto">
+              Математическая статистика{' '}
               <span className="text-primary">для психологов</span>
             </h1>
-            <p className="font-body text-base md:text-lg text-muted-foreground max-w-xl">
+            <p className="font-body text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl">
               Современный исследовательский инструмент: интерактивные лаборатории,
               калькуляторы и теория — без лишних формальностей.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
-              <Link to="/courses">
-                <Button className="btn-primary gap-2">
+              <Link to="/courses" className="block">
+                <Button className="btn-primary gap-2 w-full sm:w-auto">
                   Начать обучение
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/calculators">
+              <Link to="/calculators" className="block">
                 <Button
                   variant="outline"
-                  className="border-3 border-foreground rounded-none font-mono uppercase tracking-wider bg-background hover:bg-foreground hover:text-background"
+                  className="border-3 border-foreground rounded-none font-mono uppercase tracking-wider bg-background hover:bg-foreground hover:text-background w-full sm:w-auto"
                 >
                   <Calculator className="w-4 h-4" />
                   Открыть калькуляторы
