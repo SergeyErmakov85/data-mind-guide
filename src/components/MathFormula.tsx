@@ -8,12 +8,19 @@ interface MathFormulaProps {
   className?: string;
 }
 
+/**
+ * KaTeX wrapper.
+ *  - `display` formulas live in a horizontally scrollable block so wide
+ *    expressions never break mobile layouts (paired with `.katex-display`
+ *    overflow rules in index.css).
+ *  - Inline formulas are rendered in a span and remain selectable inline.
+ */
 export const MathFormula = ({ formula, display = false, className = '' }: MathFormulaProps) => {
-  const containerRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLSpanElement | HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      katex.render(formula, containerRef.current, {
+      katex.render(formula, containerRef.current as HTMLElement, {
         displayMode: display,
         throwOnError: false,
         trust: true,
@@ -21,10 +28,22 @@ export const MathFormula = ({ formula, display = false, className = '' }: MathFo
     }
   }, [formula, display]);
 
+  if (display) {
+    return (
+      <div
+        className={`my-4 w-full max-w-full overflow-x-auto overflow-y-hidden text-center ${className}`}
+        role="math"
+        aria-label="Формула"
+      >
+        <span ref={containerRef as React.RefObject<HTMLSpanElement>} className="inline-block" />
+      </div>
+    );
+  }
+
   return (
-    <span 
-      ref={containerRef} 
-      className={`${display ? 'block text-center my-4' : 'inline'} ${className}`}
+    <span
+      ref={containerRef as React.RefObject<HTMLSpanElement>}
+      className={`inline ${className}`}
     />
   );
 };
