@@ -90,10 +90,10 @@ export const NormalDistributionVisualizer = ({ className = '' }: NormalDistribut
           </div>
         </div>
 
-        {/* График */}
-        <div className="h-64 w-full">
+        {/* График — min 280px на мобильных, 420px на md+ */}
+        <div className="w-full min-h-[280px] md:min-h-[420px] h-[280px] md:h-[420px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 16, right: 24, left: 48, bottom: 32 }}>
               <defs>
                 <linearGradient id="zone1Gradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.6}/>
