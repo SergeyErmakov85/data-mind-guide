@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { FINAL_QUIZ, type FinalQuestion } from '@/data/quizzes/final';
 import { getProgress } from '@/lib/progress';
+import { createSafeStorage } from '@/lib/safeStorage';
 import { toast } from 'sonner';
 import { Clock, Lock, Award, AlertTriangle } from 'lucide-react';
 
@@ -43,13 +44,13 @@ function moduleScore(id: string): number {
 export default function AssessmentPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const storage = useMemo(
+    () => createSafeStorage(typeof localStorage !== 'undefined' ? localStorage : undefined),
+    [],
+  );
 
   const scores = useMemo(() => REQUIRED.map((r) => ({ ...r, score: moduleScore(r.id) })), []);
   const allow = scores.every((s) => s.score >= 80);
-
-  const [questions] = useState<FinalQuestion[]>(() =>
-    shuffle(FINAL_QUIZ).map((q) => ({ ...q, options: shuffle(q.options.map((o, i) => ({ o, i }))).map((x) => x.o), _origCorrect: q.correctIndex } as FinalQuestion)),
-  );
 
   // To preserve correctness after option-shuffle, recompute mapping per question
   const prepared = useMemo(() => {
@@ -65,6 +66,26 @@ export default function AssessmentPage() {
   const [answers, setAnswers] = useState<number[]>(() => Array(prepared.length).fill(-1));
   const [secondsLeft, setSecondsLeft] = useState(TIMER_SECONDS);
   const [submitted, setSubmitted] = useState(false);
+  const submittedRef = useRef(false);
+  const answersRef = useRef<number[]>(answers);
+  const secondsLeftRef = useRef(secondsLeft);
+  const userRef = useRef(user);
+
+  useEffect(() => {
+    submittedRef.current = submitted;
+  }, [submitted]);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   useEffect(() => {
     if (!started || submitted) return;
@@ -72,19 +93,18 @@ export default function AssessmentPage() {
       setSecondsLeft((s) => {
         if (s <= 1) {
           clearInterval(t);
-          handleSubmit();
+          void handleSubmit();
           return 0;
         }
         return s - 1;
       });
     }, 1000);
     return () => clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started, submitted]);
 
   const lastAttempt = (() => {
     try {
-      const raw = localStorage.getItem(ATTEMPT_KEY);
+      const raw = storage.getItem(ATTEMPT_KEY);
       return raw ? JSON.parse(raw) as { ts: string } : null;
     } catch { return null; }
   })();
@@ -96,14 +116,22 @@ export default function AssessmentPage() {
   })();
 
   async function handleSubmit() {
-    if (submitted) return;
+    if (submittedRef.current) return;
+    submittedRef.current = true;
     setSubmitted(true);
-    const correct = prepared.reduce((acc, q, i) => acc + (answers[i] === q.correctIndex ? 1 : 0), 0);
+    const answersSnap = answersRef.current;
+    const secondsLeftSnap = secondsLeftRef.current;
+    const userSnap = userRef.current;
+
+    const correct = prepared.reduce(
+      (acc, q, i) => acc + (answersSnap[i] === q.correctIndex ? 1 : 0),
+      0,
+    );
     const percent = Math.round((correct / prepared.length) * 100);
 
-    localStorage.setItem(ATTEMPT_KEY, JSON.stringify({ ts: new Date().toISOString(), percent }));
+    storage.setItem(ATTEMPT_KEY, JSON.stringify({ ts: new Date().toISOString(), percent }));
 
-    if (!user) {
+    if (!userSnap) {
       toast.error('Войдите, чтобы сохранить попытку');
       return;
     }
@@ -111,11 +139,11 @@ export default function AssessmentPage() {
     const { data: attempt, error } = await supabase
       .from('quiz_attempts')
       .insert({
-        user_id: user.id,
+        user_id: userSnap.id,
         quiz_id: 'final',
         score: percent,
         total_questions: prepared.length,
-        duration_seconds: TIMER_SECONDS - secondsLeft,
+        duration_seconds: TIMER_SECONDS - secondsLeftSnap,
       })
       .select('id')
       .single();
@@ -130,15 +158,15 @@ export default function AssessmentPage() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('display_name')
-        .eq('user_id', user.id)
+        .eq('user_id', userSnap.id)
         .maybeSingle();
 
-      const displayName = profile?.display_name || user.email?.split('@')[0] || 'Студент';
+      const displayName = profile?.display_name || userSnap.email?.split('@')[0] || 'Студент';
 
       const { data: cert, error: certErr } = await supabase
         .from('certificates')
         .insert({
-          user_id: user.id,
+          user_id: userSnap.id,
           attempt_id: attempt.id,
           score: percent,
           total_questions: prepared.length,
