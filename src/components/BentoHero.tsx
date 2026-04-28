@@ -99,58 +99,61 @@ const BentoHero = () => {
         </motion.article>
 
         {/* 2. NORMAL DISTRIBUTION VISUAL */}
-        <motion.article
-          variants={tile}
-          className={`${tileBase} col-span-1 md:col-span-5 md:row-span-2 bg-primary text-primary-foreground p-6 flex flex-col`}
-        >
-          <div className="font-mono text-xs uppercase tracking-widest opacity-70">
-            Fig. 02
-          </div>
-          <div className="flex-1 flex items-center justify-center">
-            <svg
-              viewBox="0 0 400 200"
-              className="w-full h-auto max-h-64"
-              role="img"
-              aria-label="Кривая нормального распределения"
-            >
-              {/* baseline */}
-              <line
-                x1="8"
-                y1="184"
-                x2="392"
-                y2="184"
-                stroke="currentColor"
-                strokeOpacity="0.3"
-                strokeWidth="1"
-              />
-              {/* mean line */}
-              <line
-                x1="200"
-                y1="20"
-                x2="200"
-                y2="184"
-                stroke="currentColor"
-                strokeOpacity="0.25"
-                strokeDasharray="4 4"
-                strokeWidth="1"
-              />
-              <path
-                d={bellPath}
-                fill="none"
-                stroke="hsl(0 0% 100%)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <div className="font-heading uppercase tracking-tight text-2xl md:text-3xl font-bold mt-4">
-            Распределения
-          </div>
-          <div className="font-mono text-xs uppercase tracking-widest opacity-70 mt-1">
-            μ = 0 · σ = 1
-          </div>
-        </motion.article>
+        <motion.div variants={tile} className="col-span-1 md:col-span-5 md:row-span-2">
+          <Link
+            to="/probability"
+            aria-label="Открыть раздел распределений"
+            className={`${tileBase} block bg-primary text-primary-foreground p-6 h-full group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
+          >
+            <div className="font-mono text-xs uppercase tracking-widest opacity-70">
+              Fig. 02
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <svg
+                viewBox="0 0 400 200"
+                className="w-full h-auto max-h-64"
+                role="img"
+                aria-label="Кривая нормального распределения"
+              >
+                {/* baseline */}
+                <line
+                  x1="8"
+                  y1="184"
+                  x2="392"
+                  y2="184"
+                  stroke="currentColor"
+                  strokeOpacity="0.3"
+                  strokeWidth="1"
+                />
+                {/* mean line */}
+                <line
+                  x1="200"
+                  y1="20"
+                  x2="200"
+                  y2="184"
+                  stroke="currentColor"
+                  strokeOpacity="0.25"
+                  strokeDasharray="4 4"
+                  strokeWidth="1"
+                />
+                <path
+                  d={bellPath}
+                  fill="none"
+                  stroke="hsl(0 0% 100%)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="font-heading uppercase tracking-tight text-2xl md:text-3xl font-bold mt-4">
+              Распределения
+            </div>
+            <div className="font-mono text-xs uppercase tracking-widest opacity-70 mt-1">
+              μ = 0 · σ = 1
+            </div>
+          </Link>
+        </motion.div>
 
         {/* 3. COUNTER LABS */}
         <motion.div variants={tile} className="col-span-1 md:col-span-3">
