@@ -1,5 +1,9 @@
+import { createSafeStorage } from '@/lib/safeStorage';
+
 // Progress tracking via localStorage
 const PROGRESS_KEY = 'matstat-progress';
+
+const storage = createSafeStorage(typeof localStorage !== 'undefined' ? localStorage : undefined);
 
 export interface ProgressData {
   completedLabs: string[];
@@ -17,7 +21,7 @@ const getDefaultProgress = (): ProgressData => ({
 
 export const getProgress = (): ProgressData => {
   try {
-    const stored = localStorage.getItem(PROGRESS_KEY);
+    const stored = storage.getItem(PROGRESS_KEY);
     if (!stored) return getDefaultProgress();
     return { ...getDefaultProgress(), ...JSON.parse(stored) };
   } catch {
@@ -27,7 +31,7 @@ export const getProgress = (): ProgressData => {
 
 const saveProgress = (data: ProgressData) => {
   data.lastActivity = new Date().toISOString();
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
+  storage.setItem(PROGRESS_KEY, JSON.stringify(data));
 };
 
 export const markLabCompleted = (labId: string) => {
@@ -78,5 +82,5 @@ export const getTotalProgress = (): { labs: number; quizzes: number; topics: num
 };
 
 export const resetProgress = () => {
-  localStorage.removeItem(PROGRESS_KEY);
+  storage.removeItem(PROGRESS_KEY);
 };

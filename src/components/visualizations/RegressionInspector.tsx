@@ -77,6 +77,7 @@ export const RegressionInspector: React.FC = () => {
     if (!ds) return;
     try {
       const res = await fetch(`/datasets/${ds.file}`);
+      if (!res.ok) throw new Error(`fetch(${ds.file}) failed: ${res.status}`);
       const text = await res.text();
       const parsed = Papa.parse<Row>(text, {
         header: true,
@@ -95,8 +96,8 @@ export const RegressionInspector: React.FC = () => {
       );
       setXVar(pair?.x ?? numericCols[0] ?? '');
       setYVar(pair?.y ?? numericCols[1] ?? '');
-    } catch {
-      /* noop */
+    } catch (e) {
+      console.error(e);
     }
   }, []);
 

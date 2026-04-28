@@ -3,6 +3,8 @@
  * Никаких внешних API — всё статично.
  */
 
+import { createSafeStorage } from '@/lib/safeStorage';
+
 export type DatasetDomain = 'personality' | 'clinical' | 'cognitive';
 
 export const DOMAIN_LABEL: Record<DatasetDomain, string> = {
@@ -171,9 +173,13 @@ export interface DatasetHandoff {
   csv: string;
 }
 
+const safeSessionStorage = createSafeStorage(
+  typeof sessionStorage !== 'undefined' ? sessionStorage : undefined,
+);
+
 export const stashDataset = (h: DatasetHandoff): void => {
   try {
-    sessionStorage.setItem(DATASET_HANDOFF_KEY, JSON.stringify(h));
+    safeSessionStorage.setItem(DATASET_HANDOFF_KEY, JSON.stringify(h));
   } catch {
     /* quota / private mode — silently ignore */
   }
@@ -181,11 +187,11 @@ export const stashDataset = (h: DatasetHandoff): void => {
 
 export const popDataset = (id?: string): DatasetHandoff | null => {
   try {
-    const raw = sessionStorage.getItem(DATASET_HANDOFF_KEY);
+    const raw = safeSessionStorage.getItem(DATASET_HANDOFF_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DatasetHandoff;
     if (id && parsed.id !== id) return null;
-    sessionStorage.removeItem(DATASET_HANDOFF_KEY);
+    safeSessionStorage.removeItem(DATASET_HANDOFF_KEY);
     return parsed;
   } catch {
     return null;

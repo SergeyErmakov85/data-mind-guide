@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Certificate {
   hash: string;
@@ -20,16 +21,34 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!hash) return;
-    (async () => {
-      const { data } = await supabase
-        .from('certificates')
-        .select('hash, display_name, score, total_questions, issued_at')
-        .eq('hash', hash)
-        .maybeSingle();
-      setCert(data);
+    if (!hash) {
+      setCert(null);
       setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('certificates')
+          .select('hash, display_name, score, total_questions, issued_at')
+          .eq('hash', hash)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error) {
+          toast.error('Не удалось проверить сертификат');
+          setCert(null);
+          return;
+        }
+        setCert(data);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [hash]);
 
   return (
