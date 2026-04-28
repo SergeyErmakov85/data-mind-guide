@@ -101,8 +101,8 @@ const BentoHero = () => {
         {/* 2. NORMAL DISTRIBUTION VISUAL */}
         <motion.div variants={tile} className="col-span-1 md:col-span-5 md:row-span-2">
           <Link
-            to="/probability"
-            aria-label="Открыть раздел распределений"
+            to="/visualizations"
+            aria-label="Открыть библиотеку распределений"
             className={`${tileBase} block bg-primary text-primary-foreground p-6 h-full group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
           >
             <div className="font-mono text-xs uppercase tracking-widest opacity-70">
