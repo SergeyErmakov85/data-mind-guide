@@ -15,8 +15,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Orbitron', 'system-ui', 'sans-serif'],
+        display: ['Orbitron', 'system-ui', 'sans-serif'],
+        body: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       borderWidth: {
@@ -89,6 +90,10 @@ export default {
         'soft': 'var(--shadow-md)',
         'brutal': '6px 6px 0 0 hsl(var(--foreground))',
         'brutal-sm': '3px 3px 0 0 hsl(var(--foreground))',
+        'glow': '0 0 20px hsl(var(--primary) / 0.35)',
+        'glow-sm': '0 0 10px hsl(var(--primary) / 0.25)',
+        'glow-accent': '0 0 20px hsl(var(--accent) / 0.35)',
+        'glass': '0 4px 24px rgba(0,0,0,0.3)',
       },
       keyframes: {
         "accordion-down": {
