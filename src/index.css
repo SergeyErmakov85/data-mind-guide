@@ -36,7 +36,7 @@
     --input: 222 47% 11%;
     --ring: 222 80% 18%;
 
-    --radius: 0;
+    --radius: 0.875rem;
 
     --success: 145 60% 40%;
     --success-foreground: 0 0% 100%;
@@ -52,10 +52,10 @@
     --gradient-warm: hsl(222 80% 18%);
     --gradient-hero: hsl(220 20% 97%);
 
-    --shadow-sm: 3px 3px 0 0 hsl(222 47% 11%);
-    --shadow-md: 6px 6px 0 0 hsl(222 47% 11%);
-    --shadow-lg: 8px 8px 0 0 hsl(222 47% 11%);
-    --shadow-card: 6px 6px 0 0 hsl(222 47% 11%);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.18);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.25);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
 
     --font-heading: 'Orbitron', system-ui, sans-serif;
     --font-body: 'IBM Plex Sans', system-ui, sans-serif;
@@ -100,10 +100,10 @@
     --input: 0 0% 98%;
     --ring: 0 0% 98%;
 
-    --shadow-sm: 3px 3px 0 0 hsl(0 0% 98%);
-    --shadow-md: 6px 6px 0 0 hsl(0 0% 98%);
-    --shadow-lg: 8px 8px 0 0 hsl(0 0% 98%);
-    --shadow-card: 6px 6px 0 0 hsl(0 0% 98%);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
 
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 0 0% 98%;
@@ -145,51 +145,72 @@
 
 @layer components {
   .card-academic {
-    @apply bg-card text-card-foreground border-3 border-foreground rounded-none shadow-brutal-sm;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    @apply bg-card/85 text-card-foreground;
+    border: 1px solid hsl(var(--border) / 0.25);
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .card-academic:hover {
-    @apply shadow-brutal;
-    transform: translate(-2px, -2px);
+    box-shadow: 0 6px 32px rgba(0,0,0,0.4), 0 0 20px hsl(var(--primary) / 0.12);
+    transform: translateY(-2px);
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground border-3 border-foreground rounded-none px-6 py-3 font-mono uppercase tracking-wider shadow-brutal-sm;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    @apply bg-primary text-primary-foreground px-6 py-3 font-mono uppercase tracking-wider;
+    border: 1px solid hsl(var(--primary) / 0.5);
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn-primary:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 0 hsl(var(--foreground));
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.35);
+    transform: translateY(-1px);
   }
 
   .btn-primary:active {
-    transform: translate(3px, 3px);
+    transform: translateY(1px);
     box-shadow: none;
   }
 
   .module-card {
-    @apply p-6 border-3 border-foreground rounded-none bg-card shadow-brutal-sm;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    @apply p-6 bg-card/85;
+    border: 1px solid hsl(var(--border) / 0.25);
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .module-card:hover {
-    @apply shadow-brutal;
-    transform: translate(-2px, -2px);
+    box-shadow: 0 6px 32px rgba(0,0,0,0.4), 0 0 20px hsl(var(--primary) / 0.12);
+    transform: translateY(-2px);
   }
 
   .stat-highlight {
-    @apply px-3 py-1 rounded-none text-sm font-mono font-semibold border-2 border-foreground bg-background text-foreground;
+    @apply px-3 py-1 text-sm font-mono font-semibold bg-background/60 text-foreground;
+    border: 1px solid hsl(var(--border) / 0.3);
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
   }
 
   .formula-box {
-    @apply p-4 my-4 rounded-none border-3 border-foreground bg-muted;
+    @apply p-4 my-4 bg-muted/50;
     font-family: 'KaTeX_Main', serif;
+    border: 1px solid hsl(var(--border) / 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .example-box {
-    @apply p-4 my-4 rounded-none border-3 border-foreground bg-secondary;
+    @apply p-4 my-4 bg-secondary/50;
+    border: 1px solid hsl(var(--border) / 0.2);
+    border-radius: 10px;
   }
 
   .nav-link {
