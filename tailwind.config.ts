@@ -23,6 +23,10 @@ export default {
       borderWidth: {
         '3': '3px',
       },
+      letterSpacing: {
+        'kinetic': '0.14em',
+        'kinetic-sm': '0.10em',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

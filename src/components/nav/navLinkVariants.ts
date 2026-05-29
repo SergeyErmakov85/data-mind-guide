@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
  * that previously lived in Header.tsx.
  */
 export const navLinkVariants = cva(
-  'flex items-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2',
+  'flex items-center gap-2 kinetic-transition focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2',
   {
     variants: {
       variant: {
@@ -28,11 +28,11 @@ export const navLinkVariants = cva(
       },
     },
     compoundVariants: [
-      // desktop active = solid primary pill
+      // desktop active = solid primary pill with glow
       {
         variant: 'desktop',
         active: true,
-        class: 'bg-primary text-primary-foreground',
+        class: 'bg-primary text-primary-foreground shadow-glow',
       },
       {
         variant: 'desktop',

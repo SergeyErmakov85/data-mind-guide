@@ -86,14 +86,14 @@ export const Header = () => {
       <a href="#main-content" className="skip-link">
         Перейти к содержимому
       </a>
-      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
         <div className="container flex h-16 items-center justify-between gap-3">
         {/* Logo — never wraps to two lines */}
-        <Link to="/" className="flex items-center gap-2 min-w-0 shrink">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+        <Link to="/" className="flex items-center gap-2 min-w-0 shrink kinetic-transition hover:opacity-80">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center shrink-0 kinetic-transition hover:shadow-glow">
             <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
           </div>
-          <span className="font-heading font-bold text-base sm:text-xl whitespace-nowrap truncate hidden xs:inline sm:inline">
+          <span className="font-heading font-bold text-base sm:text-xl whitespace-nowrap truncate hidden xs:inline sm:inline uppercase tracking-kinetic-sm">
             МатСтат для психологов
           </span>
         </Link>
