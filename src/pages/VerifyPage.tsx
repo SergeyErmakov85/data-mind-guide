@@ -31,8 +31,6 @@ export default function VerifyPage() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-        setLoading(true);
-        const { data, error } = await supabase
           .rpc('verify_certificate', { cert_hash: hash })
           .maybeSingle();
         if (cancelled) return;
@@ -42,6 +40,10 @@ export default function VerifyPage() {
           return;
         }
         setCert(data as Certificate | null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
     return () => {
       cancelled = true;
     };
