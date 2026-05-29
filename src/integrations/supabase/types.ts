@@ -194,6 +194,16 @@ export type Database = {
         Args: { _attempt_id: string; _user_id: string }
         Returns: string
       }
+      verify_certificate: {
+        Args: { cert_hash: string }
+        Returns: {
+          display_name: string
+          hash: string
+          issued_at: string
+          score: number
+          total_questions: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
