@@ -31,9 +31,9 @@ export default function VerifyPage() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('certificates')
-          .select('hash, display_name, score, total_questions, issued_at')
-          .eq('hash', hash)
+        setLoading(true);
+        const { data, error } = await supabase
+          .rpc('verify_certificate', { cert_hash: hash })
           .maybeSingle();
         if (cancelled) return;
         if (error) {
@@ -41,11 +41,7 @@ export default function VerifyPage() {
           setCert(null);
           return;
         }
-        setCert(data);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
+        setCert(data as Certificate | null);
     return () => {
       cancelled = true;
     };
