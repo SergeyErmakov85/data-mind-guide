@@ -40,6 +40,7 @@ import CertificatePage from "./pages/CertificatePage";
 import VerifyPage from "./pages/VerifyPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RequireAuth } from "./components/auth/RequireAuth";
+import { BackgroundBlobs } from "./components/BackgroundBlobs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,7 +51,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <BackgroundBlobs />
         <AuthProvider>
+          <div className="relative z-[1]">
           <Routes>
           {/* Main Pages */}
           <Route path="/" element={<Index />} />
@@ -115,6 +118,7 @@ const App = () => (
 
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
