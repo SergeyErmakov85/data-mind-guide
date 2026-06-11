@@ -108,9 +108,9 @@ const Index = () => {
       <BentoHero />
 
       {/* Probability Theory Section */}
-      <section className="container py-6">
+      <section className="container py-16">
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
@@ -226,10 +226,9 @@ const Index = () => {
         </motion.div>
       </section>
 
-
-
       {/* Download Section */}
-      <section className="container py-8">
+      <section className="container py-16">
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
