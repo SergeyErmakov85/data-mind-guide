@@ -21,6 +21,7 @@ import BinomialLabPage from "./pages/labs/BinomialLabPage";
 import ChiSquareLabPage from "./pages/labs/ChiSquareLabPage";
 import MultipleRegressionLabPage from "./pages/labs/MultipleRegressionLabPage";
 import EffectSizeLabPage from "./pages/labs/EffectSizeLabPage";
+import RiemannLabPage from "./pages/labs/RiemannLabPage";
 import DescriptiveStatsPage from "./pages/DescriptiveStatsPage";
 import CalculatorsPage from "./pages/CalculatorsPage";
 import SampleSizePage from "./pages/SampleSizePage";
@@ -76,6 +77,7 @@ const App = () => (
           <Route path="/labs/chisquare" element={<ChiSquareLabPage />} />
           <Route path="/labs/multiple-regression" element={<MultipleRegressionLabPage />} />
           <Route path="/labs/effect-size" element={<EffectSizeLabPage />} />
+          <Route path="/labs/riemann" element={<RiemannLabPage />} />
           
           {/* Courses */}
           <Route path="/calculators" element={<CalculatorsPage />} />

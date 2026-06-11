@@ -53,6 +53,7 @@ const labItems: NavItem[] = [
   { path: '/labs/binomial', label: 'Биномиальное распределение', icon: BarChart3, description: 'Вероятности и нормальное приближение' },
   { path: '/labs/chisquare', label: 'Хи-квадрат (χ²)', icon: Library, description: 'Таблицы сопряжённости и тест независимости' },
   { path: '/labs/nonparametric', label: 'Непараметрические тесты', icon: Sigma, description: 'Манна-Уитни, Спирмен и сравнение с параметрическими' },
+  { path: '/labs/riemann', label: 'Интеграл Римана', icon: Sigma, description: 'Накопленные психологические процессы через интеграл: тревога, стресс, восстановление' },
 ];
 
 const courseItems: NavItem[] = [
