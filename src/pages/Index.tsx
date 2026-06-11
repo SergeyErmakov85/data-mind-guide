@@ -226,53 +226,6 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Features */}
-      <section className="bg-muted/30 py-16">
-        <div className="container">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="font-heading text-3xl font-bold mb-4">Почему это работает</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Наш подход основан на принципах активного обучения и визуализации
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={staggerContainer}
-          >
-            {features.map((feature, index) => (
-              <motion.div key={index} variants={fadeUp} transition={{ duration: 0.4 }}>
-                <Card className="text-center border-0 bg-transparent shadow-none">
-                  <CardHeader>
-                    <motion.div
-                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <feature.icon className="w-8 h-8 text-primary" />
-                    </motion.div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
       {/* Download Section */}
       <section className="container py-8">
